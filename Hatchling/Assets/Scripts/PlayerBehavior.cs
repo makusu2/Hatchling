@@ -1,17 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
+using System.Linq;
 
 public class PlayerBehavior : MonoBehaviour {
 
     //public float speed; //shows up in editor
     
-    
+    private string[] collectibles = {"Apple","Wood","Coin"};
     
     private Rigidbody rb;
     private Camera cam;
     private CameraBehavior camBehavior;
+    private Inventory inventory;
     
     
     
@@ -20,6 +23,7 @@ public class PlayerBehavior : MonoBehaviour {
 		rb = GetComponent<Rigidbody>();
         cam = GetComponentInChildren(typeof(Camera)) as Camera;
         camBehavior = GetComponentInChildren<CameraBehavior>();
+        inventory = transform.Find("Inventory").GetComponent<Inventory>();
 	}
 	
 	// Update is called once per frame
@@ -44,6 +48,9 @@ public class PlayerBehavior : MonoBehaviour {
     void ClickOn(GameObject obj) {
         //print(obj);
         obj.SendMessage("GetClickedOn",SendMessageOptions.DontRequireReceiver);
+        if (collectibles.Contains(obj.tag)) {
+            inventory.AddItem(obj.tag);
+        }
     }
     
     void OnGUI(){

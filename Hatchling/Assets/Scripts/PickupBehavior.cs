@@ -6,14 +6,13 @@ public class PickupBehavior : MonoBehaviour {
     
     public int RespawnTime = 5;
     
-    
 	// Use this for initialization
 	void Start () {
 		
 	}
     
     void Disappear() {
-        this.GetComponent<SphereCollider>().enabled = false;
+        this.GetComponent<Collider>().enabled = false;
         this.GetComponent<MeshRenderer>().enabled = false;
     }
     
