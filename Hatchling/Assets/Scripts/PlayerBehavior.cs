@@ -5,11 +5,13 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 
+
 public class PlayerBehavior : MonoBehaviour {
 
     //public float speed; //shows up in editor
     
-    private string[] collectibles = {"Apple","Wood","Coin"};
+    
+    private string[] collectibles = {"Apple","Wood","Coin","Stone"};
     
     private Rigidbody rb;
     private Camera cam;
@@ -28,10 +30,6 @@ public class PlayerBehavior : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
-    
-    void FixedUpdate() {
         if (Input.GetButtonDown("Fire1")) {
             RaycastHit hit = camBehavior.GetRayHit();
             //print(hit.collider.name);
@@ -42,6 +40,17 @@ public class PlayerBehavior : MonoBehaviour {
                 
             }
         }
+        if (Input.GetKeyDown(KeyCode.Tab)) {
+            inventory.ToggleInventoryMenu();
+        }
+		
+	}
+    
+    void SetCursorFree(bool free) {
+        
+    }
+    
+    void FixedUpdate() {
         
     }
     

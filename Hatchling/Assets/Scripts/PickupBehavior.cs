@@ -17,7 +17,7 @@ public class PickupBehavior : MonoBehaviour {
     }
     
     void Reappear() {
-        this.GetComponent<SphereCollider>().enabled = true;
+        this.GetComponent<Collider>().enabled = true;
         this.GetComponent<MeshRenderer>().enabled = true;
     }
     

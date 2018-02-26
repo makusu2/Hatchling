@@ -1,0 +1,2 @@
+Hatchet=1*Stone,1*Branch
+SuperApple=2*Apple

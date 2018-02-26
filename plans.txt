@@ -1,0 +1,105 @@
+Crafting system
+
+Building system
+
+Enemies
+
+Dragon growth
+
+Some system of giving resources to dragon
+
+I want to express emotions as well
+
+Town where I can trade resources (get 80 apples for 100 wood or 80 wood for 100 apples or something)
+    Later on you can build the store yourself
+    
+Inventory UI where you can click on stuff - maybe integrate with crafting system
+    Okay, let's focus on what the game should have, not what's easiest to script
+        Only really simple stuff should be in the mobile crafting panel, like tools; but isn't even that too much?
+        
+
+Pause menu
+
+
+
+Dragon growth:
+    Stage 0:
+        Egg
+        Can't do SHIT
+        Needs food preparation and fire to grow
+            Maybe if you hatch it with fire but don't have food it DIES
+    Stage 1:
+        Newborn
+        At this point, it should be STRESSFUL keeping it alive; you shouldn't have enough resources to do other stuff like build
+    Stage 2:
+        Hatchling
+        Don't be afraid to stay on this step for a much longer time than the others
+    Stage 3:
+        Toddler
+        Needs fewer resources than before
+        VERY cute
+    Stage 4:
+        Adolescent
+        Should do something to help at this point; maybe keeps the fire lit or something
+        During this step, have it disappear
+            Have a trail into the woods or something to let the player know it's not a bug
+            Goal of this is to make the user miss the hatchling
+    Stage 5:
+        Adolescent
+        Returns larger than before
+            Maybe have it look very skinny but muscular where there is muscle
+        Maybe if you leave food in your "food bin" for too long, the hatchling eats it
+            HOWEVER, the more food it eats from the food bin, it gets more muscle and less skinny
+            This could also be the key to getting to the next stage
+    Stage 6: Young Adult
+        Muscular (not buff)
+        Some drama should happen at this stage; dunno what yet
+        Maybe leaves every other day to go hunting, then comes back and spends the other day eating what it got at home?
+            Or it's every third day, and on the third day it accompanies you on your travels
+                Maybe in the future make it so that you decide whether it follows you
+        Abilities:
+            Keeps the fire lit
+            Accompanies you
+    Stage 7: Adult
+        A lot like young adult
+        Very long stage
+        This stage should have it helping you out a lot, allowing you to build a lot, including a little village around your home
+    Stage 8: ??? Elder adult?
+        A lot like adult
+        Something should be different tho
+    Stage 9: Middle aged
+        Short stage; should let you know that something is changing
+    Stage 10: Getting Old (change name)
+        Defense should go down quite a bit; therefore, when you're out exploring with the hatchling, it'll get hurt easily
+    Stage 11: Elder
+        Stays at home
+        The children of the village should play with them
+        Another long stage
+    Stage 12: Dying
+        Heavy breathing
+        Clearly struggling
+        
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+Crafting:
+    Find in world:
+        Stones
+        Apples
+        Branches
+    Craft:
+        Hatchet - Branch and stone
+    Get from resources:
+        Wood - from tree, need hatchet
+        Stones - from rocks, need pickaxe
+        
