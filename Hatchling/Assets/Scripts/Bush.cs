@@ -10,9 +10,9 @@ public class Bush : MonoBehaviour {
     void SpawnFruit()
     {
         Vector3 fruitPos = new Vector3(this.transform.position.x+Random.Range(-1.0f,1.0f),
-                                       this.transform.position.y+Random.Range(0.0f,2.0f),
+                                       this.transform.position.y+Random.Range(0.0f,1.0f),
                                        this.transform.position.z+Random.Range(-1.0f,1.0f));
-        Instantiate(fruit,fruitPos,Quaternion.identity);
+        Instantiate(fruit,fruitPos,Quaternion.identity).transform.SetParent(transform);
     }
     
 	// Use this for initialization

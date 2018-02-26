@@ -5,6 +5,7 @@ using UnityEditor;
 using System.Linq;
 using UnityEngine.UI;
 using System.IO;
+using System;
 
 public class Inventory : MonoBehaviour {
     
@@ -17,9 +18,52 @@ public class Inventory : MonoBehaviour {
     private GameObject fullInventoryPanel;
     private GameObject craftingPanel;
     private GameObject FPC;
-    //public Crafting crafter;
     
     private Dictionary<string,Dictionary<string,int>> recipes;
+    
+    //public string CurrentlySelectedItem = "Hands";
+    
+    private int currentlySelectedSlot;
+    public int CurrentlySelectedSlot {
+        get { return currentlySelectedSlot;}
+        set {
+            string[] itemKeys = visibleBoxes.Keys.ToArray();
+            
+            int numSlots = itemKeys.Length;
+            if(numSlots>0) {
+                currentlySelectedSlot = value % numSlots;
+                //visibleBoxes.Keys.ToArray()[currentlySelectedSlot];
+                //CurrentlySelectedItem = visibleBoxes.Keys.ToArray()[currentlySelectedSlot];
+                string relevantItem = visibleBoxes.Keys.ToArray()[currentlySelectedSlot];
+                foreach(string key in visibleBoxes.Keys) {
+                    if (key.Equals(relevantItem)) {
+                        visibleBoxes[key].GetComponent<Image>().color = Color.yellow;
+                    }
+                    else {
+                        visibleBoxes[key].GetComponent<Image>().color = Color.white;
+                    }
+                }
+            }
+            else {
+                CurrentlySelectedItem = "Hands";
+            }
+        }
+    }
+    
+    public string CurrentlySelectedItem {
+        get { return visibleBoxes.Keys.ToArray()[CurrentlySelectedSlot]; }
+        set { 
+            try {
+                CurrentlySelectedSlot = Array.IndexOf(visibleBoxes.Keys.ToArray(),value);
+            }
+            catch(KeyNotFoundException e) {
+                Debug.LogError("Tried to select "+value+" on the inventory bar but it was not found");
+            }
+        }
+    }
+        
+    //public Crafting crafter;
+    
     
 	// Use this for initialization
 	void Start () {
@@ -46,12 +90,13 @@ public class Inventory : MonoBehaviour {
         }
         counts[name] += 1;
         if(!visibleBoxes.ContainsKey(name)) {
-            print("Hello1");
             GameObject box = GetBox(name);
-            print("Hello2");
             box.name = name+"Box";
             box.transform.SetParent(inventoryPanel.transform,false);
             visibleBoxes[name] = box;
+            if(visibleBoxes.Keys.ToArray().Length == 1) {
+                CurrentlySelectedSlot = 0;
+            }
         }
         visibleBoxes[name].transform.Find("Text").GetComponent<Text>().text = ""+counts[name];
     }
@@ -79,7 +124,6 @@ public class Inventory : MonoBehaviour {
             Debug.LogError("Could not find sprite for "+name);
             t = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Resources/InventoryIcons/unknown.png", typeof(Sprite)); //Draw an unknown thing
         }
-        print("hi3");
         return t;
     }
     

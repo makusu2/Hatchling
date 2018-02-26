@@ -26,8 +26,9 @@ public class PickupBehavior : MonoBehaviour {
         Invoke("Respawn",5); //Respawn in five seconds
     }*/
     
-    void GetClickedOn() {
+    void GetClickedOn(ClickArg args) {
         //print("Hi, I was clicked on");
+        args.player.inventory.AddItem(this.tag);
         Disappear();
         Invoke("Respawn",RespawnTime);
     }

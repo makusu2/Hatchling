@@ -16,8 +16,12 @@ public class PlayerBehavior : MonoBehaviour {
     private Rigidbody rb;
     private Camera cam;
     private CameraBehavior camBehavior;
-    private Inventory inventory;
+    public Inventory inventory;
     
+    public int attackLevel = 2;
+    public int defenseLevel = 2;
+    public int maxHealth = 10;
+    private float currentHealth;
     
     
 	// Use this for initialization
@@ -26,6 +30,7 @@ public class PlayerBehavior : MonoBehaviour {
         cam = GetComponentInChildren(typeof(Camera)) as Camera;
         camBehavior = GetComponentInChildren<CameraBehavior>();
         inventory = transform.Find("Inventory").GetComponent<Inventory>();
+        currentHealth = maxHealth;
 	}
 	
 	// Update is called once per frame
@@ -55,15 +60,15 @@ public class PlayerBehavior : MonoBehaviour {
     }
     
     void ClickOn(GameObject obj) {
-        //print(obj);
-        obj.SendMessage("GetClickedOn",SendMessageOptions.DontRequireReceiver);
-        if (collectibles.Contains(obj.tag)) {
+        obj.SendMessage("GetClickedOn",new ClickArg(this,"Hands"),SendMessageOptions.DontRequireReceiver);
+        /*if (collectibles.Contains(obj.tag)) {
             inventory.AddItem(obj.tag);
-        }
+        }*/
+        
     }
     
     void OnGUI(){
-        GUI.Box(new Rect(Screen.width/2,Screen.height/2, 10, 10), "");
+        GUI.Box(new Rect(Screen.width/2,Screen.height/2, 10, 10), ""); //Drawing crosshair
     }
     /*void OnTriggerEnter(Collider other) {
         if (other.gameObject.CompareTag("Apple")) {
