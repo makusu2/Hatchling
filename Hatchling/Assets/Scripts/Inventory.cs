@@ -36,7 +36,7 @@ public class Inventory : MonoBehaviour {
                     else {
                         visibleBoxes[key].GetComponent<Image>().color = Color.white;
                     }
-                }
+                } 
             }
             else {
                 CurrentlySelectedItem = "Hands";
@@ -81,6 +81,7 @@ public class Inventory : MonoBehaviour {
 	}
     
     public void AddItem(string name) {
+        
         if (!counts.ContainsKey(name)) {
             counts[name] = 0;
         }
