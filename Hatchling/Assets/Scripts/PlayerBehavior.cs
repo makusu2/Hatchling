@@ -16,7 +16,9 @@ public class PlayerBehavior : MonoBehaviour {
     private Rigidbody rb;
     private Camera cam;
     private CameraBehavior camBehavior;
+    private GameObject infoTextBox;
     public Inventory inventory;
+    
     
     public int attackLevel = 2;
     public int defenseLevel = 2;
@@ -31,6 +33,7 @@ public class PlayerBehavior : MonoBehaviour {
         camBehavior = GetComponentInChildren<CameraBehavior>();
         inventory = transform.Find("Inventory").GetComponent<Inventory>();
         currentHealth = maxHealth;
+        infoTextBox = GameObject.Find("InfoPanel").gameObject;
 	}
 	
 	// Update is called once per frame
@@ -48,11 +51,20 @@ public class PlayerBehavior : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Tab)) {
             inventory.ToggleInventoryMenu();
         }
+        for (int i=0;i<10;i++) {
+            if (Input.GetKeyDown(i.ToString())) {
+                inventory.CurrentlySelectedSlot = i-1; //minus 1 so that 1 is the first element rather than 0
+            }
+        }
 		
 	}
     
     void SetCursorFree(bool free) {
         
+    }
+    
+    public void SetInfoText(string s) {
+        infoTextBox.GetComponent<Text>().text = s;
     }
     
     void FixedUpdate() {

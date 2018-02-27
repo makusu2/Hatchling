@@ -92,6 +92,7 @@ public class Inventory : MonoBehaviour {
         if(!visibleBoxes.ContainsKey(name)) {
             GameObject box = GetBox(name);
             box.name = name+"Box";
+            box.transform.GetComponent<InfoHover>().infoStr = name;
             box.transform.SetParent(inventoryPanel.transform,false);
             visibleBoxes[name] = box;
             if(visibleBoxes.Keys.ToArray().Length == 1) {
