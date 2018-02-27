@@ -11,6 +11,8 @@ public class PickupBehavior : MonoBehaviour {
 		
 	}
     
+    public string PickupName;
+    
     void Disappear() {
         this.GetComponent<Collider>().enabled = false;
         this.GetComponent<MeshRenderer>().enabled = false;
@@ -21,14 +23,9 @@ public class PickupBehavior : MonoBehaviour {
         this.GetComponent<MeshRenderer>().enabled = true;
     }
     
-    /*void OnCollisionEnter() {
-        Disappear();
-        Invoke("Respawn",5); //Respawn in five seconds
-    }*/
-    
-    void GetClickedOn(ClickArg args) {
+    void GetClickedOn(GameObject player) {
         //print("Hi, I was clicked on");
-        args.player.inventory.AddItem(this.tag);
+        player.GetComponent<PlayerBehavior>().inventory.AddItem(PickupName);
         Disappear();
         Invoke("Respawn",RespawnTime);
     }

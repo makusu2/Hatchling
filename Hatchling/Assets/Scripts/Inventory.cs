@@ -14,14 +14,10 @@ public class Inventory : MonoBehaviour {
     private Dictionary<string,GameObject> visibleBoxes = new Dictionary<string,GameObject>();
     
     private GameObject player;
-    private GameObject inventoryPanel;
-    private GameObject fullInventoryPanel;
-    private GameObject craftingPanel;
-    private GameObject FPC;
+    
+    private HUD hud;
     
     private Dictionary<string,Dictionary<string,int>> recipes;
-    
-    //public string CurrentlySelectedItem = "Hands";
     
     private int currentlySelectedSlot;
     public int CurrentlySelectedSlot {
@@ -32,8 +28,6 @@ public class Inventory : MonoBehaviour {
             int numSlots = itemKeys.Length;
             if(numSlots>0) {
                 currentlySelectedSlot = value % numSlots;
-                //visibleBoxes.Keys.ToArray()[currentlySelectedSlot];
-                //CurrentlySelectedItem = visibleBoxes.Keys.ToArray()[currentlySelectedSlot];
                 string relevantItem = visibleBoxes.Keys.ToArray()[currentlySelectedSlot];
                 foreach(string key in visibleBoxes.Keys) {
                     if (key.Equals(relevantItem)) {
@@ -51,31 +45,33 @@ public class Inventory : MonoBehaviour {
     }
     
     public string CurrentlySelectedItem {
-        get { return visibleBoxes.Keys.ToArray()[CurrentlySelectedSlot]; }
+        get { 
+            try {
+                return visibleBoxes.Keys.ToArray()[CurrentlySelectedSlot]; 
+            }
+            catch(IndexOutOfRangeException) {
+                return "Hands";
+            }
+        }
         set { 
             try {
                 CurrentlySelectedSlot = Array.IndexOf(visibleBoxes.Keys.ToArray(),value);
             }
-            catch(KeyNotFoundException e) {
+            catch(KeyNotFoundException) {//
                 Debug.LogError("Tried to select "+value+" on the inventory bar but it was not found");
             }
         }
     }
-        
-    //public Crafting crafter;
     
+    public void SettleSelectedItem() {
+        CurrentlySelectedSlot = currentlySelectedSlot;
+    }
     
 	// Use this for initialization
 	void Start () {
-        //GameObject inventoryContainer = transform.parent.gameObject;
-		player = transform.parent.gameObject;
-        //player = MainPlayer.gameObject;
-        inventoryPanel = GameObject.Find("InventoryPanel").gameObject;
-        fullInventoryPanel = GameObject.Find("FullInventoryPanel").gameObject;
-        //crafter = new Crafting(this);
+        player = GameObject.FindWithTag("MainPlayer");
         recipes = LoadCraftingRecipes();
-        FPC = GameObject.Find("FPSController");
-        craftingPanel = fullInventoryPanel.transform.Find("CraftingPanel").gameObject;
+        hud = player.GetComponent<HUD>();
         CloseInventoryMenu();
 	}
 	
@@ -90,14 +86,7 @@ public class Inventory : MonoBehaviour {
         }
         counts[name] += 1;
         if(!visibleBoxes.ContainsKey(name)) {
-            GameObject box = GetBox(name);
-            box.name = name+"Box";
-            box.transform.GetComponent<InfoHover>().infoStr = name;
-            box.transform.SetParent(inventoryPanel.transform,false);
-            visibleBoxes[name] = box;
-            if(visibleBoxes.Keys.ToArray().Length == 1) {
-                CurrentlySelectedSlot = 0;
-            }
+            AddBox(name);
         }
         visibleBoxes[name].transform.Find("Text").GetComponent<Text>().text = ""+counts[name];
     }
@@ -112,9 +101,10 @@ public class Inventory : MonoBehaviour {
                 visibleBoxes.Remove(name);
             }
         }
-        catch (KeyNotFoundException k) {
+        catch (KeyNotFoundException) {
             Debug.Log("Attempted to remove item "+name+", but did not have any");
         }
+        SettleSelectedItem();
         
     }
     
@@ -128,11 +118,18 @@ public class Inventory : MonoBehaviour {
         return t;
     }
     
-    GameObject GetBox(string name){
+    void AddBox(string name){
         GameObject box = Instantiate(Resources.Load("InventoryIcons/BoxFab") as GameObject);
         Sprite spr = GetSprite(name);
         box.GetComponent<Image>().sprite = spr;
-        return box;
+        box.name = name+"Box";
+        box.transform.GetComponent<InfoHover>().infoStr = name;
+        box.transform.SetParent(hud.InventoryPanel.transform,false);
+        visibleBoxes[name] = box;
+        if(visibleBoxes.Keys.ToArray().Length == 1) {
+            CurrentlySelectedSlot = 0;
+        }
+        //return box;
     }
     
     public void CraftItem(string name) {
@@ -176,14 +173,14 @@ public class Inventory : MonoBehaviour {
     }
         
     public void UpdateCraftingRecipes() {
-        foreach(Transform child in craftingPanel.transform) {
+        foreach(Transform child in hud.CraftingPanel.transform) {
             Debug.Assert(child.GetComponent<Button>() != null);
             Destroy(child.gameObject);
         }
         string[] possibleCrafts = GetPossibleCrafts();
         foreach(string possibleCraft in possibleCrafts) {
             GameObject possibleCraftButton = Instantiate(Resources.Load("CraftingSelectionButton") as GameObject);
-            possibleCraftButton.transform.SetParent(craftingPanel.transform,false);
+            possibleCraftButton.transform.SetParent(hud.CraftingPanel.transform,false);
             possibleCraftButton.name = "Craft"+possibleCraft+"Button";
             possibleCraftButton.transform.Find("Text").GetComponent<Text>().text = possibleCraft;
             possibleCraftButton.GetComponent<CraftingSelection>().itemName = possibleCraft;
@@ -192,22 +189,16 @@ public class Inventory : MonoBehaviour {
     }
     public void OpenInventoryMenu() {
         //Update the crafting list
-        fullInventoryPanel.SetActive(true);
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        FPC.GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController> ().m_MouseLook.lockCursor = false;
+        hud.CursorFree = true;
         UpdateCraftingRecipes();
     }
     
     public void CloseInventoryMenu() {
-        fullInventoryPanel.SetActive(false);
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        FPC.GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController> ().m_MouseLook.lockCursor = true;
+        hud.CursorFree = false;
     }
     
     public void ToggleInventoryMenu() {
-        if(fullInventoryPanel.activeInHierarchy) {
+        if(hud.FullInventoryPanel.activeInHierarchy) {
             CloseInventoryMenu();
         }
         else {
@@ -215,11 +206,11 @@ public class Inventory : MonoBehaviour {
         }
     }
     
-    Dictionary<string,Dictionary<string,int>> LoadCraftingRecipes() {
+    static Dictionary<string,Dictionary<string,int>> LoadCraftingRecipes() {
         Dictionary<string,Dictionary<string,int>> recipes = new Dictionary<string,Dictionary<string,int>>();
         string path = "Assets/SettingsFiles/CraftingRecipes.txt";
         StreamReader reader = new StreamReader(path); 
-        string currentLine;
+        string currentLine;//
         while(true){
             currentLine = reader.ReadLine();
             if(currentLine != null){

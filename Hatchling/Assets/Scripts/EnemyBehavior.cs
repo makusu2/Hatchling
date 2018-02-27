@@ -32,11 +32,11 @@ public class EnemyBehavior : MonoBehaviour {
 	}
     
     
-    void GetClickedOn(ClickArg args) {
-        int damageToTake = (int)((float)(args.player.attackLevel) / (float)defenseLevel);
+    void GetClickedOn(GameObject player) {
+        int damageToTake = (int)((float)(player.GetComponent<PlayerBehavior>().attackLevel) / (float)defenseLevel);
         if (damageToTake >= currentHealth) {
             Health = 0;
-            Die(args.player);
+            Die(player.GetComponent<PlayerBehavior>());
         }
         else {
             Health -= damageToTake;
