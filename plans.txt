@@ -17,9 +17,63 @@ Inventory UI where you can click on stuff - maybe integrate with crafting system
     Okay, let's focus on what the game should have, not what's easiest to script
         Only really simple stuff should be in the mobile crafting panel, like tools; but isn't even that too much?
         
+So let's have a different model for each equippable item; would that be too difficult?
+        
 
 Pause menu
 
+Maybe each item should be a class; contains the inventory icon and 3d object and stuff like that
+    So, GameItem should extend MonoBehavior, and have different methods; also probably add a few interfaces
+    GameItems:
+        Equipable
+        Can be picked up
+        Should have an inventory icon
+        Should have a 3d model
+        I'd have to instantiate a new one for each in the game, and probably destroy it if you unequip it...
+        OH! What if I just set the equipped item model to CurrentlyEquippedItem, and on collision, have it send a "ItemCollideWith" to parent, which then looks at the actual item class to get information on what to do?
+
+I think that instead of the inventory selection we currently have, it might be better to have a "current item" slot. But I'm conflicted about that.
+    Nah, I like currently selected item. Maybe there should be a max number of slots like 5, and adding an item after 5 puts it in the full inventory panel
+
+Armor slots
+
+Design 3d objects in blender and show them in hand when they're selected
+
+Figure out how to make building work; should player have to be near something to build?
+
+Maybe the "first" item in your inventory is "hands", and you can never lose those? Plus you can just press 1 to go to "default" item selection, making things easier
+    No; I wanna do the left-click for hands thing
+
+click-and-drag to get items from fullinventory to inventory
+
+What if we do right-click to use the item, and left-click to use your hands?
+    So, left-click sends a "GetClickedOn", but right-click activates the item. Even for something like a sword, it will initiate the sword swing, and the enemy only takes damage once the sword collides with their body.
+
+Okay, so let's have a "Toolkit" item, and if you use it, it opens the building menu
+
+Let's get rid of the player's "attack" and "defense", and have their damage just be the damage of whatever weapon they're using
+
+Also, let's have only the hands and arms of player be visible, for simplicity and vive control
+
+Should the enemies also use collision (with their swords or whatever) for damage to player? Will it be too processor intensive? Hmm...
+
+Alright, graphic talk; fuckin, equipped items...
+    Do I want to have the same hand position no matter the item?
+        Left hand stays same, right hand changes for objects
+    Should there be an actual item that's a subclass of the player, or should there just be a mesh that's a component of the hands or something?
+    
+
+
+
+I really want to make the inventory standalone...
+
+End description:
+    You start off on some cutscene. Something about waking up. Sun starts to rise.
+    There are small resources nearby
+    Okay, so let's have a map
+    Maybe egg is hidden in a pile of stones?
+    
+    
 
 
 Dragon growth:
@@ -78,28 +132,4 @@ Dragon growth:
     Stage 12: Dying
         Heavy breathing
         Clearly struggling
-        
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-Crafting:
-    Find in world:
-        Stones
-        Apples
-        Branches
-    Craft:
-        Hatchet - Branch and stone
-    Get from resources:
-        Wood - from tree, need hatchet
-        Stones - from rocks, need pickaxe
         

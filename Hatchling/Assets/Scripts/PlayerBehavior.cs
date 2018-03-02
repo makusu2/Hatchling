@@ -16,6 +16,8 @@ public class PlayerBehavior : MonoBehaviour {
     public int maxHealth = 10;
     private float currentHealth;
     
+    public GameObject Equip;
+    
     public HUD Hud {get;set;}
     
     public string CurrentItem {

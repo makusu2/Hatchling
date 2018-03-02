@@ -191,11 +191,13 @@ public class Inventory : MonoBehaviour {
     public void OpenInventoryMenu() {
         //Update the crafting list
         hud.CursorFree = true;
+        hud.FullInventoryPanel.SetActive(true);
         UpdateCraftingRecipes();
     }
     
     public void CloseInventoryMenu() {
         hud.CursorFree = false;
+        hud.FullInventoryPanel.SetActive(false);
     }
     
     public void ToggleInventoryMenu() {

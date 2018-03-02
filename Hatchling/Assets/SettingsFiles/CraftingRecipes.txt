@@ -1,2 +1,7 @@
 Hatchet=1*Stone,1*Branch
 SuperApple=2*Apple
+Sword=1*Stone,5*Steel
+Bow=1*Branch,1*String
+Bucket=5*Wood
+Pickaxe=3*Stone,1*Branch
+Torch=1*Branch
