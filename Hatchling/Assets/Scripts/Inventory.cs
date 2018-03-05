@@ -6,12 +6,14 @@ using System.Linq;
 using UnityEngine.UI;
 using System.IO;
 using System;
+using System.Collections.Specialized;
 
 public class Inventory : MonoBehaviour {
     
 
     private Dictionary<string,int> counts = new Dictionary<string,int>();
     private Dictionary<string,GameObject> visibleBoxes = new Dictionary<string,GameObject>();
+    private LinkedList<string> itemOrder = new LinkedList<string>();
     
     private GameObject player;
     
@@ -23,13 +25,17 @@ public class Inventory : MonoBehaviour {
     public int CurrentlySelectedSlot {
         get { return currentlySelectedSlot;}
         set {
-            string[] itemKeys = visibleBoxes.Keys.ToArray();
+            string relevantItem = "None";
+            
+            string[] itemKeys = itemOrder.ToArray();
             
             int numSlots = itemKeys.Length;
+            
+            
             if(numSlots>0) {
                 currentlySelectedSlot = value % numSlots;
-                string relevantItem = visibleBoxes.Keys.ToArray()[currentlySelectedSlot];
-                foreach(string key in visibleBoxes.Keys) {
+                relevantItem = itemOrder.ToArray()[currentlySelectedSlot];
+                foreach(string key in itemOrder) {
                     if (key.Equals(relevantItem)) {
                         visibleBoxes[key].GetComponent<Image>().color = Color.yellow;
                     }
@@ -38,24 +44,26 @@ public class Inventory : MonoBehaviour {
                     }
                 } 
             }
-            else {
-                CurrentlySelectedItem = "Hands";
-            }
+            player.GetComponent<PlayerBehavior>().SetEquippedItem(relevantItem);
         }
     }
     
     public string CurrentlySelectedItem {
         get { 
             try {
-                return visibleBoxes.Keys.ToArray()[CurrentlySelectedSlot]; 
+                return itemOrder.ToArray()[CurrentlySelectedSlot]; 
             }
             catch(IndexOutOfRangeException) {
                 return "Hands";
             }
         }
         set { 
+            if (value.Equals("Hands")) {
+                CurrentlySelectedSlot = 0;
+                return;
+            }
             try {
-                CurrentlySelectedSlot = Array.IndexOf(visibleBoxes.Keys.ToArray(),value);
+                CurrentlySelectedSlot = Array.IndexOf(itemOrder.ToArray(),value);
             }
             catch(KeyNotFoundException) {//
                 Debug.LogError("Tried to select "+value+" on the inventory bar but it was not found");
@@ -81,7 +89,9 @@ public class Inventory : MonoBehaviour {
 	}
     
     public void AddItem(string name) {
-        
+        if (!itemOrder.Contains(name)) {
+            itemOrder.AddLast(name);
+        }
         if (!counts.ContainsKey(name)) {
             counts[name] = 0;
         }
@@ -90,6 +100,11 @@ public class Inventory : MonoBehaviour {
             AddBox(name);
         }
         visibleBoxes[name].transform.Find("Text").GetComponent<Text>().text = ""+counts[name];
+        
+        if (visibleBoxes.Keys.ToArray().Length == 1) {
+            
+            CurrentlySelectedSlot = 0;
+        }
     }
     
     public void RemoveItem(string name) {
@@ -98,6 +113,7 @@ public class Inventory : MonoBehaviour {
             visibleBoxes[name].transform.Find("Text").GetComponent<Text>().text = ""+counts[name];
             if(counts[name] == 0) {
                 counts.Remove(name);
+                itemOrder.Remove(name);
                 Destroy(visibleBoxes[name]);
                 visibleBoxes.Remove(name);
             }
@@ -110,7 +126,6 @@ public class Inventory : MonoBehaviour {
     }
     
     Sprite GetSprite(string name) {
-        //[MenuItem("AssetDatabase/LoadAssetExample")]
         Sprite t = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Resources/InventoryIcons/"+name+".png", typeof(Sprite));
         if(t == null) {
             Debug.LogError("Could not find sprite for "+name);
@@ -127,10 +142,6 @@ public class Inventory : MonoBehaviour {
         box.transform.GetComponent<InfoHover>().infoStr = name;
         box.transform.SetParent(hud.InventoryPanel.transform,false);
         visibleBoxes[name] = box;
-        if(visibleBoxes.Keys.ToArray().Length == 1) {
-            CurrentlySelectedSlot = 0;
-        }
-        //return box;
     }
     
     public void CraftItem(string name) {
