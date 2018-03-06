@@ -7,17 +7,24 @@ public class EnemyBehavior : MonoBehaviour {
 
     
     public int attackLevel = 2;
-    public int defenseLevel = 2;
-    public int maxHealth = 5;
-    private float currentHealth;
+    //public int defenseLevel = 2;
+    public int maxHealth = 15;
     public string drop = "Coin";
     
     
+    private float currentHealth;
     public float Health {
         get{return currentHealth;}
         set {
-            currentHealth = value;
-            transform.parent.gameObject.transform.Find("HealthText").GetComponent<TextMesh>().text = value.ToString();
+            if(value<=0) {
+                currentHealth = 0;
+                transform.parent.gameObject.transform.Find("HealthText").GetComponent<TextMesh>().text = "0";
+                Die(GameObject.FindWithTag("MainPlayer").GetComponent<PlayerBehavior>());
+            }
+            else {
+                currentHealth = value;
+                transform.parent.gameObject.transform.Find("HealthText").GetComponent<TextMesh>().text = value.ToString();
+            }
         }
     }
     
@@ -31,16 +38,10 @@ public class EnemyBehavior : MonoBehaviour {
 		
 	}
     
-    
-    void GetClickedOn(GameObject player) {
-        int damageToTake = (int)((float)(player.GetComponent<PlayerBehavior>().attackLevel) / (float)defenseLevel);
-        if (damageToTake >= currentHealth) {
-            Health = 0;
-            Die(player.GetComponent<PlayerBehavior>());
-        }
-        else {
-            Health -= damageToTake;
-        }
+    public void GetSwungAt(GameObject player) {
+        int damageToTake = player.GetComponent<PlayerBehavior>().AttackLevel;
+        Health -= damageToTake;
+        
     }
     
     void Die(PlayerBehavior player) {

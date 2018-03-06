@@ -12,10 +12,23 @@ public class PlayerBehavior : MonoBehaviour {
     public Inventory inventory;
     
     
-    public int attackLevel = 2;
-    public int defenseLevel = 2;
+    public int AttackLevel = 1;
+    //public int defenseLevel = 2;
     public int maxHealth = 10;
+    
     private float currentHealth;
+    public float Health {
+        get{return currentHealth;}
+        set {
+            if(value<=0) {
+                currentHealth = 0;
+                Die();
+            }
+            else {
+                currentHealth = value;
+            }
+        }
+    }
     
     public GameObject EquippedContainer;
     
@@ -41,6 +54,7 @@ public class PlayerBehavior : MonoBehaviour {
             if (transChild.gameObject.name == item) {
                 wasFound = true;
                 transChild.gameObject.SetActive(true);
+                AttackLevel = transChild.gameObject.GetComponent<HandItemBehavior>().AttackLevel;
             }
             else {
                 transChild.gameObject.SetActive(false);
@@ -53,6 +67,7 @@ public class PlayerBehavior : MonoBehaviour {
         else {
             UsingHands = true;
             Arms.GetComponent<Animator>().SetBool("WeaponIsOn",false);
+            AttackLevel = 1;
         }
     }
     
@@ -73,7 +88,7 @@ public class PlayerBehavior : MonoBehaviour {
 	void Start () {
         Arms = transform.Find("Arms05").gameObject;
         inventory = transform.Find("Inventory").GetComponent<Inventory>();
-        currentHealth = maxHealth;
+        Health = maxHealth;
         Hud = GetComponent<HUD>();
         EquippedContainer = GameObject.FindWithTag("EquipContainer").gameObject;
         SetEquippedItem("Hands");
@@ -129,4 +144,11 @@ public class PlayerBehavior : MonoBehaviour {
         GUI.Box(new Rect(Screen.width/2,Screen.height/2, 10, 10), ""); //Drawing crosshair
     }
     
+    public void GetDamaged(int attackLevel) {
+        Health -= attackLevel;
+    }
+    
+    void Die() {
+        print("YOU HAVE DIED");
+    }
 }
