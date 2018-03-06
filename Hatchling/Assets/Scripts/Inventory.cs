@@ -21,6 +21,8 @@ public class Inventory : MonoBehaviour {
     
     private Dictionary<string,Dictionary<string,int>> recipes;
     
+    private int maxNumItems = 3;
+    
     private int currentlySelectedSlot;
     public int CurrentlySelectedSlot {
         get { return currentlySelectedSlot;}
@@ -46,6 +48,18 @@ public class Inventory : MonoBehaviour {
             }
             player.GetComponent<PlayerBehavior>().SetEquippedItem(relevantItem);
         }
+    }
+    
+    public void MoveToExtraInventory(string name) {
+        visibleBoxes[name].transform.SetParent(hud.ExtraInventoryPanel.transform);
+        itemOrder.Remove(name);
+        SettleSelectedItem();
+    }
+    
+    public void MoveToNormalInventory(string name) {
+        visibleBoxes[name].transform.SetParent(hud.InventoryPanel.transform);
+        itemOrder.AddLast(name);
+        SettleSelectedItem();
     }
     
     public string CurrentlySelectedItem {
@@ -101,9 +115,12 @@ public class Inventory : MonoBehaviour {
         }
         visibleBoxes[name].transform.Find("Text").GetComponent<Text>().text = ""+counts[name];
         
-        if (visibleBoxes.Keys.ToArray().Length == 1) {
+        if (itemOrder.ToArray().Length == 1) {
             
             CurrentlySelectedSlot = 0;
+        }
+        if (itemOrder.ToArray().Length > maxNumItems) {
+            MoveToExtraInventory(name);
         }
     }
     

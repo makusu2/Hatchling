@@ -11,10 +11,18 @@ public class PlayerBehavior : MonoBehaviour {
 
     public Inventory inventory;
     
-    
-    public int AttackLevel = 1;
+    private int attackLevel;
+    public int AttackLevel {
+        get {
+            return attackLevel;
+        }
+        set {
+            attackLevel = value;
+            Hud.SetAttackStat(value);
+        }
+    }
     //public int defenseLevel = 2;
-    public int maxHealth = 10;
+    public int maxHealth = 100;
     
     private float currentHealth;
     public float Health {
@@ -22,9 +30,11 @@ public class PlayerBehavior : MonoBehaviour {
         set {
             if(value<=0) {
                 currentHealth = 0;
+                Hud.SetHealthStat(0);
                 Die();
             }
             else {
+                Hud.SetHealthStat((int)value);
                 currentHealth = value;
             }
         }
@@ -71,7 +81,7 @@ public class PlayerBehavior : MonoBehaviour {
         }
     }
     
-    public HUD Hud {get;set;}
+    public HUD Hud;
     
     public string CurrentItem {
         get {
@@ -86,10 +96,10 @@ public class PlayerBehavior : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
+        Hud = GetComponent<HUD>();
         Arms = transform.Find("Arms05").gameObject;
         inventory = transform.Find("Inventory").GetComponent<Inventory>();
         Health = maxHealth;
-        Hud = GetComponent<HUD>();
         EquippedContainer = GameObject.FindWithTag("EquipContainer").gameObject;
         SetEquippedItem("Hands");
 	}
@@ -113,7 +123,6 @@ public class PlayerBehavior : MonoBehaviour {
         }
         for (int i=0;i<10;i++) {
             if (Input.GetKeyDown(i.ToString())) {
-                //print("Selecting slot: "+(i-1).ToString());
                 inventory.CurrentlySelectedSlot = i-1; //minus 1 so that 1 is the first element rather than 0
             }
         }
