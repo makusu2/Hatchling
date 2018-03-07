@@ -40,6 +40,20 @@ public class PlayerBehavior : MonoBehaviour {
         }
     }
     
+    
+    public GameObject HeldItemObject {
+        get {
+            foreach(Transform transChild in EquippedContainer.transform) {
+                if (transChild.gameObject.activeInHierarchy) {
+                    return transChild.gameObject;
+                }
+            }
+            throw new NullReferenceException();
+        }
+        set {}
+    }
+            
+    
     public GameObject EquippedContainer;
     
     public GameObject Arms;
@@ -64,7 +78,12 @@ public class PlayerBehavior : MonoBehaviour {
             if (transChild.gameObject.name == item) {
                 wasFound = true;
                 transChild.gameObject.SetActive(true);
-                AttackLevel = transChild.gameObject.GetComponent<HandItemBehavior>().AttackLevel;
+                try {
+                    AttackLevel = transChild.gameObject.GetComponent<HandItemBehavior>().AttackLevel;
+                }
+                catch(NullReferenceException) {
+                    AttackLevel = 1;
+                }
             }
             else {
                 transChild.gameObject.SetActive(false);
@@ -106,6 +125,19 @@ public class PlayerBehavior : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (inventory.PreparingBuild) {
+            if (Input.GetButtonDown("Fire1")) {
+                inventory.CompleteBuildItem();
+            }
+            else {
+                RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
+                Vector3 newPosition = hit.point;
+                newPosition.y = newPosition.y + inventory.PrepareBuildObject.GetComponent<Renderer>().bounds.size.y / 2.0f;
+                inventory.PrepareBuildObject.transform.position = newPosition;
+                //Update location
+            }
+            return;
+        }
         if (Input.GetButtonDown("Fire1")) {
             RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
             try {
@@ -140,7 +172,8 @@ public class PlayerBehavior : MonoBehaviour {
         }
         else {
             //swing item
-            Arms.GetComponent<Animator>().SetTrigger("Swing");
+            HeldItemObject.SendMessage("ActivateItem",SendMessageOptions.RequireReceiver);
+            //Arms.GetComponent<Animator>().SetTrigger("Swing");
         }
     }
     

@@ -19,7 +19,12 @@ public class Inventory : MonoBehaviour {
     
     private HUD hud;
     
-    private Dictionary<string,Dictionary<string,int>> recipes;
+    private Dictionary<string,Dictionary<string,int>> craftingRecipes;
+    private Dictionary<string,Dictionary<string,int>> buildingRecipes;
+    
+    public GameObject PrepareBuildObject;
+    public bool PreparingBuild = false;
+    
     
     private int maxNumItems = 3;
     
@@ -92,7 +97,8 @@ public class Inventory : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         player = GameObject.FindWithTag("MainPlayer");
-        recipes = LoadCraftingRecipes();
+        craftingRecipes = LoadCraftingRecipes();
+        buildingRecipes = LoadBuildingRecipes();
         hud = player.GetComponent<HUD>();
         CloseInventoryMenu();
 	}
@@ -145,6 +151,9 @@ public class Inventory : MonoBehaviour {
     Sprite GetSprite(string name) {
         Sprite t = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Resources/InventoryIcons/"+name+".png", typeof(Sprite));
         if(t == null) {
+            t = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Resources/BuildingIcons/"+name+".png", typeof(Sprite)); //not currently using
+        }
+        if (t == null) {
             Debug.LogError("Could not find sprite for "+name);
             t = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Resources/InventoryIcons/unknown.png", typeof(Sprite)); //Draw an unknown thing
         }
@@ -161,8 +170,19 @@ public class Inventory : MonoBehaviour {
         visibleBoxes[name] = box;
     }
     
+    /*void AddBuildingBox(string name) {
+        GameObject box = Instantiate(Resources.Load("InventoryIcons/BoxFab") as GameObject);
+        Sprite spr = GetSprite(name);
+        box.GetComponent<Image>().sprite = spr;
+        box.name = name+"Box";
+        box.transform.GetComponent<InfoHover>().infoStr = name;
+        box.transform.SetParent(hud.BuildingPanel.transform,false);
+        visibleBoxes[name] = box;
+        
+    }*/
+    
     public void CraftItem(string name) {
-        Dictionary<string,int> ingredients = recipes[name];
+        Dictionary<string,int> ingredients = craftingRecipes[name];
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
             string ingredient = ingredientPair.Key;
             int count = ingredientPair.Value;
@@ -174,18 +194,61 @@ public class Inventory : MonoBehaviour {
         UpdateCraftingRecipes();
     }
     
+    
+    
+    
+    
+    
+    public void PrepareBuildItem(string name) {
+        CloseBuildingMenu();
+        PrepareBuildObject = Instantiate(Resources.Load(name) as GameObject);//load object from resources
+        PrepareBuildObject.GetComponent<Collider>().enabled = false;
+        PreparingBuild = true;
+        //the rest should be taken care of in player's fixedupdate
+    }
+    public void CompleteBuildItem() {
+        PreparingBuild = false;
+        PrepareBuildObject.GetComponent<Collider>().enabled = true;
+        //might need to do more here
+    }
+    
     public string[] GetPossibleCrafts() {
         List<string> possibleCrafts = new List<string>();
-        foreach(string possibleCraft in recipes.Keys) {
+        foreach(string possibleCraft in craftingRecipes.Keys) {
             if(CanCraftItem(possibleCraft)) {
                 possibleCrafts.Add(possibleCraft);
             }
         }
         return possibleCrafts.ToArray();
     }
+    public string[] GetPossibleBuilds() {
+        List<string> possibleBuilds = new List<string>();
+        foreach(string possibleBuild in buildingRecipes.Keys) {
+            if(CanBuildItem(possibleBuild)) {
+                possibleBuilds.Add(possibleBuild);
+            }
+        }
+        return possibleBuilds.ToArray();
+    }
         
     public bool CanCraftItem(string possibleCraft) {
-        Dictionary<string,int> ingredients = recipes[possibleCraft];
+        Dictionary<string,int> ingredients = craftingRecipes[possibleCraft];
+        foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
+            string ingredient = ingredientPair.Key;
+            int count = ingredientPair.Value;
+            try {
+                if(counts[ingredient] < count) {
+                    return false;
+                }
+            }
+            catch(KeyNotFoundException) { //item isn't in inventory, therefore player has 0
+                return false;
+            }
+        }
+        return true;
+    }
+    public bool CanBuildItem(string possibleBuild) {
+        Dictionary<string,int> ingredients = buildingRecipes[possibleBuild];
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
             string ingredient = ingredientPair.Key;
             int count = ingredientPair.Value;
@@ -214,7 +277,20 @@ public class Inventory : MonoBehaviour {
             possibleCraftButton.transform.Find("Text").GetComponent<Text>().text = possibleCraft;
             possibleCraftButton.GetComponent<CraftingSelection>().itemName = possibleCraft;
         }
-        
+    }
+    public void UpdateBuildingRecipes() {
+        foreach(Transform child in hud.BuildingPanel.transform) {
+            Debug.Assert(child.GetComponent<Button>() != null);
+            Destroy(child.gameObject);
+        }
+        string[] possibleBuilds = GetPossibleBuilds();
+        foreach(string possibleBuild in possibleBuilds) {
+            GameObject possibleBuildButton = Instantiate(Resources.Load("BuildingSelectionButton") as GameObject);
+            possibleBuildButton.transform.SetParent(hud.BuildingPanel.transform,false);
+            possibleBuildButton.name = "Build"+possibleBuild+"Button";
+            possibleBuildButton.transform.Find("Text").GetComponent<Text>().text = possibleBuild;
+            possibleBuildButton.GetComponent<BuildingSelection>().itemName = possibleBuild;
+        }
     }
     public void OpenInventoryMenu() {
         //Update the crafting list
@@ -227,6 +303,15 @@ public class Inventory : MonoBehaviour {
         hud.CursorFree = false;
         hud.FullInventoryPanel.SetActive(false);
     }
+    public void OpenBuildingMenu() {
+        hud.CursorFree = true;
+        hud.BuildingPanel.SetActive(true);
+        UpdateBuildingRecipes();
+    }
+    public void CloseBuildingMenu() {
+        hud.CursorFree = false;
+        hud.BuildingPanel.SetActive(false);
+    }
     
     public void ToggleInventoryMenu() {
         if(hud.FullInventoryPanel.activeInHierarchy) {
@@ -236,10 +321,44 @@ public class Inventory : MonoBehaviour {
             OpenInventoryMenu();
         }
     }
+    public void ToggleBuildingMenu() {
+        if (hud.BuildingPanel.activeInHierarchy) {
+            CloseBuildingMenu();
+        }
+        else {
+            OpenBuildingMenu();
+        }
+    }
     
     static Dictionary<string,Dictionary<string,int>> LoadCraftingRecipes() {
         Dictionary<string,Dictionary<string,int>> recipes = new Dictionary<string,Dictionary<string,int>>();
         string path = "Assets/SettingsFiles/CraftingRecipes.txt";
+        StreamReader reader = new StreamReader(path); 
+        string currentLine;//
+        while(true){
+            currentLine = reader.ReadLine();
+            if(currentLine != null){
+                string toCreate = currentLine.Split('=')[0];
+                string remainder = currentLine.Split('=')[1];
+                string[] components = remainder.Split(',');
+                recipes[toCreate] = new Dictionary<string,int>();
+                for(int i=0;i<components.Length;i++) {
+                    string comp = components[i];
+                    int count = int.Parse(comp.Split('*')[0]);
+                    string compMat = comp.Split('*')[1];
+                    recipes[toCreate][compMat] = count;
+                }
+            }
+            else{
+                break;
+            }
+        }
+        reader.Close();
+        return(recipes);
+    }
+    static Dictionary<string,Dictionary<string,int>> LoadBuildingRecipes() {
+        Dictionary<string,Dictionary<string,int>> recipes = new Dictionary<string,Dictionary<string,int>>();
+        string path = "Assets/SettingsFiles/BuildingRecipes.txt";
         StreamReader reader = new StreamReader(path); 
         string currentLine;//
         while(true){

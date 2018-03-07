@@ -5,3 +5,4 @@ Bow=1*Branch,1*String
 Bucket=5*Wood
 Pickaxe=3*Stone,1*Branch
 Torch=1*Branch
+Toolkit = 1*Stone,1*Branch,1*Wood
