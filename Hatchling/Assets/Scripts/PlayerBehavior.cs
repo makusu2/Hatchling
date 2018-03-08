@@ -132,7 +132,7 @@ public class PlayerBehavior : MonoBehaviour {
             else {
                 RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
                 Vector3 newPosition = hit.point;
-                newPosition.y = newPosition.y + inventory.PrepareBuildObject.GetComponent<Renderer>().bounds.size.y / 2.0f;
+                newPosition.y = newPosition.y + inventory.PrepareBuildOffset;
                 inventory.PrepareBuildObject.transform.position = newPosition;
                 //Update location
             }

@@ -23,10 +23,11 @@ public class Inventory : MonoBehaviour {
     private Dictionary<string,Dictionary<string,int>> buildingRecipes;
     
     public GameObject PrepareBuildObject;
+    public float PrepareBuildOffset;
     public bool PreparingBuild = false;
     
     
-    private int maxNumItems = 3;
+    private int maxNumItems = 5;
     
     private int currentlySelectedSlot;
     public int CurrentlySelectedSlot {
@@ -201,7 +202,15 @@ public class Inventory : MonoBehaviour {
     
     public void PrepareBuildItem(string name) {
         CloseBuildingMenu();
-        PrepareBuildObject = Instantiate(Resources.Load(name) as GameObject);//load object from resources
+        try {
+            GameObject prepareBuildTemplate = Resources.Load(name) as GameObject; //Have to check bounds from this since they don't get updated in the instantiated version
+            PrepareBuildObject = Instantiate(prepareBuildTemplate);//load object from resources
+            PrepareBuildOffset = prepareBuildTemplate.GetComponent<Collider>().bounds.min.y;
+        }
+        catch(NullReferenceException) {
+            Debug.Log("Tried to prepare build "+name+" but couldn't find it in resources");
+            return;
+        }
         PrepareBuildObject.GetComponent<Collider>().enabled = false;
         PreparingBuild = true;
         //the rest should be taken care of in player's fixedupdate
