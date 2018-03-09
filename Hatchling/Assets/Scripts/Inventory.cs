@@ -31,10 +31,53 @@ public class Inventory : MonoBehaviour {
     
     public readonly int maxNumItems = 5;
     
+    public readonly int maxExtraNumItems = 10;
+    
+    public int maxTotalNumItems {
+        get {
+            return maxNumItems + maxExtraNumItems;
+        }
+    }
+    
+    
     public int CurrentNumItems {
         get {
             return itemOrder.ToArray().Length;
         }
+    }
+    
+    public int CurrentExtraNumItems {
+        get {
+            return visibleBoxes.Keys.ToArray().Length - itemOrder.ToArray().Length;
+        }
+    }
+    
+    public int CurrentTotalNumItems {
+        get {
+            return visibleBoxes.Keys.ToArray().Length;
+        }
+    }
+    
+    public bool NormalInventoryFull {
+        get {
+            return CurrentNumItems >= maxNumItems;
+        }
+    }
+    
+    public bool ExtraInventoryFull {
+        get {
+            return CurrentExtraNumItems >= maxExtraNumItems;
+        }
+    }
+    
+    public bool TotalInventoryFull {
+        get {
+            return CurrentTotalNumItems >= maxTotalNumItems;
+        }
+    }
+    
+    public void DiscardItem(string name) {
+        //TODO instantiate the item and place it next to player. This will be called when the user willingly drops an item, or attempts to pick an item up despite not having the room.
     }
     
     private int currentlySelectedSlot;
@@ -65,14 +108,20 @@ public class Inventory : MonoBehaviour {
     }
     
     public void MoveToExtraInventory(string name) {
+        if (ExtraInventoryFull) {
+            DiscardItem(name);
+            //TODO make a noise or something explaining that it's full
+            return;
+        }
         visibleBoxes[name].transform.SetParent(hud.ExtraInventoryPanel.transform);
         itemOrder.Remove(name);
         SettleSelectedItem();
     }
     
     public void MoveToNormalInventory(string name) {
-        if (CurrentNumItems >= maxNumItems) {
-            Debug.LogError("Tried to move "+name+" to normal inventory but it was full");
+        if (NormalInventoryFull) {
+            DiscardItem(name);
+            //TODO make a noise or something explaining that it's full
             return;
         }
         visibleBoxes[name].transform.SetParent(hud.InventoryPanel.transform);
@@ -122,6 +171,7 @@ public class Inventory : MonoBehaviour {
 	}
     
     public void AddItem(string name) {
+        //TODO make sure that if the item exists in extra, it goes to extra, not normal
         if (!itemOrder.Contains(name)) {
             itemOrder.AddLast(name);
         }
@@ -138,8 +188,13 @@ public class Inventory : MonoBehaviour {
             
             CurrentlySelectedSlot = 0;
         }
-        if (itemOrder.ToArray().Length > maxNumItems) {
-            MoveToExtraInventory(name);
+        if (NormalInventoryFull) {
+            if (ExtraInventoryFull) {
+                DiscardItem(name);
+            }
+            else {
+                MoveToExtraInventory(name);
+            }
         }
     }
     

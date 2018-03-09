@@ -1,7 +1,3 @@
-Building system
-
-Enemies
-
 Dragon growth
 
 Some system of giving resources to dragon
@@ -17,6 +13,29 @@ So let's have a different model for each equippable item; would that be too diff
 
 Pause menu
 
+Armor slots
+
+Remember to make variables static if they're going to stay the same
+
+
+Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" and then you can just "deposit" stuff and eventually houses will appear and stuff?
+
+Add scroll bar to menus that can run out of room
+
+Hunger and thirst system
+
+
+
+
+
+
+
+Completed:
+
+
+Okay, so let's have a "Toolkit" item, and if you use it, it opens the building menu
+    But this is not for houses or anything, just small walls that the user can make with what they choose; the other guy is for villages
+    
 Maybe each item should be a class; contains the inventory icon and 3d object and stuff like that
     So, GameItem should extend MonoBehavior, and have different methods; also probably add a few interfaces
     GameItems:
@@ -27,34 +46,9 @@ Maybe each item should be a class; contains the inventory icon and 3d object and
         I'd have to instantiate a new one for each in the game, and probably destroy it if you unequip it...
         OH! What if I just set the equipped item model to CurrentlyEquippedItem, and on collision, have it send a "ItemCollideWith" to parent, which then looks at the actual item class to get information on what to do?
 
+Enemies
 
-Armor slots
-
-Design 3d objects in blender and show them in hand when they're selected
-
-Figure out how to make building work; should player have to be near something to build?
-
-
-click-and-drag to get items from fullinventory to inventory
-
-Remember to make variables static if they're going to stay the same
-
-
-Okay, so let's have a "Toolkit" item, and if you use it, it opens the building menu
-    But this is not for houses or anything, just small walls that the user can make with what they choose; the other guy is for villages
-
-Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" and then you can just "deposit" stuff and eventually houses will appear and stuff?
-
-Add scroll bar to menus that can run out of room
-
-
-
-
-
-
-
-
-Completed:
+Building System
 
 Crafting system
 
