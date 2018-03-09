@@ -140,7 +140,7 @@ public class PlayerBehavior : MonoBehaviour {
             }
             return;
         }
-        if (Input.GetButtonDown("Fire1")) {
+        if (!Hud.UsingUI && Input.GetButtonDown("Fire1")) {
             RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
             try {
                 ClickOn(hit.transform.gameObject);
@@ -149,11 +149,14 @@ public class PlayerBehavior : MonoBehaviour {
                 //Nothing was hit, don't need to do anything
             }
         }
-        if (Input.GetButtonDown("Fire2")) { 
+        if (!Hud.UsingUI && Input.GetButtonDown("Fire2")) { 
             UseItem();
         }
         if (Input.GetKeyDown(KeyCode.Tab)) {
             Hud.InventoryMenuOpen = !Hud.InventoryMenuOpen;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            Hud.PauseMenuOpen = !Hud.PauseMenuOpen;
         }
         for (int i=0;i<10;i++) {
             if (Input.GetKeyDown(i.ToString())) {

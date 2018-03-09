@@ -77,7 +77,10 @@ public class Inventory : MonoBehaviour {
     }
     
     public void DiscardItem(string name) {
-        //TODO instantiate the item and place it next to player. This will be called when the user willingly drops an item, or attempts to pick an item up despite not having the room.
+        while(counts.ContainsKey(name)){
+            //TODO instantiate the item and place it next to player. This will be called when the user willingly drops an item, or attempts to pick an item up despite not having the room.
+            RemoveItem(name);
+        }
     }
     
     private int currentlySelectedSlot;
