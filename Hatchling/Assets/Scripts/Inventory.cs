@@ -22,12 +22,20 @@ public class Inventory : MonoBehaviour {
     private Dictionary<string,Dictionary<string,int>> craftingRecipes;
     private Dictionary<string,Dictionary<string,int>> buildingRecipes;
     
+    [System.NonSerialized]
     public GameObject PrepareBuildObject;
+    [System.NonSerialized]
     public float PrepareBuildOffset;
+    [System.NonSerialized]
     public bool PreparingBuild = false;
     
+    public readonly int maxNumItems = 5;
     
-    private int maxNumItems = 5;
+    public int CurrentNumItems {
+        get {
+            return itemOrder.ToArray().Length;
+        }
+    }
     
     private int currentlySelectedSlot;
     public int CurrentlySelectedSlot {
@@ -63,6 +71,10 @@ public class Inventory : MonoBehaviour {
     }
     
     public void MoveToNormalInventory(string name) {
+        if (CurrentNumItems >= maxNumItems) {
+            Debug.LogError("Tried to move "+name+" to normal inventory but it was full");
+            return;
+        }
         visibleBoxes[name].transform.SetParent(hud.InventoryPanel.transform);
         itemOrder.AddLast(name);
         SettleSelectedItem();
@@ -101,7 +113,7 @@ public class Inventory : MonoBehaviour {
         craftingRecipes = LoadCraftingRecipes();
         buildingRecipes = LoadBuildingRecipes();
         hud = player.GetComponent<HUD>();
-        CloseInventoryMenu();
+        hud.InventoryMenuOpen = false;
 	}
 	
 	// Update is called once per frame
@@ -168,6 +180,7 @@ public class Inventory : MonoBehaviour {
         box.name = name+"Box";
         box.transform.GetComponent<InfoHover>().infoStr = name;
         box.transform.SetParent(hud.InventoryPanel.transform,false);
+        box.transform.GetComponent<InventoryIconBehavior>().Item = name;
         visibleBoxes[name] = box;
     }
     
@@ -201,7 +214,7 @@ public class Inventory : MonoBehaviour {
     
     
     public void PrepareBuildItem(string name) {
-        CloseBuildingMenu();
+        hud.BuildingMenuOpen = false;
         try {
             GameObject prepareBuildTemplate = Resources.Load(name) as GameObject; //Have to check bounds from this since they don't get updated in the instantiated version
             PrepareBuildObject = Instantiate(prepareBuildTemplate);//load object from resources
@@ -299,43 +312,6 @@ public class Inventory : MonoBehaviour {
             possibleBuildButton.name = "Build"+possibleBuild+"Button";
             possibleBuildButton.transform.Find("Text").GetComponent<Text>().text = possibleBuild;
             possibleBuildButton.GetComponent<BuildingSelection>().itemName = possibleBuild;
-        }
-    }
-    public void OpenInventoryMenu() {
-        //Update the crafting list
-        hud.CursorFree = true;
-        hud.FullInventoryPanel.SetActive(true);
-        UpdateCraftingRecipes();
-    }
-    
-    public void CloseInventoryMenu() {
-        hud.CursorFree = false;
-        hud.FullInventoryPanel.SetActive(false);
-    }
-    public void OpenBuildingMenu() {
-        hud.CursorFree = true;
-        hud.BuildingPanel.SetActive(true);
-        UpdateBuildingRecipes();
-    }
-    public void CloseBuildingMenu() {
-        hud.CursorFree = false;
-        hud.BuildingPanel.SetActive(false);
-    }
-    
-    public void ToggleInventoryMenu() {
-        if(hud.FullInventoryPanel.activeInHierarchy) {
-            CloseInventoryMenu();
-        }
-        else {
-            OpenInventoryMenu();
-        }
-    }
-    public void ToggleBuildingMenu() {
-        if (hud.BuildingPanel.activeInHierarchy) {
-            CloseBuildingMenu();
-        }
-        else {
-            OpenBuildingMenu();
         }
     }
     

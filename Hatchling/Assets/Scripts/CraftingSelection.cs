@@ -4,12 +4,17 @@ using UnityEngine;
 
 public class CraftingSelection : MonoBehaviour {
 
+    private GameObject player;
     private Inventory inventory;
     public string itemName;
     
-	// Use this for initialization
+    void Awake() {
+        player = GameObject.FindWithTag("MainPlayer");
+    }
+    
 	void Start () {
-        inventory = GameObject.Find("Inventory").GetComponent<Inventory>();
+        player = GameObject.FindWithTag("MainPlayer");
+        inventory = player.GetComponent<Inventory>();
 	}
 	
 	// Update is called once per frame

@@ -37,11 +37,20 @@ Figure out how to make building work; should player have to be near something to
 
 click-and-drag to get items from fullinventory to inventory
 
+Remember to make variables static if they're going to stay the same
+
 
 Okay, so let's have a "Toolkit" item, and if you use it, it opens the building menu
     But this is not for houses or anything, just small walls that the user can make with what they choose; the other guy is for villages
 
 Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" and then you can just "deposit" stuff and eventually houses will appear and stuff?
+
+Add scroll bar to menus that can run out of room
+
+
+
+
+
 
 
 

@@ -18,7 +18,6 @@ public class CameraBehavior : MonoBehaviour {
         Vector3 pos = transform.position;
         Vector3 fwd = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
-        //Debug.DrawRay(pos,fwd, Color.green);
         if(!Physics.Raycast(pos,fwd,out hit)) {
            
         }

@@ -10,6 +10,7 @@ using UnityEditor;
 public class PlayerBehavior : MonoBehaviour {
 
     public Inventory inventory;
+    public HUD Hud;
     
     private int attackLevel;
     public int AttackLevel {
@@ -100,7 +101,6 @@ public class PlayerBehavior : MonoBehaviour {
         }
     }
     
-    public HUD Hud;
     
     public string CurrentItem {
         get {
@@ -111,13 +111,15 @@ public class PlayerBehavior : MonoBehaviour {
         }
     }
     
-    
+    void Awake() {
+        Arms = GameObject.FindWithTag("Arms");
+        
+    }
     
 	// Use this for initialization
 	void Start () {
         Hud = GetComponent<HUD>();
-        Arms = transform.Find("Arms05").gameObject;
-        inventory = transform.Find("Inventory").GetComponent<Inventory>();
+        inventory = gameObject.GetComponent<Inventory>();
         Health = maxHealth;
         EquippedContainer = GameObject.FindWithTag("EquipContainer").gameObject;
         SetEquippedItem("Hands");
@@ -151,7 +153,7 @@ public class PlayerBehavior : MonoBehaviour {
             UseItem();
         }
         if (Input.GetKeyDown(KeyCode.Tab)) {
-            inventory.ToggleInventoryMenu();
+            Hud.InventoryMenuOpen = !Hud.InventoryMenuOpen;
         }
         for (int i=0;i<10;i++) {
             if (Input.GetKeyDown(i.ToString())) {
@@ -173,7 +175,6 @@ public class PlayerBehavior : MonoBehaviour {
         else {
             //swing item
             HeldItemObject.SendMessage("ActivateItem",SendMessageOptions.RequireReceiver);
-            //Arms.GetComponent<Animator>().SetTrigger("Swing");
         }
     }
     
