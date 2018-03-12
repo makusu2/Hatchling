@@ -8,9 +8,6 @@ I want to express emotions as well
 
         
 
-Pause menu
-
-Armor slots
 
 Remember to make variables static if they're going to stay the same
 
@@ -21,7 +18,6 @@ Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" 
 
 Add scroll bar to menus that can run out of room
 
-Hunger and thirst system
 
 
 
@@ -30,8 +26,20 @@ You need to commission stuff, bud
 
 
 
+    
+    
+    
+    
+    
+    
+    
 Completed:
 
+Pause menu
+
+Armor slots
+
+Hunger and thirst system
 
 Okay, so let's have a "Toolkit" item, and if you use it, it opens the building menu
     But this is not for houses or anything, just small walls that the user can make with what they choose; the other guy is for villages

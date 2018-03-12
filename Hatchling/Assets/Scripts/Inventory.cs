@@ -19,9 +19,8 @@ public class Inventory : MonoBehaviour {
         return counts[item];
     }
     
-    public Dictionary<string,GameObject> VisibleBoxes {
-        get {return visibleBoxes;}
-    }
+    public Dictionary<String,int> Counts { get { return counts;}}
+    public Dictionary<string,GameObject> VisibleBoxes {get {return visibleBoxes;}}
     
     private GameObject player;
     

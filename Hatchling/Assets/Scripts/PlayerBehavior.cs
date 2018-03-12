@@ -12,6 +12,13 @@ public class PlayerBehavior : MonoBehaviour {
     public Inventory inventory;
     public HUD Hud;
     
+    
+    private int currentUpdate = 0;
+    [SerializeField]
+    private int hungerDecreasePeriod = 200;
+    [SerializeField]
+    private int thirstDecreasePeriod = 100;
+    
     private int attackLevel;
     public int AttackLevel {
         get {
@@ -72,6 +79,17 @@ public class PlayerBehavior : MonoBehaviour {
         print("Collided with "+col.gameObject.name);
     }
     
+    void CorrectHeldItems() {
+        foreach(Transform transChild in EquippedContainer.transform) {
+            try {
+                transChild.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ;
+            }
+            catch(MissingComponentException) {
+                
+            }
+        }
+    }
+    
     public void SetEquippedItem(string item) {
         bool wasFound = false;
         
@@ -123,6 +141,9 @@ public class PlayerBehavior : MonoBehaviour {
         Health = maxHealth;
         EquippedContainer = GameObject.FindWithTag("EquipContainer").gameObject;
         SetEquippedItem("Hands");
+        CorrectHeldItems();
+        HungerLevel = 100;
+        ThirstLevel = 100;
 	}
 	
 	// Update is called once per frame
@@ -172,7 +193,44 @@ public class PlayerBehavior : MonoBehaviour {
 	}
     
     void FixedUpdate() {
-        
+        currentUpdate++;
+        if (currentUpdate % hungerDecreasePeriod == 0) {
+            HungerLevel--;
+        }
+        if (currentUpdate % thirstDecreasePeriod == 0) {
+            ThirstLevel--;
+        }
+    }
+    
+    private int hungerLevel;
+    public int HungerLevel {
+        get { return hungerLevel;}
+        set {
+            hungerLevel = value;
+            if (hungerLevel > 100) {
+                hungerLevel = 100;
+            }
+            if (hungerLevel <= 0) {
+                hungerLevel = 0;
+                Die();
+            }
+            Hud.HungerText.GetComponent<Text>().text = hungerLevel.ToString();
+        }
+    }
+    private int thirstLevel;
+    public int ThirstLevel {
+        get { return thirstLevel;}
+        set {
+            thirstLevel = value;
+            if (thirstLevel > 100) {
+                thirstLevel = 100;
+            }
+            if (thirstLevel <= 0) {
+                thirstLevel = 0;
+                Die();
+            }
+            Hud.ThirstText.GetComponent<Text>().text = thirstLevel.ToString();
+        }
     }
     
     void UseItem() {
