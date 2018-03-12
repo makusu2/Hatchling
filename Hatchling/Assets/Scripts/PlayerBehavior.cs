@@ -153,7 +153,12 @@ public class PlayerBehavior : MonoBehaviour {
             UseItem();
         }
         if (Input.GetKeyDown(KeyCode.Tab)) {
-            Hud.InventoryMenuOpen = !Hud.InventoryMenuOpen;
+            if (Hud.TownMenuOpen) {
+                Hud.TownMenuOpen = false;
+            }
+            else {
+                Hud.InventoryMenuOpen = !Hud.InventoryMenuOpen;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Hud.PauseMenuOpen = !Hud.PauseMenuOpen;

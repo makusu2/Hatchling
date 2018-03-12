@@ -15,6 +15,14 @@ public class Inventory : MonoBehaviour {
     private Dictionary<string,GameObject> visibleBoxes = new Dictionary<string,GameObject>();
     private LinkedList<string> itemOrder = new LinkedList<string>();
     
+    public int CountOf(string item) {
+        return counts[item];
+    }
+    
+    public Dictionary<string,GameObject> VisibleBoxes {
+        get {return visibleBoxes;}
+    }
+    
     private GameObject player;
     
     private HUD hud;
@@ -116,7 +124,12 @@ public class Inventory : MonoBehaviour {
             //TODO make a noise or something explaining that it's full
             return;
         }
-        visibleBoxes[name].transform.SetParent(hud.ExtraInventoryPanel.transform);
+        try {
+            visibleBoxes[name].transform.SetParent(hud.ExtraInventoryPanel.transform);
+        }
+        catch(KeyNotFoundException) {
+            Debug.LogError("Tried moving "+name+" from normal to extra inventory, but visibleBoxes didn't contain "+name+".");
+        }
         itemOrder.Remove(name);
         SettleSelectedItem();
     }
