@@ -12,9 +12,6 @@ I want to express emotions as well
 Remember to make variables static if they're going to stay the same
 
 
-Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" and then you can just "deposit" stuff and eventually houses will appear and stuff?
-    Eventually he builds a trading post where people trade like 80 apples for 100 wood or whatever
-    So, what's the best way of doing it? Should he say "I need 70 bricks" or whatever, or should you just deposit stuff? Or, should it be like the crafting system, where possible builds appear when you talk to them?
 
 Add scroll bar to menus that can run out of room
 
@@ -35,6 +32,12 @@ You need to commission stuff, bud
     
 Completed:
 
+
+
+Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" and then you can just "deposit" stuff and eventually houses will appear and stuff?
+    Eventually he builds a trading post where people trade like 80 apples for 100 wood or whatever
+    So, what's the best way of doing it? Should he say "I need 70 bricks" or whatever, or should you just deposit stuff? Or, should it be like the crafting system, where possible builds appear when you talk to them?
+    
 Pause menu
 
 Armor slots
