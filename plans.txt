@@ -6,15 +6,7 @@ Some system of giving resources to dragon
 I want to express emotions as well    
         
 
-        
-
-
 Remember to make variables static if they're going to stay the same
-
-
-
-Add scroll bar to menus that can run out of room
-
 
 
 
@@ -33,6 +25,7 @@ You need to commission stuff, bud
 Completed:
 
 
+Add scroll bar to menus that can run out of room
 
 Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" and then you can just "deposit" stuff and eventually houses will appear and stuff?
     Eventually he builds a trading post where people trade like 80 apples for 100 wood or whatever
