@@ -1,3 +1,18 @@
+Small ideas:
+
+Mine rocks
+Electrical system for town
+Swimming mechanic
+Maybe rewrite FPS script
+
+
+
+
+
+
+
+Long term:
+
 Dragon growth
 
 Some system of giving resources to dragon
