@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
+#pragma warning disable
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using UnityEditor.Build;
 
 namespace UnityStandardAssets.Utility
 {
