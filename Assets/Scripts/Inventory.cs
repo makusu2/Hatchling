@@ -286,8 +286,13 @@ public class Inventory : MonoBehaviour {
     public void PrepareBuildItem(string name) {
         hud.BuildingMenuOpen = false;
         try {
-            GameObject prepareBuildTemplate = Resources.Load(name) as GameObject; //Have to check bounds from this since they don't get updated in the instantiated version
-            PrepareBuildObject = Instantiate(prepareBuildTemplate);//load object from resources
+            GameObject prepareBuildTemplate = Resources.Load("InWorld/"+name) as GameObject; //Have to check bounds from this since they don't get updated in the instantiated version
+            try {
+                PrepareBuildObject = Instantiate(prepareBuildTemplate);//load object from resources
+            }
+            catch(ArgumentException) {
+                Debug.LogError("Tried to instantiate "+name+" but couldn't find it in resources");
+            }
             PrepareBuildOffset = prepareBuildTemplate.GetComponent<Collider>().bounds.min.y;
         }
         catch(NullReferenceException) {
