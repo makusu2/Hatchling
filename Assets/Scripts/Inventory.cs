@@ -292,6 +292,7 @@ public class Inventory : MonoBehaviour {
             }
             catch(ArgumentException) {
                 Debug.LogError("Tried to instantiate "+name+" but couldn't find it in resources");
+                return;
             }
             PrepareBuildOffset = prepareBuildTemplate.GetComponent<Collider>().bounds.min.y;
         }
