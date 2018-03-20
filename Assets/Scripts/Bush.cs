@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bush : MonoBehaviour {
     
-    public GameObject fruit;
+    private GameObject fruit;
     public int maxFruit = 8;
     
     void SpawnFruit()
@@ -17,6 +17,7 @@ public class Bush : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
+        fruit = Resources.Load("InWorld/Apple") as GameObject;
 		for (int i=0;i<maxFruit;i++) {
             SpawnFruit();
         }

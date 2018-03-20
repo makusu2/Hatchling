@@ -118,6 +118,7 @@ public class PlayerBehavior : MonoBehaviour {
             try {
                 GameObject newHeld = Instantiate(Resources.Load("Equipables/"+item) as GameObject);
                 wasFound = true;
+                newHeld.name = item;
                 newHeld.transform.SetParent(EquippedContainer.transform,false);
                 newHeld.SetActive(true);
                 try {
@@ -126,6 +127,8 @@ public class PlayerBehavior : MonoBehaviour {
                 catch(NullReferenceException) {
                     AttackLevel = 1;
                 }
+                UsingHands = false;
+                Arms.GetComponent<Animator>().SetBool("WeaponIsOn",true);
                 
             }
             catch(ArgumentException) {
