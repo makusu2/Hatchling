@@ -1,0 +1,7 @@
+Governor Well hello there! And welcome to my town!
+Player Your town?
+Governor That's right! It may not look like much right now, but eventually this land will be full of people!
+Player Well, good luck with that!
+Governor Actually, seeing as you're here, I've got a little request; I don't have enough supplies to build homes. Have you got any on you?
+Player I might...
+Governor Well, if you have a surplus, come back here and talk to me. I can't offer you any goods in return, but I can assure you that it'll be worth it once you see the town.
