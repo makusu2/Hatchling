@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#pragma warning disable
+using UnityEngine;
 using System.Collections;
  
 public class ExtendedFlycam : MonoBehaviour
