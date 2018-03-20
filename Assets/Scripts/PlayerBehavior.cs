@@ -108,14 +108,32 @@ public class PlayerBehavior : MonoBehaviour {
                 transChild.gameObject.SetActive(false);
             }
         }
+        
         if (wasFound) {
             UsingHands = false;
             Arms.GetComponent<Animator>().SetBool("WeaponIsOn",true);
         }
         else {
-            UsingHands = true;
-            Arms.GetComponent<Animator>().SetBool("WeaponIsOn",false);
-            AttackLevel = 1;
+            //load resource and equip
+            try {
+                GameObject newHeld = Instantiate(Resources.Load("Equipables/"+item) as GameObject);
+                wasFound = true;
+                newHeld.transform.SetParent(EquippedContainer.transform,false);
+                newHeld.SetActive(true);
+                try {
+                    AttackLevel = newHeld.GetComponent<HandItemBehavior>().AttackLevel;
+                }
+                catch(NullReferenceException) {
+                    AttackLevel = 1;
+                }
+                
+            }
+            catch(ArgumentException) {
+                //Item doesn't have an equippable version
+                UsingHands = true;
+                Arms.GetComponent<Animator>().SetBool("WeaponIsOn",false);
+                AttackLevel = 1;
+            }
         }
     }
     
