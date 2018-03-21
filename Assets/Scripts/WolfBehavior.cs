@@ -22,6 +22,17 @@ public class WolfBehavior : MonoBehaviour {
     [SerializeField]
     private float turnSpeed = 3;
     
+    private float bleedTime = 0.5f;
+    
+    
+    private GameObject teethPoint;
+    private Vector3 teethPointLocation {
+        get {
+            return teethPoint.transform.position;
+        }
+    }
+    
+    private GameObject bloodGO;
     
     public string drop = "Coin";
     
@@ -68,6 +79,9 @@ public class WolfBehavior : MonoBehaviour {
 	void Start () {
         Health = maxHealth;
         player = GameObject.FindWithTag("MainPlayer");
+        teethPoint = transform.Find("TeethPoint").gameObject;
+        bloodGO = teethPoint.transform.Find("BloodSprayEffect").gameObject;
+        bloodGO.SetActive(false);
 	}
 	
 	// Update is called once per frame
@@ -112,6 +126,14 @@ public class WolfBehavior : MonoBehaviour {
     
     void StopMoving() {
         
+    }
+    
+    void Bleed() {
+        bloodGO.SetActive(true);
+        Invoke("StopBleeding",bleedTime);
+    }
+    void StopBleeding() {
+        bloodGO.SetActive(false);
     }
     
     void DoRunStepToPlayer() {
@@ -168,6 +190,10 @@ public class WolfBehavior : MonoBehaviour {
         float dist = Vector3.Distance(transform.position,player.transform.position);
         if (dist < distToDamage) {
             player.GetComponent<PlayerBehavior>().GetDamaged(attackLevel);
+            Bleed();
+        }
+        else {
+            //Failed hit
         }
     }
     
@@ -176,7 +202,7 @@ public class WolfBehavior : MonoBehaviour {
     }
     
     public void Respawn() {
-        //do respawny stuff here
+        Health = maxHealth;
     }
     
     public void GetSwungAt(GameObject player) {
