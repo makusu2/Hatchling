@@ -7,6 +7,8 @@ public class HandItemBehavior : MonoBehaviour {
 
     public int AttackLevel = 1;
     
+    [SerializeField] private AudioClip hitSound;
+    
     private GameObject player;
 	// Use this for initialization
 	void Start () {
