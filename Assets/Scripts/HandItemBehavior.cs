@@ -20,9 +20,9 @@ public class HandItemBehavior : MonoBehaviour {
         
 	}
     void OnTriggerEnter(Collider col) {
-        
         if(!col.gameObject.CompareTag("Ground") && player.GetComponent<PlayerBehavior>().IsSwinging) {
             col.gameObject.SendMessage("GetSwungAt",player,SendMessageOptions.DontRequireReceiver);
+            AudioSource.PlayClipAtPoint(hitSound,transform.position);
             player.GetComponent<PlayerBehavior>().Arms.GetComponent<Animator>().SetTrigger("CancelSwing"); //NOT WORKING
         }
     }
