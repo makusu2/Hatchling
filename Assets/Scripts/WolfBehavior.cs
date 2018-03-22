@@ -24,6 +24,9 @@ public class WolfBehavior : MonoBehaviour {
     
     private float bleedTime = 0.5f;
     
+    [SerializeField] private AudioClip successBiteSound;
+    [SerializeField] private AudioClip failBiteSound;
+    
     
     private GameObject teethPoint;
     private Vector3 teethPointLocation {
@@ -169,13 +172,6 @@ public class WolfBehavior : MonoBehaviour {
             if (!IsRunning) {
                 gameObject.GetComponent<Animator>().SetTrigger("Dash");
             }
-            /*if (!LookingNearPlayer()) {
-                TurnTowardPlayer();
-            }
-            else {
-                DoRunStepToPlayer();
-                TurnTowardPlayer();
-            }*/
         }
         else {
             gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
@@ -196,9 +192,10 @@ public class WolfBehavior : MonoBehaviour {
         if (dist < distToDamage) {
             player.GetComponent<PlayerBehavior>().GetDamaged(attackLevel);
             Bleed();
+            AudioSource.PlayClipAtPoint(successBiteSound,teethPointLocation);
         }
         else {
-            //Failed hit
+            AudioSource.PlayClipAtPoint(failBiteSound,teethPointLocation);
         }
     }
     
