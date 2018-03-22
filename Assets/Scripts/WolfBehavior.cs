@@ -149,12 +149,12 @@ public class WolfBehavior : MonoBehaviour {
     
     void FixedUpdate() {
         if (IsAttacking) {
-            
             return;
         }
         float distToPlayer = Vector3.Distance(transform.position,player.transform.position);
         if (distToPlayer < distToAttack) {
             gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
+            GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true;
             if (!LookingNearPlayer()) {
                 TurnTowardPlayer();
             }
@@ -163,14 +163,19 @@ public class WolfBehavior : MonoBehaviour {
             }
         }
         else if (distToPlayer < distToNotice) {
+            GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = false;
+            GetComponent<UnityEngine.AI.NavMeshAgent>().destination = player.transform.position;
             gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
-            if (!LookingNearPlayer()) {
+            if (!IsRunning) {
+                gameObject.GetComponent<Animator>().SetTrigger("Dash");
+            }
+            /*if (!LookingNearPlayer()) {
                 TurnTowardPlayer();
             }
             else {
                 DoRunStepToPlayer();
                 TurnTowardPlayer();
-            }
+            }*/
         }
         else {
             gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
