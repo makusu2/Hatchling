@@ -14,11 +14,13 @@ public class MiningRock : MonoBehaviour {
     
     private System.Random rnd = new System.Random();
     
+    private GameObject player;
+    
 	// Use this for initialization
 	void Start () {
 		currentStone = MaxStone;
         currentSteel = MaxSteel;
-        
+        player = GameObject.FindWithTag("MainPlayer");
 	}
 	
 	// Update is called once per frame

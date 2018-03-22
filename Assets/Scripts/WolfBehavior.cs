@@ -21,11 +21,17 @@ public class WolfBehavior : MonoBehaviour {
     private float runSpeed = 5;
     [SerializeField]
     private float turnSpeed = 3;
+    [SerializeField]
+    private int maxRoamDistance = 20;
+    
+    private Vector3 spawnPoint;
     
     private float bleedTime = 0.5f;
     
     [SerializeField] private AudioClip successBiteSound;
     [SerializeField] private AudioClip failBiteSound;
+    
+    private static System.Random rnd = new System.Random();
     
     
     private GameObject teethPoint;
@@ -56,9 +62,10 @@ public class WolfBehavior : MonoBehaviour {
         }
     }
     
+    private bool isAttacking = false;
     public bool IsAttacking {
         get {
-            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.hit") || gameObject.GetComponent<Animator>().GetBool("BeginAttack");
+            return isAttacking || gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.hit") || gameObject.GetComponent<Animator>().GetBool("BeginAttack");
         }
         set{}
     }
@@ -76,6 +83,15 @@ public class WolfBehavior : MonoBehaviour {
         }
         set {}
     }
+    
+    private Vector3 GetNewRoamDestination() {
+        int xDif = rnd.Next(-maxRoamDistance,maxRoamDistance);
+        int zDif = rnd.Next(-maxRoamDistance,maxRoamDistance);
+        Vector3 newPos = spawnPoint;
+        newPos.x += xDif;
+        newPos.z += zDif;
+        return newPos;
+    }
             
     
 	// Use this for initialization
@@ -85,6 +101,8 @@ public class WolfBehavior : MonoBehaviour {
         teethPoint = transform.Find("TeethPoint").gameObject;
         bloodGO = teethPoint.transform.Find("BloodSprayEffect").gameObject;
         bloodGO.SetActive(false);
+        spawnPoint = transform.position;
+        gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
 	}
 	
 	// Update is called once per frame
@@ -119,34 +137,12 @@ public class WolfBehavior : MonoBehaviour {
         return lookingNearPlayer;
     }
     
-    void RunForward() {
-        
-    }
-    
-    void WalkForward() {
-        
-    }
-    
-    void StopMoving() {
-        
-    }
-    
     void Bleed() {
         bloodGO.SetActive(true);
         Invoke("StopBleeding",bleedTime);
     }
     void StopBleeding() {
         bloodGO.SetActive(false);
-    }
-    
-    void DoRunStepToPlayer() {
-        float step = runSpeed * Time.deltaTime;
-        Vector3 desiredPosition = player.transform.position;
-        desiredPosition.y = 0;
-        transform.position = Vector3.MoveTowards(transform.position, desiredPosition, step);
-        if (!IsRunning) {
-            gameObject.GetComponent<Animator>().SetTrigger("Dash");
-        }
     }
     
     
@@ -168,13 +164,23 @@ public class WolfBehavior : MonoBehaviour {
         else if (distToPlayer < distToNotice) {
             GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = false;
             GetComponent<UnityEngine.AI.NavMeshAgent>().destination = player.transform.position;
+            GetComponent<UnityEngine.AI.NavMeshAgent>().speed = runSpeed;
             gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
             if (!IsRunning) {
                 gameObject.GetComponent<Animator>().SetTrigger("Dash");
             }
         }
         else {
-            gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
+            //gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
+            ContinueRoaming();
+        }
+    }
+    
+    void ContinueRoaming() {
+        if (GetComponent<UnityEngine.AI.NavMeshAgent>().remainingDistance < 2) {
+            GetComponent<UnityEngine.AI.NavMeshAgent>().destination = GetNewRoamDestination();
+            GetComponent<UnityEngine.AI.NavMeshAgent>().speed = walkSpeed;
+            GetComponent<Animator>().SetTrigger("BeginWalk");
         }
     }
     
@@ -184,6 +190,7 @@ public class WolfBehavior : MonoBehaviour {
         if (!IsAttacking) {
             gameObject.GetComponent<Animator>().SetTrigger("BeginAttack");
             Invoke("TestHit",0.5f);
+            isAttacking = true;
         }
     }
     
@@ -197,6 +204,7 @@ public class WolfBehavior : MonoBehaviour {
         else {
             AudioSource.PlayClipAtPoint(failBiteSound,teethPointLocation);
         }
+        isAttacking = false;
     }
     
     void GetClickedOn(GameObject player) {

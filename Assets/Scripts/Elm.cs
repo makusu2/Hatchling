@@ -11,8 +11,11 @@ public class Elm : MonoBehaviour {
     private int currentWood;
     private int currentBranches;
     
+    private GameObject player;
+    
 	// Use this for initialization
 	void Start () {
+        player = GameObject.FindWithTag("MainPlayer");
 		currentWood = MaxWood;
         currentBranches = MaxBranches;
 	}
