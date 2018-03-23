@@ -72,16 +72,56 @@ public class WolfBehavior : MonoBehaviour {
     
     public bool IsWalking {
         get {
-            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.walk") || gameObject.GetComponent<Animator>().GetBool("BeginWalk");
+            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.walk") || gameObject.GetComponent<Animator>().GetBool("Walking");
         }
         set {}
     }
     
     public bool IsRunning {
         get {
-            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.run") || gameObject.GetComponent<Animator>().GetBool("Dash");
+            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.run") || gameObject.GetComponent<Animator>().GetBool("Running");
         }
         set {}
+    }
+    
+    
+    
+    
+    void SetAction(string action) {
+        if (action == "Walking") {
+            GetComponent<Animator>().SetBool("AllowIdle",false);
+            GetComponent<Animator>().SetBool("Walking",true);
+            GetComponent<Animator>().SetBool("Running",false);
+            GetComponent<Animator>().SetBool("Dead",false);
+            GetComponent<Animator>().ResetTrigger("BeginAttack");
+        }
+        else if (action == "Idle") {
+            GetComponent<Animator>().SetBool("AllowIdle",true);
+            GetComponent<Animator>().SetBool("Walking",false);
+            GetComponent<Animator>().SetBool("Running",false);
+            GetComponent<Animator>().ResetTrigger("BeginAttack");
+        }
+        else if (action == "Dash") {
+            GetComponent<Animator>().SetBool("AllowIdle",false);
+            GetComponent<Animator>().SetBool("Walking",false);
+            GetComponent<Animator>().SetBool("Running",true);
+            GetComponent<Animator>().SetBool("Dead",false);
+            GetComponent<Animator>().ResetTrigger("BeginAttack");
+        }
+        else if (action == "Attack") {
+            GetComponent<Animator>().SetBool("AllowIdle",false);
+            GetComponent<Animator>().SetBool("Walking",false);
+            GetComponent<Animator>().SetBool("Running",false);
+            GetComponent<Animator>().SetBool("Dead",false);
+            GetComponent<Animator>().SetTrigger("BeginAttack");
+        }
+        else if (action == "Die") {
+            GetComponent<Animator>().SetBool("AllowIdle",false);
+            GetComponent<Animator>().SetBool("Walking",false);
+            GetComponent<Animator>().SetBool("Running",false);
+            GetComponent<Animator>().SetBool("Dead",true);
+            GetComponent<Animator>().ResetTrigger("BeginAttack");
+        }
     }
     
     private Vector3 GetNewRoamDestination() {
@@ -102,7 +142,7 @@ public class WolfBehavior : MonoBehaviour {
         bloodGO = teethPoint.transform.Find("BloodSprayEffect").gameObject;
         bloodGO.SetActive(false);
         spawnPoint = transform.position;
-        gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
+        //gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
 	}
 	
 	// Update is called once per frame
@@ -111,9 +151,7 @@ public class WolfBehavior : MonoBehaviour {
 	}
     
     void TurnTowardPlayer() {
-        if (!IsWalking && !IsRunning) {
-            gameObject.GetComponent<Animator>().SetTrigger("BeginWalk");
-        }
+        SetAction("Walking");
             
         Vector3 targetDir = player.transform.position - transform.position;
         float step = turnSpeed * Time.deltaTime;
@@ -152,7 +190,7 @@ public class WolfBehavior : MonoBehaviour {
         }
         float distToPlayer = Vector3.Distance(transform.position,player.transform.position);
         if (distToPlayer < distToAttack) {
-            gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
+            //gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
             GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true;
             if (!LookingNearPlayer()) {
                 TurnTowardPlayer();
@@ -165,9 +203,8 @@ public class WolfBehavior : MonoBehaviour {
             GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = false;
             GetComponent<UnityEngine.AI.NavMeshAgent>().destination = player.transform.position;
             GetComponent<UnityEngine.AI.NavMeshAgent>().speed = runSpeed;
-            gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
             if (!IsRunning) {
-                gameObject.GetComponent<Animator>().SetTrigger("Dash");
+                SetAction("Dash");
             }
         }
         else {
@@ -180,15 +217,13 @@ public class WolfBehavior : MonoBehaviour {
         if (GetComponent<UnityEngine.AI.NavMeshAgent>().remainingDistance < 2) {
             GetComponent<UnityEngine.AI.NavMeshAgent>().destination = GetNewRoamDestination();
             GetComponent<UnityEngine.AI.NavMeshAgent>().speed = walkSpeed;
-            GetComponent<Animator>().SetTrigger("BeginWalk");
+            SetAction("Walking");
         }
     }
     
     void BeginAttack() {
-        gameObject.GetComponent<Animator>().ResetTrigger("Dash");
-        gameObject.GetComponent<Animator>().ResetTrigger("BeginWalk");
         if (!IsAttacking) {
-            gameObject.GetComponent<Animator>().SetTrigger("BeginAttack");
+            SetAction("Attack");
             Invoke("TestHit",0.5f);
             isAttacking = true;
         }

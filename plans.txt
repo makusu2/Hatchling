@@ -4,7 +4,13 @@ Electrical system for town
 Swimming mechanic
 Maybe rewrite FPS script
 Make trees show some sort of dust or whatever when hit with a hatchet
-blood
+Update governor model
+Add trader
+Add chest
+Decide on whether to have max items in inventory
+
+
+
 
 
 

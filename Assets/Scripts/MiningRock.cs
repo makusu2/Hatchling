@@ -38,7 +38,7 @@ public class MiningRock : MonoBehaviour {
         this.GetComponent<MeshRenderer>().enabled = true;
     }
     
-    public void GetSwungAt(GameObject player) {
+    public void GetSwungAt() {
         if(player.GetComponent<PlayerBehavior>().CurrentItem.Equals("Pickaxe")) {
             player.GetComponent<PlayerBehavior>().inventory.AddItem(GetItemToGive());
             if(currentStone <= 0 && currentSteel <= 0) {

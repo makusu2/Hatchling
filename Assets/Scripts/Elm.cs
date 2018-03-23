@@ -35,9 +35,10 @@ public class Elm : MonoBehaviour {
         this.GetComponent<MeshRenderer>().enabled = true;
     }
     
-    public void GetSwungAt(GameObject player) {
+    public void GetSwungAt() {
         if(player.GetComponent<PlayerBehavior>().CurrentItem.Equals("Hatchet")) {
             player.GetComponent<PlayerBehavior>().inventory.AddItem("Wood");
+            
             currentWood -= 1;
             if(currentWood <= 0) {
                 Die();
