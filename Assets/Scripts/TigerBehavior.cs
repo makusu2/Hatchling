@@ -17,8 +17,8 @@ public class TigerBehavior : MonoBehaviour {
     [SerializeField]
     private int distToDamage = 2;
     
-    [SerializeField]
-    private float walkSpeed = 2;
+    //[SerializeField]
+    //private float walkSpeed = 2;
     [SerializeField]
     private float runSpeed = 5;
     [SerializeField]
