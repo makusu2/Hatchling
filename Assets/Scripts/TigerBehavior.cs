@@ -152,7 +152,7 @@ public class TigerBehavior : MonoBehaviour {
     void TestHit() {
         float dist = Vector3.Distance(transform.position,player.transform.position);
         if (dist < distToDamage) {
-            player.GetComponent<PlayerBehavior>().GetDamaged(attackLevel);
+            player.GetComponent<Health>().GetDamaged(attackLevel);
         }
     }
     

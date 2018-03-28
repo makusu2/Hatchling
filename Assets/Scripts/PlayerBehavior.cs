@@ -19,6 +19,8 @@ public class PlayerBehavior : MonoBehaviour {
     [SerializeField]
     private int thirstDecreasePeriod = 100;
     
+    public Health health;
+    
     private int attackLevel;
     public int AttackLevel {
         get {
@@ -27,24 +29,6 @@ public class PlayerBehavior : MonoBehaviour {
         set {
             attackLevel = value;
             Hud.SetAttackStat(value);
-        }
-    }
-    //public int defenseLevel = 2;
-    public int maxHealth = 100;
-    
-    private float currentHealth;
-    public float Health {
-        get{return currentHealth;}
-        set {
-            if(value<=0) {
-                currentHealth = 0;
-                Hud.SetHealthStat(0);
-                Die();
-            }
-            else {
-                Hud.SetHealthStat((int)value);
-                currentHealth = value;
-            }
         }
     }
     
@@ -73,10 +57,6 @@ public class PlayerBehavior : MonoBehaviour {
             return Arms.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Punch") || Arms.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Swing");
         }
         set{}
-    }
-    
-    void OnCollisionEnter(Collision col) {
-        print("Collided with "+col.gameObject.name);
     }
     
     void CorrectHeldItems() {
@@ -152,14 +132,16 @@ public class PlayerBehavior : MonoBehaviour {
     
     void Awake() {
         Arms = GameObject.FindWithTag("Arms");
+        Hud = GetComponent<HUD>();
+        
+        health = GetComponent<Health>();
+        health.Setup(maxHealth:100,isPlayer:true, hud:Hud);
         
     }
-    
 	// Use this for initialization
 	void Start () {
-        Hud = GetComponent<HUD>();
+        
         inventory = gameObject.GetComponent<Inventory>();
-        Health = maxHealth;
         EquippedContainer = GameObject.FindWithTag("EquipContainer").gameObject;
         SetEquippedItem("Hands");
         CorrectHeldItems();
@@ -272,10 +254,6 @@ public class PlayerBehavior : MonoBehaviour {
     
     void OnGUI(){
         GUI.Box(new Rect(Screen.width/2,Screen.height/2, 10, 10), ""); //Drawing crosshair
-    }
-    
-    public void GetDamaged(int attackLevel) {
-        Health -= attackLevel;
     }
     
     void Die() {

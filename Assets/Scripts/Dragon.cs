@@ -6,6 +6,8 @@ using System;
 public class Dragon : MonoBehaviour {
 
     private int attackCooldown = 2;
+    
+    private Health health;
 
     private GameObject body;
     public GameObject Body {
@@ -41,7 +43,7 @@ public class Dragon : MonoBehaviour {
     }
     private UnityEngine.AI.NavMeshAgent nav;
    
-    public int maxHealth = 15;
+    //public int maxHealth = 15;
     
     private int distToNotice = 15;
     
@@ -53,8 +55,6 @@ public class Dragon : MonoBehaviour {
     
     public float BleedTime = 0.5f;
     
-    [SerializeField] private AudioClip successBiteSound;
-    [SerializeField] private AudioClip failBiteSound;
     
     private static System.Random rnd = new System.Random();
     
@@ -64,19 +64,6 @@ public class Dragon : MonoBehaviour {
     private GameObject player;
     
     
-    private float currentHealth;
-    public float Health {
-        get{return currentHealth;}
-        set {
-            if(value<=0) {
-                currentHealth = 0;
-                Die();
-            }
-            else {
-                currentHealth = value;
-            }
-        }
-    }
     
     private float lastAttackTime;
     public bool IsAttacking {
@@ -137,7 +124,8 @@ public class Dragon : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
-        Health = maxHealth;
+        health = GetComponent<Health>();
+        health.Setup(maxHealth:100,immunities:new Health.DamageTypes[]{Health.DamageTypes.fire});
         player = GameObject.FindWithTag("MainPlayer");
         spawnPoint = transform.position;
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
@@ -214,19 +202,13 @@ public class Dragon : MonoBehaviour {
     
     void ThrowFireball() {
         GameObject fireball = Instantiate(Resources.Load("InWorld/Fireball") as GameObject);
-        //fireball.transform.SetParent(transform,false);
         fireball.SetActive(true);
         fireball.transform.position = Body.transform.Find("MouthLocation").position;
         fireball.GetComponent<FireballBehavior>().GetShot(transform.forward);
-        //fireball.GetComponent<Rigidbody>().velocity = transform.forward;
-    }
-    
-    public void GetDamaged(int damage) {
-        Health -= damage;
     }
     
     void Die() {
-        gameObject.SetActive(false);
+        print("Dragon has died");
     }
     
     public void DoDelayedActions() {

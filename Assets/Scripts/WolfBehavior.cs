@@ -6,7 +6,7 @@ public class WolfBehavior : MonoBehaviour {
 
     public int attackLevel = 2;
     //public int defenseLevel = 2;
-    public int maxHealth = 15;
+    //public int maxHealth = 15;
     
     [SerializeField]
     private int distToNotice = 15;
@@ -14,6 +14,8 @@ public class WolfBehavior : MonoBehaviour {
     private  int distToAttack = 2;
     [SerializeField]
     private int distToDamage = 2;
+    
+    private Health health;
     
     [SerializeField]
     private float walkSpeed = 2;
@@ -48,7 +50,7 @@ public class WolfBehavior : MonoBehaviour {
     private GameObject player;
     
     
-    private float currentHealth;
+    /*private float currentHealth;
     public float Health {
         get{return currentHealth;}
         set {
@@ -60,7 +62,7 @@ public class WolfBehavior : MonoBehaviour {
                 currentHealth = value;
             }
         }
-    }
+    }*/
     
     private bool isAttacking = false;
     public bool IsAttacking {
@@ -136,7 +138,9 @@ public class WolfBehavior : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
-        Health = maxHealth;
+        //Health = maxHealth;
+        health = GetComponent<Health>();
+        health.Setup(maxHealth:15);
         player = GameObject.FindWithTag("MainPlayer");
         teethPoint = transform.Find("TeethPoint").gameObject;
         bloodGO = teethPoint.transform.Find("BloodSprayEffect").gameObject;
@@ -232,7 +236,7 @@ public class WolfBehavior : MonoBehaviour {
     void TestHit() {
         float dist = Vector3.Distance(transform.position,player.transform.position);
         if (dist < distToDamage) {
-            player.GetComponent<PlayerBehavior>().GetDamaged(attackLevel);
+            player.GetComponent<Health>().GetDamaged(attackLevel);
             Bleed();
             AudioSource.PlayClipAtPoint(successBiteSound,teethPointLocation);
         }
@@ -247,16 +251,17 @@ public class WolfBehavior : MonoBehaviour {
     }
     
     public void Respawn() {
-        Health = maxHealth;
+        health.Respawn();
     }
     
     public void GetSwungAt(GameObject player) {
         int damageToTake = player.GetComponent<PlayerBehavior>().AttackLevel;
-        Health -= damageToTake;
+        health.GetDamaged(damageToTake);
         
     }
     
-    void Die(PlayerBehavior player) {
+    void Die() {
+        PlayerBehavior player = GameObject.FindWithTag("MainPlayer").GetComponent<PlayerBehavior>();
         player.inventory.AddItem(drop);
         gameObject.SetActive(false);
     }
