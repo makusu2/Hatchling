@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Faction : MonoBehaviour {
-
-    enum factions { Player, Wolf, };
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    
+    public Factions faction;
+    
+    public Factions[] GetEnemyFactions() {
+        return enemyFactions[faction];
+    }
+    
+    public static Dictionary<Factions,Factions[]> enemyFactions = new Dictionary<Factions,Factions[]>(){
+        {Factions.player, new Factions[]{Factions.wolf,}},
+        {Factions.wolf, new Factions[]{Factions.player,}}
+    };
 }
+public enum Factions { player, wolf, };

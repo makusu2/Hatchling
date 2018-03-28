@@ -1,13 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using System;
 
 public class Dragon : MonoBehaviour {
 
-    private int attackCooldown = 2;
+    private float attackCooldown = 0.2f; //Should probably be higher for the real game
+    
+    private GameObject targetEnemy = null;
     
     private Health health;
+    
+    //public Factions faction = Factions.player;
 
     private GameObject body;
     public GameObject Body {
@@ -45,10 +50,11 @@ public class Dragon : MonoBehaviour {
    
     //public int maxHealth = 15;
     
-    private int distToNotice = 15;
+    private int distToNotice = 30; //Higher than others on purpose; can sense things far away
     
     private float walkSpeed = 5;
     private float runSpeed = 8;
+    private float turnSpeed = 3;
     private int maxRoamDistance = 20;
     
     private Vector3 spawnPoint;
@@ -124,6 +130,7 @@ public class Dragon : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
+        GetComponent<EnemyFinder>().Setup(distToNotice: this.distToNotice);
         health = GetComponent<Health>();
         health.Setup(maxHealth:100,immunities:new Health.DamageTypes[]{Health.DamageTypes.fire});
         player = GameObject.FindWithTag("MainPlayer");
@@ -132,7 +139,8 @@ public class Dragon : MonoBehaviour {
         lastAttackTime = Time.time - attackCooldown;
         BodyStage = "NewbornBody";
         SetDestination(transform.position);
-        DoDelayedActions();
+        //DoDelayedActions();
+        TestForNearbyEnemies();
 	}
 	
 	// Update is called once per frame
@@ -158,7 +166,25 @@ public class Dragon : MonoBehaviour {
             return;
         }
         else {
-            ContinueRoaming();
+            if (targetEnemy == null) {
+                ContinueRoaming();
+            }
+            else{
+                if (targetEnemy.GetComponent<Health>().IsDead) {
+                    targetEnemy = null;
+                    return;
+                }
+                SetDestination(targetEnemy.transform.position, isRunning: true);
+                if (DistToDest() < 5) {
+                    nav.isStopped = true;
+                    if (LookingNearTarget()) {
+                        BeginAttack();
+                    }
+                    else {
+                        TurnTowardTarget();
+                    }
+                }
+            }
         }
     }
     
@@ -194,6 +220,7 @@ public class Dragon : MonoBehaviour {
     
     void BeginAttack() {
         if (!IsAttacking) {
+            SetAction("Attack");
             //TODO do attack here; decide which to do like breathe fire or whatever
             ThrowFireball();
             lastAttackTime = Time.time;
@@ -211,8 +238,56 @@ public class Dragon : MonoBehaviour {
         print("Dragon has died");
     }
     
-    public void DoDelayedActions() {
+    /*public void DoDelayedActions() {
         ThrowFireball();
         Invoke("DoDelayedActions",1);
+    }*/
+    
+    
+    
+    
+    
+    
+    void TurnTowardTarget() {
+        SetAction("Walking");
+            
+        Vector3 targetDir = targetEnemy.transform.position - transform.position;
+        float step = turnSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
+        Quaternion newRotation = Quaternion.LookRotation(newDir);
+        newRotation.x = 0.0f;
+        newRotation.z = 0.0f;
+        
+        
+        transform.rotation = newRotation;
+    }
+    
+    bool LookingNearTarget() {
+        Vector3 targetDir = targetEnemy.transform.position - transform.position;
+        Vector3 currentDir = transform.forward;
+        targetDir.y = 0;
+        currentDir.y = 0;
+        float angleBetween = Vector3.Angle(targetDir,currentDir);
+        
+        bool lookingNearTarget = angleBetween < 10;
+        return lookingNearTarget;
+    }
+    
+    void TestForNearbyEnemies() {
+        UpdateTargetEnemy();
+        //print(GetNearbyFactionGOs().ToString());
+        Invoke("TestForNearbyEnemies",2);
+    }
+    
+    void UpdateTargetEnemy() {
+        if (targetEnemy != null) {
+            if (targetEnemy.GetComponent<Health>().IsDead) {
+                targetEnemy = null;
+            }
+        }
+        if (targetEnemy == null) {
+            GameObject targetGO = GetComponent<EnemyFinder>().GetClosestEnemy();
+            targetEnemy = targetGO;
+        }
     }
 }

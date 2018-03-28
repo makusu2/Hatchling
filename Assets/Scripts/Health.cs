@@ -6,7 +6,7 @@ using System;
 
 public class Health : MonoBehaviour {
     
-    [Flags] public enum DamageTypes {unknown, fire, }
+    public enum DamageTypes {unknown, fire, }
 
     public int maxHealth;
     
@@ -34,6 +34,14 @@ public class Health : MonoBehaviour {
             }
         }
     }
+    
+    public bool IsDead {
+        get {
+            return health <= 0;
+        }
+    }
+    
+    
 	// Use this for initialization
 	void Start () {
 		health = maxHealth;
@@ -64,4 +72,5 @@ public class Health : MonoBehaviour {
     public void Respawn() {
         health = maxHealth;
     }
+    
 }

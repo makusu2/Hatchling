@@ -12,6 +12,8 @@ public class PlayerBehavior : MonoBehaviour {
     public Inventory inventory;
     public HUD Hud;
     
+    //public Factions faction = Factions.player;
+    
     
     private int currentUpdate = 0;
     [SerializeField]

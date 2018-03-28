@@ -44,7 +44,9 @@ public class PickupBehavior : MonoBehaviour {
         //print("Hi, I was clicked on");
         player.GetComponent<PlayerBehavior>().inventory.AddItem(PickupName);
         Disappear();
-        Invoke("Respawn",RespawnTime);
+        if(RespawnTime >= 0) {
+            Invoke("Respawn",RespawnTime);
+        }
     }
     
     void Respawn() {

@@ -5,30 +5,23 @@ using UnityEngine;
 public class WolfBehavior : MonoBehaviour {
 
     public int attackLevel = 2;
-    //public int defenseLevel = 2;
-    //public int maxHealth = 15;
     
-    [SerializeField]
     private int distToNotice = 15;
-    [SerializeField]
     private  int distToAttack = 2;
-    [SerializeField]
     private int distToDamage = 2;
     
     private Health health;
     
-    [SerializeField]
     private float walkSpeed = 2;
-    [SerializeField]
     private float runSpeed = 5;
-    [SerializeField]
     private float turnSpeed = 3;
-    [SerializeField]
     private int maxRoamDistance = 20;
     
     private Vector3 spawnPoint;
     
     private float bleedTime = 0.5f;
+    
+    private Loot loot;
     
     [SerializeField] private AudioClip successBiteSound;
     [SerializeField] private AudioClip failBiteSound;
@@ -50,19 +43,6 @@ public class WolfBehavior : MonoBehaviour {
     private GameObject player;
     
     
-    /*private float currentHealth;
-    public float Health {
-        get{return currentHealth;}
-        set {
-            if(value<=0) {
-                currentHealth = 0;
-                Die(player.GetComponent<PlayerBehavior>());
-            }
-            else {
-                currentHealth = value;
-            }
-        }
-    }*/
     
     private bool isAttacking = false;
     public bool IsAttacking {
@@ -139,6 +119,8 @@ public class WolfBehavior : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         //Health = maxHealth;
+        loot = GetComponent<Loot>();
+        loot.Setup("Coin");
         health = GetComponent<Health>();
         health.Setup(maxHealth:15);
         player = GameObject.FindWithTag("MainPlayer");
@@ -262,7 +244,7 @@ public class WolfBehavior : MonoBehaviour {
     
     void Die() {
         PlayerBehavior player = GameObject.FindWithTag("MainPlayer").GetComponent<PlayerBehavior>();
-        player.inventory.AddItem(drop);
+        loot.ReleaseLoot();
         gameObject.SetActive(false);
     }
 }
