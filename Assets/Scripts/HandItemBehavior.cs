@@ -20,10 +20,15 @@ public class HandItemBehavior : MonoBehaviour {
         
 	}
     void OnTriggerEnter(Collider col) {
-        if(!col.gameObject.CompareTag("Ground") && player.GetComponent<PlayerBehavior>().IsSwinging) {
+        /*if(!col.gameObject.CompareTag("Ground") && player.GetComponent<PlayerBehavior>().IsSwinging) {
             col.gameObject.SendMessage("GetSwungAt",SendMessageOptions.DontRequireReceiver);
             AudioSource.PlayClipAtPoint(hitSound,transform.position);
             player.GetComponent<PlayerBehavior>().Arms.GetComponent<Animator>().SetTrigger("CancelSwing"); //NOT WORKING
+        }*/
+        
+        Health colHealth = col.gameObject.GetComponent<Health>();
+        if (colHealth != null) {
+            colHealth.GetDamaged(AttackLevel);
         }
     }
     

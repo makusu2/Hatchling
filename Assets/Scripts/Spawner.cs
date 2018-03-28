@@ -35,7 +35,7 @@ public class Spawner : MonoBehaviour {
                 //not active hierarchy means they're dead
                 child.SetActive(true);
                 child.gameObject.SendMessage("Respawn",SendMessageOptions.DontRequireReceiver);
-                
+                break;
             }
         }
         Invoke("CheckForRespawn",RespawnWaitPeriod);

@@ -7,8 +7,10 @@ public class WolfBehavior : MonoBehaviour {
     public int attackLevel = 2;
     
     private int distToNotice = 15;
-    private  int distToAttack = 2;
-    private int distToDamage = 2;
+    private int distToAttack = 2;
+    private float distToDamage = 0.1f;
+    
+    private UnityEngine.AI.NavMeshAgent nav;
     
     private Health health;
     
@@ -20,6 +22,8 @@ public class WolfBehavior : MonoBehaviour {
     private Vector3 spawnPoint;
     
     private float bleedTime = 0.5f;
+    
+    private GameObject targetEnemy = null;
     
     private Loot loot;
     
@@ -83,7 +87,7 @@ public class WolfBehavior : MonoBehaviour {
             GetComponent<Animator>().SetBool("Running",false);
             GetComponent<Animator>().ResetTrigger("BeginAttack");
         }
-        else if (action == "Dash") {
+        else if (action == "Running") {
             GetComponent<Animator>().SetBool("AllowIdle",false);
             GetComponent<Animator>().SetBool("Walking",false);
             GetComponent<Animator>().SetBool("Running",true);
@@ -103,6 +107,9 @@ public class WolfBehavior : MonoBehaviour {
             GetComponent<Animator>().SetBool("Running",false);
             GetComponent<Animator>().SetBool("Dead",true);
             GetComponent<Animator>().ResetTrigger("BeginAttack");
+        }
+        else {
+            Debug.LogWarning("Tried to set action to "+action+" but it doesn't exist");
         }
     }
     
@@ -128,6 +135,9 @@ public class WolfBehavior : MonoBehaviour {
         bloodGO = teethPoint.transform.Find("BloodSprayEffect").gameObject;
         bloodGO.SetActive(false);
         spawnPoint = transform.position;
+        nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        GetComponent<EnemyFinder>().Setup(distToNotice: this.distToNotice);
+        TestForNearbyEnemies();
         //gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
 	}
 	
@@ -136,29 +146,9 @@ public class WolfBehavior : MonoBehaviour {
 		
 	}
     
-    void TurnTowardPlayer() {
-        SetAction("Walking");
-            
-        Vector3 targetDir = player.transform.position - transform.position;
-        float step = turnSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
-        Quaternion newRotation = Quaternion.LookRotation(newDir);
-        newRotation.x = 0.0f;
-        newRotation.z = 0.0f;
-        
-        
-        transform.rotation = newRotation;
-    }
     
-    bool LookingNearPlayer() {
-        Vector3 targetDir = player.transform.position - transform.position;
-        Vector3 currentDir = transform.forward;
-        targetDir.y = 0;
-        currentDir.y = 0;
-        float angleBetween = Vector3.Angle(targetDir,currentDir);
-        
-        bool lookingNearPlayer = angleBetween < 10;
-        return lookingNearPlayer;
+    float DistToDest() {
+        return nav.pathPending?Vector3.Distance(transform.position, nav.destination):nav.remainingDistance;
     }
     
     void Bleed() {
@@ -174,29 +164,95 @@ public class WolfBehavior : MonoBehaviour {
         if (IsAttacking) {
             return;
         }
-        float distToPlayer = Vector3.Distance(transform.position,player.transform.position);
-        if (distToPlayer < distToAttack) {
-            //gameObject.GetComponent<Animator>().SetBool("AllowIdle",false);
-            GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = true;
-            if (!LookingNearPlayer()) {
-                TurnTowardPlayer();
+        else {
+            if (targetEnemy == null) {
+                ContinueRoaming();
             }
             else {
-                BeginAttack();
+                if (targetEnemy.GetComponent<Health>().IsDead) {
+                    targetEnemy = null;
+                    return;
+                }
+                SetDestination(targetEnemy.transform.position,isRunning:true);
+                if(DistToDest() < 2) {
+                    nav.isStopped = true;
+                    if (LookingNearTarget()) {
+                        BeginAttack();
+                    }
+                    else {
+                        TurnTowardTarget();
+                    }
+                }
             }
         }
-        else if (distToPlayer < distToNotice) {
-            GetComponent<UnityEngine.AI.NavMeshAgent>().isStopped = false;
-            GetComponent<UnityEngine.AI.NavMeshAgent>().destination = player.transform.position;
-            GetComponent<UnityEngine.AI.NavMeshAgent>().speed = runSpeed;
-            if (!IsRunning) {
-                SetAction("Dash");
+    }
+    
+    
+    void TurnTowardTarget() {
+        SetAction("Walking");
+            
+        Vector3 targetDir = targetEnemy.transform.position - transform.position;
+        float step = turnSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
+        Quaternion newRotation = Quaternion.LookRotation(newDir);
+        newRotation.x = 0.0f;
+        newRotation.z = 0.0f;
+        
+        
+        transform.rotation = newRotation;
+    }
+        
+    
+    void TestForNearbyEnemies() {
+        UpdateTargetEnemy();
+        Invoke("TestForNearbyEnemies",2);
+    }
+        
+    
+    void UpdateTargetEnemy() {
+        if (targetEnemy != null) {
+            if (targetEnemy.GetComponent<Health>().IsDead || Vector3.Distance(targetEnemy.transform.position,transform.position) > distToNotice) {
+                targetEnemy = null;
             }
+        }
+        if (targetEnemy == null) {
+            GameObject targetGO = GetComponent<EnemyFinder>().GetClosestEnemy();
+            targetEnemy = targetGO;
+        }
+    }
+        
+    
+    void SetDestination(Vector3 position, bool isRunning = true) {
+        nav.destination = position;
+        
+        bool closeEnough = DistToDest() < distToAttack;
+        if(closeEnough) {
+            nav.isStopped = true;
+            SetAction("Idle");
         }
         else {
-            //gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
-            ContinueRoaming();
+            nav.isStopped = false;
+            nav.speed = isRunning?runSpeed:walkSpeed;
+            if(isRunning) {
+                SetAction("Running");
+            }
+            else {
+                SetAction("Walking");
+            }
         }
+    }
+        
+    
+    
+    bool LookingNearTarget() {
+        Vector3 targetDir = targetEnemy.transform.position - transform.position;
+        Vector3 currentDir = transform.forward;
+        targetDir.y = 0;
+        currentDir.y = 0;
+        float angleBetween = Vector3.Angle(targetDir,currentDir);
+        
+        bool lookingNearTarget = angleBetween < 10;
+        return lookingNearTarget;
     }
     
     void ContinueRoaming() {
@@ -216,9 +272,11 @@ public class WolfBehavior : MonoBehaviour {
     }
     
     void TestHit() {
-        float dist = Vector3.Distance(transform.position,player.transform.position);
+        //float dist = Vector3.Distance(transform.position,player.transform.position);
+        Vector3 targetPos = targetEnemy.GetComponent<Collider>().ClosestPointOnBounds(teethPointLocation);
+        float dist = Vector2.Distance(new Vector2(targetPos.x,targetPos.z),new Vector2(teethPointLocation.x,teethPointLocation.z));
         if (dist < distToDamage) {
-            player.GetComponent<Health>().GetDamaged(attackLevel);
+            targetEnemy.GetComponent<Health>().GetDamaged(attackLevel);
             Bleed();
             AudioSource.PlayClipAtPoint(successBiteSound,teethPointLocation);
         }
@@ -228,22 +286,12 @@ public class WolfBehavior : MonoBehaviour {
         isAttacking = false;
     }
     
-    void GetClickedOn(GameObject player) {
-        BeginAttack();
-    }
     
     public void Respawn() {
         health.Respawn();
     }
     
-    public void GetSwungAt(GameObject player) {
-        int damageToTake = player.GetComponent<PlayerBehavior>().AttackLevel;
-        health.GetDamaged(damageToTake);
-        
-    }
-    
     void Die() {
-        PlayerBehavior player = GameObject.FindWithTag("MainPlayer").GetComponent<PlayerBehavior>();
         loot.ReleaseLoot();
         gameObject.SetActive(false);
     }

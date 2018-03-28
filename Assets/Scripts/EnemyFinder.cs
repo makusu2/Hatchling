@@ -54,7 +54,6 @@ public class EnemyFinder : MonoBehaviour {
     
     Dictionary<Factions,GameObject[]> GetNearbyFactionGOs() {
         Dictionary<Factions,List<GameObject>> factLists = new Dictionary<Factions,List<GameObject>>();
-        //List<GameObject> nearbyEnemies = new List<GameObject>();
         Collider[] possibleColliders = Physics.OverlapSphere(transform.position,distToNotice);
         foreach (Collider possibleCollider in possibleColliders) {
             GameObject possibleGO = possibleCollider.gameObject;
