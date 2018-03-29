@@ -12,7 +12,8 @@ public class Faction : MonoBehaviour {
     
     public static Dictionary<Factions,Factions[]> enemyFactions = new Dictionary<Factions,Factions[]>(){
         {Factions.player, new Factions[]{Factions.wolf,}},
-        {Factions.wolf, new Factions[]{Factions.player,}}
+        {Factions.wolf, new Factions[]{Factions.player,}},
+        {Factions.None,new Factions[]{}},
     };
 }
-public enum Factions { player, wolf, };
+public enum Factions { None, player, wolf, };

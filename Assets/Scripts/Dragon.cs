@@ -11,8 +11,6 @@ public class Dragon : MonoBehaviour {
     private GameObject targetEnemy = null;
     
     private Health health;
-    
-    //public Factions faction = Factions.player;
 
     private GameObject body;
     public GameObject Body {
@@ -21,12 +19,15 @@ public class Dragon : MonoBehaviour {
         }
     }
     
-    public string BodyStage {
+    private DragonStage stage;
+    public DragonStage Stage {
         get {
-            return body.name;
+            return stage;
         }
         set {
-            Transform possibleTrans = transform.Find(value);
+            stage = value;
+            string goName = stage.ToString()+"Body";
+            Transform possibleTrans = transform.Find(goName);
             if(possibleTrans == null) {
                 throw new ArgumentException();
             }
@@ -39,8 +40,19 @@ public class Dragon : MonoBehaviour {
                 }
             }
             body = possibleTrans.gameObject;
+            
+            FitColliderToChildren();
+            
+            if(stage == DragonStage.Egg) {
+                GetComponent<Faction>().faction = Factions.None;
+            }
+            else {
+                GetComponent<Faction>().faction = Factions.player;
+            }
         }
     }
+    
+    
     private Animator ani {
         get {
             return Body.GetComponent<Animator>();
@@ -80,13 +92,13 @@ public class Dragon : MonoBehaviour {
     
     public bool IsWalking {
         get {
-            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.walk") || gameObject.GetComponent<Animator>().GetBool("Walking");
+            return ani.GetCurrentAnimatorStateInfo(0).IsName("Base.walk") || ani.GetBool("Walking");
         }
     }
     
     public bool IsRunning {
         get {
-            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.run") || gameObject.GetComponent<Animator>().GetBool("Running");
+            return ani.GetCurrentAnimatorStateInfo(0).IsName("Base.run") || ani.GetBool("Running");
         }
     }
     
@@ -126,8 +138,7 @@ public class Dragon : MonoBehaviour {
         newPos.z += zDif;
         return newPos;
     }
-            
-    
+           
 	// Use this for initialization
 	void Start () {
         GetComponent<EnemyFinder>().Setup(distToNotice: this.distToNotice);
@@ -137,10 +148,11 @@ public class Dragon : MonoBehaviour {
         spawnPoint = transform.position;
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
         lastAttackTime = Time.time - attackCooldown;
-        BodyStage = "NewbornBody";
+        Stage = DragonStage.Egg; //Change to egg
         SetDestination(transform.position);
         //DoDelayedActions();
         TestForNearbyEnemies();
+        Invoke("CheckGrowDragon",5);
 	}
 	
 	// Update is called once per frame
@@ -162,7 +174,7 @@ public class Dragon : MonoBehaviour {
     
     
     void FixedUpdate() {
-        if (IsAttacking) {
+        if (Stage == DragonStage.Egg || IsAttacking) {
             return;
         }
         else {
@@ -190,6 +202,9 @@ public class Dragon : MonoBehaviour {
     
     
     void SetDestination(Vector3 position, bool isRunning = true) {
+        if (!MobileStage()) {
+            return;
+        }
         nav.destination = position;
         
         bool closeEnough = DistToDest() < 2;
@@ -238,14 +253,38 @@ public class Dragon : MonoBehaviour {
         print("Dragon has died");
     }
     
-    /*public void DoDelayedActions() {
-        ThrowFireball();
-        Invoke("DoDelayedActions",1);
-    }*/
+    
+    void CheckGrowDragon() {
+        //Make a bunch of dicts of enum to whatever info you need, and make the dragon stages enums
+        if (CanEvolve()) {
+            GrowDragon();
+        }
+        Invoke("CheckGrowDragon",5);
+    }
+    void GrowDragon() {
+        Stage += 1;
+    }
     
     
     
-    
+    bool NearFire() {
+        int requiredDistToFire = 5;
+        Collider[] possibleColliders = Physics.OverlapSphere(transform.position,requiredDistToFire);
+        foreach (Collider possibleCollider in possibleColliders) {
+            GameObject possibleGO = possibleCollider.gameObject;
+            int heatLevel;
+            try {
+                heatLevel = possibleGO.GetComponent<Heated>().HeatLevel;
+                if(heatLevel >= 3) {
+                    return true;
+                }
+            }
+            catch(NullReferenceException) {
+                continue;
+            }
+        }
+        return false;
+    }
     
     
     void TurnTowardTarget() {
@@ -275,7 +314,6 @@ public class Dragon : MonoBehaviour {
     
     void TestForNearbyEnemies() {
         UpdateTargetEnemy();
-        //print(GetNearbyFactionGOs().ToString());
         Invoke("TestForNearbyEnemies",2);
     }
     
@@ -290,4 +328,56 @@ public class Dragon : MonoBehaviour {
             targetEnemy = targetGO;
         }
     }
+    
+    
+     void FitColliderToChildren ()
+    {
+        BoxCollider bc = gameObject.GetComponent<BoxCollider>();
+        Bounds bounds = new Bounds (Vector3.zero, Vector3.zero);
+        bool hasBounds = false;
+        Renderer[] renderers =  gameObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer render in renderers) {
+            if (hasBounds) {
+                bounds.Encapsulate(render.bounds);
+            } else {
+                bounds = render.bounds;
+                hasBounds = true;
+           }
+       }
+      if (hasBounds) {
+            bc.center = bounds.center - gameObject.transform.position;
+            bc.size = bounds.size;
+      } else {
+            bc.size = bc.center = Vector3.zero;
+            bc.size = Vector3.zero;
+      }
+   }
+   
+    public enum DragonStage { Egg, Newborn, };
+    public static string NameOfStage(int index) {
+        return Enum.GetName(typeof(DragonStage), index);
+    }
+    public bool CanEvolve() {
+        switch(Stage) {
+            case DragonStage.Egg:
+                return NearFire();
+            case DragonStage.Newborn:
+                return false;
+            default:
+                Debug.LogError("No evolution condition for "+Stage.ToString());
+                return false;
+        }
+    }
+    public bool MobileStage() {
+        switch(Stage) {
+            case DragonStage.Egg:
+                return false;
+            case DragonStage.Newborn:
+                return true;
+            default:
+                Debug.LogError("No mobility found for "+Stage.ToString());
+                return false;
+        }
+    }
+    
 }

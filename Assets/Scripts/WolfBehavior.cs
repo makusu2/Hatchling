@@ -127,7 +127,7 @@ public class WolfBehavior : MonoBehaviour {
 	void Start () {
         //Health = maxHealth;
         loot = GetComponent<Loot>();
-        loot.Setup("Coin");
+        loot.Setup(drop);
         health = GetComponent<Health>();
         health.Setup(maxHealth:15);
         player = GameObject.FindWithTag("MainPlayer");
