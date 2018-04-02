@@ -80,7 +80,7 @@ public class PlayerBehavior : MonoBehaviour {
                 wasFound = true;
                 transChild.gameObject.SetActive(true);
                 try {
-                    AttackLevel = transChild.gameObject.GetComponent<HandItemBehavior>().AttackLevel;
+                    AttackLevel = transChild.gameObject.GetComponent<HeldWeapon>().AttackLevel;
                 }
                 catch(NullReferenceException) {
                     AttackLevel = 1;
@@ -104,7 +104,7 @@ public class PlayerBehavior : MonoBehaviour {
                 newHeld.transform.SetParent(EquippedContainer.transform,false);
                 newHeld.SetActive(true);
                 try {
-                    AttackLevel = newHeld.GetComponent<HandItemBehavior>().AttackLevel;
+                    AttackLevel = newHeld.GetComponent<HeldWeapon>().AttackLevel;
                 }
                 catch(NullReferenceException) {
                     AttackLevel = 1;
@@ -245,7 +245,7 @@ public class PlayerBehavior : MonoBehaviour {
         }
         else {
             //swing item
-            HeldItemObject.SendMessage("ActivateItem",SendMessageOptions.RequireReceiver);
+            HeldItemObject.GetComponent<HeldWeapon>().ActivateItem();
         }
     }
     
