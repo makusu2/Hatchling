@@ -143,7 +143,7 @@ public class Dragon : MonoBehaviour {
 	void Start () {
         GetComponent<EnemyFinder>().Setup(distToNotice: this.distToNotice);
         health = GetComponent<Health>();
-        health.Setup(maxHealth:100,immunities:new Health.DamageTypes[]{Health.DamageTypes.fire});
+        health.Setup(maxHealth:100,immunities:new Health.DamageTypes[]{Health.DamageTypes.fire},deathMethod:Die);
         player = GameObject.FindWithTag("MainPlayer");
         spawnPoint = transform.position;
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
@@ -249,7 +249,7 @@ public class Dragon : MonoBehaviour {
         fireball.GetComponent<FireballBehavior>().GetShot(transform.forward);
     }
     
-    void Die() {
+    public void Die() {
         print("Dragon has died");
     }
     

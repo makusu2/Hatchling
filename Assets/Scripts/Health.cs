@@ -12,6 +12,8 @@ public class Health : MonoBehaviour {
     
     public bool IsPlayer;
     
+    public Action deathMethod;
+    
     public DamageTypes[] immunities = {};
     
     public HUD Hud;
@@ -24,7 +26,7 @@ public class Health : MonoBehaviour {
                 if(IsPlayer) {
                     Hud.SetHealthStat(0);
                 }
-                SendMessage("Die");
+                deathMethod();
             }
             else {
                 if(IsPlayer) {
@@ -47,13 +49,19 @@ public class Health : MonoBehaviour {
 		health = maxHealth;
 	}
     
-    public void Setup(int maxHealth=10, bool isPlayer = false, DamageTypes[] immunities = null, HUD hud = null) {
+    public void Setup(int maxHealth=10, bool isPlayer = false, DamageTypes[] immunities = null, HUD hud = null, Action deathMethod = null) {
         this.maxHealth = maxHealth;
         this.IsPlayer = isPlayer;
         if (immunities != null) {
             this.immunities = immunities;
         }
         this.Hud = hud;
+        if (deathMethod == null) {
+            this.deathMethod = Die;
+        }
+        else {
+            this.deathMethod = deathMethod;
+        }
     }
 	
 	// Update is called once per frame
@@ -71,6 +79,10 @@ public class Health : MonoBehaviour {
     
     public void Respawn() {
         health = maxHealth;
+    }
+    
+    void Die() {
+        print("No die method was specified for "+gameObject.name);
     }
     
 }

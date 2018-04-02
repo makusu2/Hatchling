@@ -8,7 +8,7 @@ public class WolfBehavior : MonoBehaviour {
     
     private int distToNotice = 15;
     private int distToAttack = 2;
-    private float distToDamage = 0.1f;
+    private float distToDamage = 0.2f;
     
     private UnityEngine.AI.NavMeshAgent nav;
     
@@ -42,9 +42,7 @@ public class WolfBehavior : MonoBehaviour {
     
     private GameObject bloodGO;
     
-    public string drop = "Coin";
-    
-    private GameObject player;
+    private string drop = "1*Coin,2*UncookedMeat";
     
     
     
@@ -129,8 +127,7 @@ public class WolfBehavior : MonoBehaviour {
         loot = GetComponent<Loot>();
         loot.Setup(drop);
         health = GetComponent<Health>();
-        health.Setup(maxHealth:15);
-        player = GameObject.FindWithTag("MainPlayer");
+        health.Setup(maxHealth:15,deathMethod:Die);
         teethPoint = transform.Find("TeethPoint").gameObject;
         bloodGO = teethPoint.transform.Find("BloodSprayEffect").gameObject;
         bloodGO.SetActive(false);

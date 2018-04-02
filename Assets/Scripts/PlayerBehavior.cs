@@ -137,7 +137,7 @@ public class PlayerBehavior : MonoBehaviour {
         Hud = GetComponent<HUD>();
         
         health = GetComponent<Health>();
-        health.Setup(maxHealth:100,isPlayer:true, hud:Hud);
+        health.Setup(maxHealth:100,isPlayer:true, hud:Hud,deathMethod:Die);
         
     }
 	// Use this for initialization
@@ -258,7 +258,7 @@ public class PlayerBehavior : MonoBehaviour {
         GUI.Box(new Rect(Screen.width/2,Screen.height/2, 10, 10), ""); //Drawing crosshair
     }
     
-    void Die() {
+    public void Die() {
         print("YOU HAVE DIED");
     }
 }
