@@ -27,7 +27,7 @@ public class HandItemBehavior : MonoBehaviour {
         }*/
         
         Health colHealth = col.gameObject.GetComponent<Health>();
-        if (colHealth != null) {
+        if (colHealth != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
             colHealth.GetDamaged(AttackLevel);
         }
     }
