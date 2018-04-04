@@ -23,6 +23,15 @@ public class EnemyFinder : MonoBehaviour {
         return null;
     }
     
+    public GameObject GetClosestFood() {
+        GameObject[] nearbyFoods = GetNearbyFoods();
+        if (nearbyFoods.Length > 0) {
+            GameObject targetGO = GetClosestGameObject(nearbyFoods);
+            return targetGO;
+        }
+        return null;
+    }
+    
     
     GameObject GetClosestGameObject(GameObject[] GOs) {
         if (GOs.Length == 0) {
@@ -38,6 +47,17 @@ public class EnemyFinder : MonoBehaviour {
             }
         }
         return minGO;
+    }
+    
+    GameObject[] GetNearbyFoods() {
+        Collider[] possibleColliders = Physics.OverlapSphere(transform.position,distToNotice);
+        List<GameObject> foods = new List<GameObject>();
+        foreach (Collider possibleCollider in possibleColliders) {
+            if (possibleCollider.gameObject.GetComponent<FoodBehavior>() != null) {
+                foods.Add(possibleCollider.gameObject);
+            }
+        }
+        return foods.ToArray();
     }
     
     GameObject[] GetNearbyEnemies() {

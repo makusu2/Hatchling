@@ -245,7 +245,9 @@ public class PlayerBehavior : MonoBehaviour {
         }
         else {
             //swing item
-            HeldItemObject.GetComponent<HeldWeapon>().ActivateItem();
+            //HeldItemObject.GetComponent<HeldWeapon>().ActivateItem();
+            HeldItemObject.SendMessage("ActivateItem");
+            //TODO make it not send; can't currently do cuz only heldweapons works
         }
     }
     

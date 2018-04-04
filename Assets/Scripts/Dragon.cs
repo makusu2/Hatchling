@@ -9,6 +9,7 @@ public class Dragon : MonoBehaviour {
     private float attackCooldown = 0.2f; //Should probably be higher for the real game
     
     private GameObject targetEnemy = null;
+    private GameObject targetFood = null;
     
     private Health health;
 
@@ -18,6 +19,14 @@ public class Dragon : MonoBehaviour {
             return body;
         }
     }
+    public GameObject BodyMesh {
+        get {
+            return body.transform.Find(Stage.ToString()+"BodyMesh").gameObject;
+        }
+    }
+    
+    private readonly int newbornFoodToEvolve = 1;
+    private int newbornFoodEaten = 0;
     
     private DragonStage stage;
     public DragonStage Stage {
@@ -25,6 +34,7 @@ public class Dragon : MonoBehaviour {
             return stage;
         }
         set {
+            transform.rotation = Quaternion.identity; //Set rotation to (0,0,0). Messes bounds up if you don't.
             stage = value;
             string goName = stage.ToString()+"Body";
             Transform possibleTrans = transform.Find(goName);
@@ -42,6 +52,7 @@ public class Dragon : MonoBehaviour {
             body = possibleTrans.gameObject;
             
             FitColliderToChildren();
+            //Invoke("FitColliderToChildren",5);
             
             if(stage == DragonStage.Egg) {
                 GetComponent<Faction>().faction = Factions.None;
@@ -151,7 +162,7 @@ public class Dragon : MonoBehaviour {
         Stage = DragonStage.Egg; //Change to egg
         SetDestination(transform.position);
         //DoDelayedActions();
-        TestForNearbyEnemies();
+        TestForNearbyTargets();
         Invoke("CheckGrowDragon",5);
 	}
 	
@@ -178,10 +189,7 @@ public class Dragon : MonoBehaviour {
             return;
         }
         else {
-            if (targetEnemy == null) {
-                ContinueRoaming();
-            }
-            else{
+            if (targetEnemy != null) {
                 if (targetEnemy.GetComponent<Health>().IsDead) {
                     targetEnemy = null;
                     return;
@@ -196,6 +204,21 @@ public class Dragon : MonoBehaviour {
                         TurnTowardTarget();
                     }
                 }
+            }
+            else if (targetFood != null){
+                SetDestination(targetFood.transform.position,isRunning:false);
+                if (DistToDest() < 2) {
+                    nav.isStopped = true;
+                    if (LookingNearTarget()) {
+                        EatFood();
+                    }
+                    else {
+                        TurnTowardTarget();
+                    }
+                }
+            }
+            else {
+                ContinueRoaming();
             }
         }
     }
@@ -290,7 +313,7 @@ public class Dragon : MonoBehaviour {
     void TurnTowardTarget() {
         SetAction("Walking");
             
-        Vector3 targetDir = targetEnemy.transform.position - transform.position;
+        Vector3 targetDir = nav.destination - transform.position;
         float step = turnSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
         Quaternion newRotation = Quaternion.LookRotation(newDir);
@@ -302,7 +325,7 @@ public class Dragon : MonoBehaviour {
     }
     
     bool LookingNearTarget() {
-        Vector3 targetDir = targetEnemy.transform.position - transform.position;
+        Vector3 targetDir = nav.destination - transform.position;
         Vector3 currentDir = transform.forward;
         targetDir.y = 0;
         currentDir.y = 0;
@@ -312,9 +335,17 @@ public class Dragon : MonoBehaviour {
         return lookingNearTarget;
     }
     
-    void TestForNearbyEnemies() {
+    void TestForNearbyTargets() {
         UpdateTargetEnemy();
-        Invoke("TestForNearbyEnemies",2);
+        UpdateTargetFood();
+        Invoke("TestForNearbyTargets",2);
+    }
+    
+    void UpdateTargetFood() {
+        if(targetFood == null) {
+            GameObject targetGO = GetComponent<EnemyFinder>().GetClosestFood();
+            targetFood = targetGO;
+        }
     }
     
     void UpdateTargetEnemy() {
@@ -332,28 +363,48 @@ public class Dragon : MonoBehaviour {
     
      void FitColliderToChildren ()
     {
+        //print("Fitting collider to children...");
         BoxCollider bc = gameObject.GetComponent<BoxCollider>();
         Bounds bounds = new Bounds (Vector3.zero, Vector3.zero);
         bool hasBounds = false;
         Renderer[] renderers =  gameObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer render in renderers) {
+            //print("Found renderer: "+render.name);
             if (hasBounds) {
                 bounds.Encapsulate(render.bounds);
-            } else {
-                bounds = render.bounds;
-                hasBounds = true;
-           }
-       }
-      if (hasBounds) {
+            } 
+            else {
+        //print("Rend bounds: "+BodyMesh.GetComponent<Renderer>().bounds.ToString());
+            bounds = render.bounds;
+            hasBounds = true;
+            }
+        //print("Col bounds: "+bounds.ToString());
+           //}
+       //}
+        }
+        if (hasBounds) {
             bc.center = bounds.center - gameObject.transform.position;
             bc.size = bounds.size;
-      } else {
+        } else {
             bc.size = bc.center = Vector3.zero;
             bc.size = Vector3.zero;
-      }
+        }
+      //print("True bounds: "+bc.bounds.ToString());
    }
    
-    public enum DragonStage { Egg, Newborn, };
+   public void EatFood(GameObject foodGO = default(GameObject)) {
+       if (foodGO == default(GameObject)) {
+           foodGO = targetFood;
+       }
+       if(Vector3.Distance(foodGO.transform.position,transform.position) > 10) {
+           Debug.LogWarning("Food was WAY too far away when hatchling tried to eat it!");
+       }
+       Destroy(foodGO);
+       newbornFoodEaten += 1;
+       foodGO = null;
+   }
+   
+    public enum DragonStage { Egg, Newborn, Toddler, };
     public static string NameOfStage(int index) {
         return Enum.GetName(typeof(DragonStage), index);
     }
@@ -362,6 +413,8 @@ public class Dragon : MonoBehaviour {
             case DragonStage.Egg:
                 return NearFire();
             case DragonStage.Newborn:
+                return newbornFoodEaten >= newbornFoodToEvolve;
+            case DragonStage.Toddler:
                 return false;
             default:
                 Debug.LogError("No evolution condition for "+Stage.ToString());
@@ -373,6 +426,8 @@ public class Dragon : MonoBehaviour {
             case DragonStage.Egg:
                 return false;
             case DragonStage.Newborn:
+                return true;
+            case DragonStage.Toddler:
                 return true;
             default:
                 Debug.LogError("No mobility found for "+Stage.ToString());
