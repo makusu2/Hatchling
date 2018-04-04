@@ -73,6 +73,10 @@ public class HUD : MonoBehaviour {
     public Inventory Inventory;
     [System.NonSerialized]
     public GameObject Town;
+    [System.NonSerialized]
+    public GameObject Cam;
+    [System.NonSerialized]
+    public CameraBehavior CamBehavior;
     
     public bool CursorFree {
         get {
@@ -109,6 +113,8 @@ public class HUD : MonoBehaviour {
 		infoText = GameObject.FindWithTag("InfoText");
         Town = GameObject.FindWithTag("Town");
         Inventory = Player.GetComponent<Inventory>();
+        Cam = GameObject.FindWithTag("MainCamera");
+        CamBehavior = Cam.GetComponent<CameraBehavior>();
         
     }
     

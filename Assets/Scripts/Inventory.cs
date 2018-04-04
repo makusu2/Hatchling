@@ -40,6 +40,10 @@ public class Inventory : MonoBehaviour {
     
     public readonly int maxExtraNumItems = 10;
     
+    public readonly int maxStack = 30;
+    
+    private System.Random rnd = new System.Random();
+    
     public int maxTotalNumItems {
         get {
             return maxNumItems + maxExtraNumItems;
@@ -83,10 +87,31 @@ public class Inventory : MonoBehaviour {
         }
     }
     
-    public void DiscardItem(string name) {
-        while(counts.ContainsKey(name)){
-            //TODO instantiate the item and place it next to player. This will be called when the user willingly drops an item, or attempts to pick an item up despite not having the room.
+    Vector3 GetDiscardPosition() {
+        int maxDist = 10;
+        RaycastHit hit = hud.CamBehavior.GetRayHit(maxDist:maxDist);
+        if (object.Equals(hit,default(RaycastHit))) {
+            return Camera.main.transform.position + Camera.main.transform.forward*maxDist;
+        }
+        return hit.point;
+    }
+    public void DiscardItem(string name,int numToDrop = -1) {
+        if(numToDrop == -1 || numToDrop>counts[name]) {
+            numToDrop = counts[name];
+        }
+        
+        GameObject goTemplate = Resources.Load("InWorld/"+name) as GameObject;
+        if (goTemplate == null) {
+            Debug.LogError("Could not find inworld gameobject for "+name);
+            return;
+        }
+        for (int i=0;i<numToDrop;i++) {
+            //TODO add some sound to indicate dropping here
             RemoveItem(name);
+            GameObject droppedGO = Instantiate(goTemplate);
+            droppedGO.SetActive(true);
+            Vector3 spawnPosition = GetDiscardPosition();
+            droppedGO.transform.position = spawnPosition;
         }
     }
     
@@ -120,7 +145,6 @@ public class Inventory : MonoBehaviour {
     public void MoveToExtraInventory(string name) {
         if (ExtraInventoryFull) {
             DiscardItem(name);
-            //TODO make a noise or something explaining that it's full
             return;
         }
         try {
@@ -136,7 +160,6 @@ public class Inventory : MonoBehaviour {
     public void MoveToNormalInventory(string name) {
         if (NormalInventoryFull) {
             DiscardItem(name);
-            //TODO make a noise or something explaining that it's full
             return;
         }
         visibleBoxes[name].transform.SetParent(hud.InventoryPanel.transform);
@@ -210,6 +233,9 @@ public class Inventory : MonoBehaviour {
             else {
                 MoveToExtraInventory(name);
             }
+        }
+        if(counts[name] > maxStack) {
+            DiscardItem(name, numToDrop: counts[name]-maxStack);
         }
     }
     

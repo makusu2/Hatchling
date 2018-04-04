@@ -9,10 +9,12 @@ public class HeldWeapon : MonoBehaviour {
     
     [SerializeField] private AudioClip hitSound;
     
-    private GameObject player;
+    private static GameObject player;
 	// Use this for initialization
 	void Start () {
-		player = GameObject.FindWithTag("MainPlayer");
+        if(player == null) {
+            player = GameObject.FindWithTag("MainPlayer");
+        }
 	}
 	
 	// Update is called once per frame
