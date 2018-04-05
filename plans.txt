@@ -4,10 +4,8 @@ Electrical system for town
 Swimming mechanic
 Maybe rewrite FPS script
 Make trees show some sort of dust or whatever when hit with a hatchet
-Update governor model
 Add trader
 Add chest
-Decide on whether to have max items in inventory
 
 
 
@@ -46,6 +44,9 @@ You need to commission stuff, bud
     
 Completed:
 
+Update governor model
+
+Decide on whether to have max items in inventory
 
 Add scroll bar to menus that can run out of room
 

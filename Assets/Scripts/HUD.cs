@@ -31,6 +31,8 @@ public class HUD : MonoBehaviour {
         AttackText.GetComponent<Text>().text = attackStat.ToString();
     }
     
+    public GameObject CurrentTrader = null;
+    
     [System.NonSerialized]
     public GameObject InventoryPanel;
     [System.NonSerialized]
@@ -39,6 +41,10 @@ public class HUD : MonoBehaviour {
     public GameObject CraftingPanel;
     [System.NonSerialized]
     public GameObject CraftingPanelView;
+    [System.NonSerialized]
+    public GameObject TraderPanel;
+    [System.NonSerialized]
+    public GameObject TraderPanelView;
     //[System.NonSerialized]
     //public GameObject CraftingPanelScrollbar;
     [System.NonSerialized]
@@ -96,6 +102,8 @@ public class HUD : MonoBehaviour {
         ExtraInventoryPanel = GameObject.FindWithTag("ExtraInventoryPanel");
         CraftingPanel = GameObject.FindWithTag("CraftingPanel");
         CraftingPanelView = GameObject.FindWithTag("CraftingPanelView");
+        TraderPanel = GameObject.FindWithTag("TraderPanel");
+        TraderPanelView = GameObject.FindWithTag("TraderPanelView");
         //CraftingPanelScrollbar = GameObject.FindWithTag("CraftingPanelScrollbar");
         BuildingPanel = GameObject.FindWithTag("BuildingPanel");
         BuildingPanelView = GameObject.FindWithTag("BuildingPanelView");
@@ -115,7 +123,6 @@ public class HUD : MonoBehaviour {
         Inventory = Player.GetComponent<Inventory>();
         Cam = GameObject.FindWithTag("MainCamera");
         CamBehavior = Cam.GetComponent<CameraBehavior>();
-        
     }
     
 	void Start () {
@@ -123,6 +130,7 @@ public class HUD : MonoBehaviour {
         BuildingMenuOpen = false;
         PauseMenuOpen = false;
         TownMenuOpen = false;
+        TraderMenuOpen = false;
         DialogueContinue(); //Unless we have dialogue at the start of the game, this just closes the pause menu
 	}
 	
@@ -192,6 +200,7 @@ public class HUD : MonoBehaviour {
         }
     }
     
+    
     private bool buildingMenuOpen = false;
     public bool BuildingMenuOpen {
         get {
@@ -233,6 +242,28 @@ public class HUD : MonoBehaviour {
             townMenuOpen = value;
             ExtraInventoryPanel.SetActive(value);
             UsingUI = value;
+        }
+    }
+    
+    private bool traderMenuOpen = false;
+    public bool TraderMenuOpen {
+        get { return traderMenuOpen;}
+        set {
+            if (value && CurrentTrader == null) {
+                Debug.LogError("Attempted to open trade menu without CurrentTrader being assigned in HUD");
+            }
+            //TraderBehavior traderBehavior = CurrentTrader.GetComponent<TraderBehavior>();
+            if(value) {
+                CurrentTrader.GetComponent<TraderBehavior>().CreateButtons();
+            }
+            else if (CurrentTrader != null) {
+                CurrentTrader.GetComponent<TraderBehavior>().DestroyButtons();
+            }
+            CursorFree = value;
+            TraderPanelView.SetActive(value);
+            traderMenuOpen = value;
+            UsingUI = value;
+            //Make sure tab closes it
         }
     }
 

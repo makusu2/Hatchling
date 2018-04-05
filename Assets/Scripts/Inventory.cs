@@ -16,10 +16,15 @@ public class Inventory : MonoBehaviour {
     private LinkedList<string> itemOrder = new LinkedList<string>();
     
     public int CountOf(string item) {
-        return counts[item];
+        try {
+            return counts[item];
+        }
+        catch {
+            return 0;
+        }
     }
     
-    public Dictionary<String,int> Counts { get { return counts;}}
+    public Dictionary<String,int> Counts { get { return counts;}} //TODO make this private and have all other stuff call CountOf
     public Dictionary<string,GameObject> VisibleBoxes {get {return visibleBoxes;}}
     
     private GameObject player;
@@ -41,6 +46,7 @@ public class Inventory : MonoBehaviour {
     public readonly int maxExtraNumItems = 10;
     
     public readonly int maxStack = 30;
+    public string[] noStackLimit = new string[] {"Coin",};
     
     private System.Random rnd = new System.Random();
     
@@ -234,7 +240,7 @@ public class Inventory : MonoBehaviour {
                 MoveToExtraInventory(name);
             }
         }
-        if(counts[name] > maxStack) {
+        if(counts[name] > maxStack && !(noStackLimit.Contains(name))) {
             DiscardItem(name, numToDrop: counts[name]-maxStack);
         }
     }

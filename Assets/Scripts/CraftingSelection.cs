@@ -13,7 +13,6 @@ public class CraftingSelection : MonoBehaviour {
     }
     
 	void Start () {
-        player = GameObject.FindWithTag("MainPlayer");
         inventory = player.GetComponent<Inventory>();
 	}
 	

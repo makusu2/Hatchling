@@ -21,6 +21,24 @@ public class PlayerBehavior : MonoBehaviour {
     [SerializeField]
     private int thirstDecreasePeriod = 100;
     
+    public int Money {
+        get {
+            return inventory.CountOf("Coin");
+        }
+        set {
+            if(value > inventory.CountOf("Coin")) {
+                while (value > inventory.CountOf("Coin")) {
+                    inventory.AddItem("Coin");
+                }
+            }
+            else if (value < inventory.CountOf("Coin")){
+                while (value<inventory.CountOf("Coin")) {
+                    inventory.RemoveItem("Coin");
+                }
+            }
+        }
+    }
+    
     public Health health;
     
     private int attackLevel;
@@ -179,7 +197,10 @@ public class PlayerBehavior : MonoBehaviour {
             UseItem();
         }
         if (Input.GetKeyDown(KeyCode.Tab)) {
-            if (Hud.TownMenuOpen) {
+            if (Hud.TraderMenuOpen) {
+                Hud.TraderMenuOpen = false;
+            }
+            else if (Hud.TownMenuOpen) {
                 Hud.TownMenuOpen = false;
             }
             else {
