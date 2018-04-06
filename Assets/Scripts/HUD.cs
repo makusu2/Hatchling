@@ -34,53 +34,11 @@ public class HUD : MonoBehaviour {
     public GameObject CurrentTrader = null;
     
     [System.NonSerialized]
-    public GameObject InventoryPanel;
+    public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, DialoguePanel, DialogueFace, DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText;
     [System.NonSerialized]
-    public GameObject ExtraInventoryPanel;
-    [System.NonSerialized]
-    public GameObject CraftingPanel;
-    [System.NonSerialized]
-    public GameObject CraftingPanelView;
-    [System.NonSerialized]
-    public GameObject TraderPanel;
-    [System.NonSerialized]
-    public GameObject TraderPanelView;
-    //[System.NonSerialized]
-    //public GameObject CraftingPanelScrollbar;
-    [System.NonSerialized]
-    public GameObject BuildingPanel;
-    [System.NonSerialized]
-    public GameObject BuildingPanelView;
-    [System.NonSerialized]
-    public GameObject PausePanel;
-    [System.NonSerialized]
-    public GameObject ArmorPanel;
-    [System.NonSerialized]
-    public GameObject TownPanel;
-    [System.NonSerialized]
-    public GameObject DialoguePanel;
-    [System.NonSerialized]
-    public GameObject DialogueFace;
-    [System.NonSerialized]
-    public GameObject DialogueText;
-    [System.NonSerialized]
-    public GameObject HealthText;
-    [System.NonSerialized]
-    public GameObject DefenseText;
-    [System.NonSerialized]
-    public GameObject AttackText;
-    [System.NonSerialized]
-    public GameObject HungerText;
-    [System.NonSerialized]
-    public GameObject ThirstText;
-    [System.NonSerialized]
-    public GameObject Player;
+    public GameObject Player, Town, Cam;
     [System.NonSerialized]
     public Inventory Inventory;
-    [System.NonSerialized]
-    public GameObject Town;
-    [System.NonSerialized]
-    public GameObject Cam;
     [System.NonSerialized]
     public CameraBehavior CamBehavior;
     
@@ -104,7 +62,6 @@ public class HUD : MonoBehaviour {
         CraftingPanelView = GameObject.FindWithTag("CraftingPanelView");
         TraderPanel = GameObject.FindWithTag("TraderPanel");
         TraderPanelView = GameObject.FindWithTag("TraderPanelView");
-        //CraftingPanelScrollbar = GameObject.FindWithTag("CraftingPanelScrollbar");
         BuildingPanel = GameObject.FindWithTag("BuildingPanel");
         BuildingPanelView = GameObject.FindWithTag("BuildingPanelView");
         PausePanel = GameObject.FindWithTag("PausePanel");
@@ -173,6 +130,14 @@ public class HUD : MonoBehaviour {
         
     }
     
+    public void CloseAllUI() {
+        InventoryMenuOpen = BuildingMenuOpen = PauseMenuOpen = TownMenuOpen = TraderMenuOpen = false;
+    }
+    
+    public bool AnySpecialPanelOpen() {
+        return BuildingMenuOpen || PauseMenuOpen || TownMenuOpen || TraderMenuOpen;
+    }
+    
     private bool dialoguePanelOpen = false;
     public bool DialoguePanelOpen {
         get { return dialoguePanelOpen;}
@@ -193,7 +158,6 @@ public class HUD : MonoBehaviour {
             ArmorPanel.SetActive(value);
             if (value) {
                 Inventory.UpdateCraftingRecipes();
-                //CraftingPanelView.GetComponent<ScrollRect>().normalizedPosition = new Vector2(0, 1); //Should bring it to the top
             }
             inventoryMenuOpen = value;
             UsingUI = value;
@@ -252,7 +216,6 @@ public class HUD : MonoBehaviour {
             if (value && CurrentTrader == null) {
                 Debug.LogError("Attempted to open trade menu without CurrentTrader being assigned in HUD");
             }
-            //TraderBehavior traderBehavior = CurrentTrader.GetComponent<TraderBehavior>();
             if(value) {
                 CurrentTrader.GetComponent<TraderBehavior>().CreateButtons();
             }
@@ -263,7 +226,6 @@ public class HUD : MonoBehaviour {
             TraderPanelView.SetActive(value);
             traderMenuOpen = value;
             UsingUI = value;
-            //Make sure tab closes it
         }
     }
 
@@ -288,13 +250,6 @@ public class Dialogue {
         }
         this.text = text;
     }
-    
-    
-    
-    
-    
-    
-    
     
     Sprite GetSprite(string name) {
         Sprite t = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Resources/DialogueFaces/"+name+".png", typeof(Sprite));

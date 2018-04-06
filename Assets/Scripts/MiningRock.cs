@@ -12,8 +12,6 @@ public class MiningRock : MonoBehaviour {
     private int currentStone;
     private int currentSteel;
     
-    private System.Random rnd = new System.Random();
-    
     private GameObject player;
     
 	// Use this for initialization
@@ -49,7 +47,7 @@ public class MiningRock : MonoBehaviour {
     
     string GetItemToGive() {
         int totalItems = currentStone + currentSteel;
-        int randIndex = rnd.Next(0,totalItems);
+        int randIndex = MakuUtil.rnd.Next(0,totalItems);
         if(randIndex > currentStone) {
             currentSteel -= 1;
             return "Steel";

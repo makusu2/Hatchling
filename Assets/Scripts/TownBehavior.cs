@@ -21,6 +21,15 @@ public class TownBehavior : MonoBehaviour {
     
     private int updateDelay = 2;
     
+    public int CountOf(string item) {
+        try {
+            return itemCounts[name];
+        }
+        catch {
+            return 0;
+        }
+    }
+    
     
     void Awake() {
 		player = GameObject.FindWithTag("MainPlayer");
@@ -142,14 +151,7 @@ public class TownBehavior : MonoBehaviour {
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
             string ingredient = ingredientPair.Key;
             int count = ingredientPair.Value;
-            try {
-                if(itemCounts[ingredient] < count) {
-                    return false;
-                }
-            }
-            catch(KeyNotFoundException) { //item isn't in inventory, therefore player has 0
-                return false;
-            }
+            return(CountOf(ingredient) >= count);
         }
         return true;
     }
@@ -165,29 +167,6 @@ public class TownBehavior : MonoBehaviour {
     }
     
     static Dictionary<string,Dictionary<string,int>> LoadTownRecipes() {
-        Dictionary<string,Dictionary<string,int>> recipes = new Dictionary<string,Dictionary<string,int>>();
-        string path = "Assets/SettingsFiles/TownRecipes.txt";
-        StreamReader reader = new StreamReader(path); 
-        string currentLine;//
-        while(true){
-            currentLine = reader.ReadLine();
-            if(currentLine != null){
-                string toCreate = currentLine.Split('=')[0];
-                string remainder = currentLine.Split('=')[1];
-                string[] components = remainder.Split(',');
-                recipes[toCreate] = new Dictionary<string,int>();
-                for(int i=0;i<components.Length;i++) {
-                    string comp = components[i];
-                    int count = int.Parse(comp.Split('*')[0]);
-                    string compMat = comp.Split('*')[1];
-                    recipes[toCreate][compMat] = count;
-                }
-            }
-            else{
-                break;
-            }
-        }
-        reader.Close();
-        return(recipes);
+        return MakuUtil.LoadRecipeFile("Assets/SettingsFiles/TownRecipes.txt");
     }
 }

@@ -37,6 +37,8 @@ public class Inventory : MonoBehaviour {
     [System.NonSerialized]
     public GameObject PrepareBuildObject;
     [System.NonSerialized]
+    public string PrepareBuildName;
+    [System.NonSerialized]
     public float PrepareBuildOffset;
     [System.NonSerialized]
     public bool PreparingBuild = false;
@@ -48,8 +50,6 @@ public class Inventory : MonoBehaviour {
     public readonly int maxStack = 30;
     public string[] noStackLimit = new string[] {"Coin",};
     
-    private System.Random rnd = new System.Random();
-    
     public int maxTotalNumItems {
         get {
             return maxNumItems + maxExtraNumItems;
@@ -57,41 +57,17 @@ public class Inventory : MonoBehaviour {
     }
     
     
-    public int CurrentNumItems {
-        get {
-            return itemOrder.ToArray().Length;
-        }
-    }
+    public int CurrentNumItems { get {return itemOrder.ToArray().Length;}}
     
-    public int CurrentExtraNumItems {
-        get {
-            return visibleBoxes.Keys.ToArray().Length - itemOrder.ToArray().Length;
-        }
-    }
+    public int CurrentExtraNumItems {get {return visibleBoxes.Keys.ToArray().Length - itemOrder.ToArray().Length;}}
     
-    public int CurrentTotalNumItems {
-        get {
-            return visibleBoxes.Keys.ToArray().Length;
-        }
-    }
+    public int CurrentTotalNumItems {get {return visibleBoxes.Keys.ToArray().Length;}}
     
-    public bool NormalInventoryFull {
-        get {
-            return CurrentNumItems >= maxNumItems;
-        }
-    }
+    public bool NormalInventoryFull {get {return CurrentNumItems >= maxNumItems;}}
     
-    public bool ExtraInventoryFull {
-        get {
-            return CurrentExtraNumItems >= maxExtraNumItems;
-        }
-    }
+    public bool ExtraInventoryFull {get {return CurrentExtraNumItems >= maxExtraNumItems;}}
     
-    public bool TotalInventoryFull {
-        get {
-            return CurrentTotalNumItems >= maxTotalNumItems;
-        }
-    }
+    public bool TotalInventoryFull {get {return CurrentTotalNumItems >= maxTotalNumItems;}}
     
     Vector3 GetDiscardPosition() {
         int maxDist = 10;
@@ -286,17 +262,6 @@ public class Inventory : MonoBehaviour {
         visibleBoxes[name] = box;
     }
     
-    /*void AddBuildingBox(string name) {
-        GameObject box = Instantiate(Resources.Load("InventoryIcons/BoxFab") as GameObject);
-        Sprite spr = GetSprite(name);
-        box.GetComponent<Image>().sprite = spr;
-        box.name = name+"Box";
-        box.transform.GetComponent<InfoHover>().infoStr = name;
-        box.transform.SetParent(hud.BuildingPanel.transform,false);
-        visibleBoxes[name] = box;
-        
-    }*/
-    
     public void CraftItem(string name) {
         Dictionary<string,int> ingredients = craftingRecipes[name];
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
@@ -321,6 +286,7 @@ public class Inventory : MonoBehaviour {
             GameObject prepareBuildTemplate = Resources.Load("InWorld/"+name) as GameObject; //Have to check bounds from this since they don't get updated in the instantiated version
             try {
                 PrepareBuildObject = Instantiate(prepareBuildTemplate);//load object from resources
+                PrepareBuildName = name;
             }
             catch(ArgumentException) {
                 Debug.LogError("Tried to instantiate "+name+" but couldn't find it in resources");
@@ -339,6 +305,14 @@ public class Inventory : MonoBehaviour {
     public void CompleteBuildItem() {
         PreparingBuild = false;
         PrepareBuildObject.GetComponent<Collider>().enabled = true;
+        Dictionary<string,int> ingredients = buildingRecipes[PrepareBuildName];
+        foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
+            string ingredient = ingredientPair.Key;
+            int count = ingredientPair.Value;
+                for (int i=0;i<count;i++) {
+                    RemoveItem(ingredient);
+                }
+        }
         //might need to do more here
     }
     
@@ -366,12 +340,7 @@ public class Inventory : MonoBehaviour {
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
             string ingredient = ingredientPair.Key;
             int count = ingredientPair.Value;
-            try {
-                if(counts[ingredient] < count) {
-                    return false;
-                }
-            }
-            catch(KeyNotFoundException) { //item isn't in inventory, therefore player has 0
+            if(CountOf(ingredient) < count) {
                 return false;
             }
         }
@@ -382,12 +351,7 @@ public class Inventory : MonoBehaviour {
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
             string ingredient = ingredientPair.Key;
             int count = ingredientPair.Value;
-            try {
-                if(counts[ingredient] < count) {
-                    return false;
-                }
-            }
-            catch(KeyNotFoundException) { //item isn't in inventory, therefore player has 0
+            if (CountOf(ingredient) < count) {
                 return false;
             }
         }
@@ -424,55 +388,9 @@ public class Inventory : MonoBehaviour {
     }
     
     static Dictionary<string,Dictionary<string,int>> LoadCraftingRecipes() {
-        Dictionary<string,Dictionary<string,int>> recipes = new Dictionary<string,Dictionary<string,int>>();
-        string path = "Assets/SettingsFiles/CraftingRecipes.txt";
-        StreamReader reader = new StreamReader(path); 
-        string currentLine;//
-        while(true){
-            currentLine = reader.ReadLine();
-            if(currentLine != null){
-                string toCreate = currentLine.Split('=')[0];
-                string remainder = currentLine.Split('=')[1];
-                string[] components = remainder.Split(',');
-                recipes[toCreate] = new Dictionary<string,int>();
-                for(int i=0;i<components.Length;i++) {
-                    string comp = components[i];
-                    int count = int.Parse(comp.Split('*')[0]);
-                    string compMat = comp.Split('*')[1];
-                    recipes[toCreate][compMat] = count;
-                }
-            }
-            else{
-                break;
-            }
-        }
-        reader.Close();
-        return(recipes);
+        return MakuUtil.LoadRecipeFile("Assets/SettingsFiles/CraftingRecipes.txt");
     }
     static Dictionary<string,Dictionary<string,int>> LoadBuildingRecipes() {
-        Dictionary<string,Dictionary<string,int>> recipes = new Dictionary<string,Dictionary<string,int>>();
-        string path = "Assets/SettingsFiles/BuildingRecipes.txt";
-        StreamReader reader = new StreamReader(path); 
-        string currentLine;//
-        while(true){
-            currentLine = reader.ReadLine();
-            if(currentLine != null){
-                string toCreate = currentLine.Split('=')[0];
-                string remainder = currentLine.Split('=')[1];
-                string[] components = remainder.Split(',');
-                recipes[toCreate] = new Dictionary<string,int>();
-                for(int i=0;i<components.Length;i++) {
-                    string comp = components[i];
-                    int count = int.Parse(comp.Split('*')[0]);
-                    string compMat = comp.Split('*')[1];
-                    recipes[toCreate][compMat] = count;
-                }
-            }
-            else{
-                break;
-            }
-        }
-        reader.Close();
-        return(recipes);
+        return MakuUtil.LoadRecipeFile("Assets/SettingsFiles/BuildingRecipes.txt");
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ToolkitBehavior : MonoBehaviour {
+public class ToolkitBehavior : MonoBehaviour, ItemActivator {
 
     private GameObject player;
     

@@ -14,25 +14,19 @@ public class Dragon : MonoBehaviour {
     private Health health;
 
     private GameObject body;
-    public GameObject Body {
-        get {
-            return body;
-        }
-    }
+    public GameObject Body {get {return body;}}
     public GameObject BodyMesh {
         get {
             return body.transform.Find(Stage.ToString()+"BodyMesh").gameObject;
         }
     }
     
-    private readonly int newbornFoodToEvolve = 1;
+    private readonly int newbornFoodToEvolve = 10;
     private int newbornFoodEaten = 0;
     
     private DragonStage stage;
     public DragonStage Stage {
-        get {
-            return stage;
-        }
+        get {return stage;}
         set {
             transform.rotation = Quaternion.identity; //Set rotation to (0,0,0). Messes bounds up if you don't.
             stage = value;
@@ -42,12 +36,13 @@ public class Dragon : MonoBehaviour {
                 throw new ArgumentException();
             }
             foreach (Transform child in transform) {
-                if (child == possibleTrans) {
+                child.gameObject.SetActive(child == possibleTrans); //If it's the trans, active, otherwise inactive
+                /*if (child == possibleTrans) {
                     child.gameObject.SetActive(true);
                 }
                 else {
                     child.gameObject.SetActive(false);
-                }
+                }*/
             }
             body = possibleTrans.gameObject;
             
@@ -64,11 +59,7 @@ public class Dragon : MonoBehaviour {
     }
     
     
-    private Animator ani {
-        get {
-            return Body.GetComponent<Animator>();
-        }
-    }
+    private Animator ani {get {return Body.GetComponent<Animator>();}}
     private UnityEngine.AI.NavMeshAgent nav;
    
     //public int maxHealth = 15;
@@ -85,7 +76,7 @@ public class Dragon : MonoBehaviour {
     public float BleedTime = 0.5f;
     
     
-    private static System.Random rnd = new System.Random();
+    //private static System.Random rnd = new System.Random();
     
     
     
@@ -142,8 +133,8 @@ public class Dragon : MonoBehaviour {
     }
     
     private Vector3 GetNewRoamDestination() {
-        int xDif = rnd.Next(-maxRoamDistance,maxRoamDistance);
-        int zDif = rnd.Next(-maxRoamDistance,maxRoamDistance);
+        int xDif = MakuUtil.rnd.Next(-maxRoamDistance,maxRoamDistance);
+        int zDif = MakuUtil.rnd.Next(-maxRoamDistance,maxRoamDistance);
         Vector3 newPos = spawnPoint;
         newPos.x += xDif;
         newPos.z += zDif;
@@ -159,7 +150,7 @@ public class Dragon : MonoBehaviour {
         spawnPoint = transform.position;
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
         lastAttackTime = Time.time - attackCooldown;
-        Stage = DragonStage.Egg; //Change to egg
+        Stage = DragonStage.Egg; 
         SetDestination(transform.position);
         //DoDelayedActions();
         TestForNearbyTargets();
@@ -363,24 +354,18 @@ public class Dragon : MonoBehaviour {
     
      void FitColliderToChildren ()
     {
-        //print("Fitting collider to children...");
         BoxCollider bc = gameObject.GetComponent<BoxCollider>();
         Bounds bounds = new Bounds (Vector3.zero, Vector3.zero);
         bool hasBounds = false;
         Renderer[] renderers =  gameObject.GetComponentsInChildren<Renderer>();
         foreach (Renderer render in renderers) {
-            //print("Found renderer: "+render.name);
             if (hasBounds) {
                 bounds.Encapsulate(render.bounds);
             } 
             else {
-        //print("Rend bounds: "+BodyMesh.GetComponent<Renderer>().bounds.ToString());
             bounds = render.bounds;
             hasBounds = true;
             }
-        //print("Col bounds: "+bounds.ToString());
-           //}
-       //}
         }
         if (hasBounds) {
             bc.center = bounds.center - gameObject.transform.position;
@@ -389,7 +374,6 @@ public class Dragon : MonoBehaviour {
             bc.size = bc.center = Vector3.zero;
             bc.size = Vector3.zero;
         }
-      //print("True bounds: "+bc.bounds.ToString());
    }
    
    public void EatFood(GameObject foodGO = default(GameObject)) {

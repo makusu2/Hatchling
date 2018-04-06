@@ -5,12 +5,12 @@ using UnityEngine;
 public class GovernorBehavior : MonoBehaviour {
 
     private bool explainedSituation = false;
-    private GameObject town;
+    //private GameObject town;
     private GameObject player;
     private HUD hud;
     
     void Awake() {
-        town = GameObject.FindWithTag("Town");
+        //town = GameObject.FindWithTag("Town");
         player = GameObject.FindWithTag("MainPlayer");
     }
     

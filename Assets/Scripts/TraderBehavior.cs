@@ -15,8 +15,6 @@ public class TraderBehavior : MonoBehaviour {
     
     private HUD hud;
     
-    private static System.Random rnd = new System.Random();
-    
     void Awake() {
         hud = GameObject.FindWithTag("MainPlayer").GetComponent<HUD>();
     }
@@ -101,7 +99,7 @@ public class TraderBehavior : MonoBehaviour {
     }
     
     static string randomItem() {
-        return CoinValue.Keys.ToArray()[rnd.Next(CoinValue.Count)];
+        return CoinValue.Keys.ToArray()[MakuUtil.rnd.Next(CoinValue.Count)];
     }
     public static Dictionary<string,int> CoinValue = new Dictionary<string,int>() {
         {"Apple",5},

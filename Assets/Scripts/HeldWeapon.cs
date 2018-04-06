@@ -1,13 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class HeldWeapon : MonoBehaviour {
+public class HeldWeapon : MonoBehaviour, ItemActivator {
 
 
     public int AttackLevel = 1;
     
     [SerializeField] private AudioClip hitSound;
+    
+    [SerializeField]
+    public Action customActivateItem;
     
     private static GameObject player;
 	// Use this for initialization
@@ -28,7 +32,19 @@ public class HeldWeapon : MonoBehaviour {
         }
     }
     
+    void Setup(Action usageFunc) {
+        this.customActivateItem = usageFunc;
+    }
+    
     public void ActivateItem() {
-        player.GetComponent<PlayerBehavior>().Arms.GetComponent<Animator>().SetTrigger("Swing");
+        if (customActivateItem == null) {
+            Swing();
+        }
+        else {
+            customActivateItem();
+        }
+    }
+    void Swing() {
+            player.GetComponent<PlayerBehavior>().Arms.GetComponent<Animator>().SetTrigger("Swing");
     }
 }

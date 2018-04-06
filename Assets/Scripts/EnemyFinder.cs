@@ -13,23 +13,37 @@ public class EnemyFinder : MonoBehaviour {
         this.distToNotice = distToNotice;
     }
     
-    public GameObject GetClosestEnemy() {
-        
-        GameObject[] nearbyEnemies = GetNearbyEnemies();
-        if (nearbyEnemies.Length > 0) {
-            GameObject targetGO = GetClosestGameObject(nearbyEnemies);
-            return targetGO;
+    public GameObject GetClosestWithProp(Func<GameObject,bool> qualificationFunc) {
+        GameObject[] nearbyQualifiers = GetNearbyWithProp(qualificationFunc);
+        if (nearbyQualifiers.Length > 0) {
+            return GetClosestGameObject(nearbyQualifiers);
         }
         return null;
     }
+    public GameObject[] GetNearbyWithProp(Func<GameObject,bool> qualificationFunc) {
+        Collider[] possibleColliders = Physics.OverlapSphere(transform.position,distToNotice);
+        List<GameObject> GOs = new List<GameObject>();
+        foreach (Collider possibleCollider in possibleColliders) {
+            if (qualificationFunc(possibleCollider.gameObject)) {
+                GOs.Add(possibleCollider.gameObject);
+            }
+        }
+        return GOs.ToArray();
+    }
+    
+    public bool IsEnemy(GameObject go) {
+        Factions[] enemyFactions = GetComponent<Faction>().GetEnemyFactions();
+        Faction enemyFaction = go.GetComponent<Faction>();
+        return (enemyFaction != null && enemyFactions.Contains(enemyFaction.faction));
+    }
+    public GameObject GetClosestEnemy() {
+        Func<GameObject,bool> qualFunc = (GameObject go) => IsEnemy(go);
+        return GetClosestWithProp(qualFunc);
+    }
     
     public GameObject GetClosestFood() {
-        GameObject[] nearbyFoods = GetNearbyFoods();
-        if (nearbyFoods.Length > 0) {
-            GameObject targetGO = GetClosestGameObject(nearbyFoods);
-            return targetGO;
-        }
-        return null;
+        Func<GameObject,bool> qualFunc = (GameObject go) => go.GetComponent<FoodBehavior>() != null;
+        return GetClosestWithProp(qualFunc);
     }
     
     
@@ -49,50 +63,4 @@ public class EnemyFinder : MonoBehaviour {
         return minGO;
     }
     
-    GameObject[] GetNearbyFoods() {
-        Collider[] possibleColliders = Physics.OverlapSphere(transform.position,distToNotice);
-        List<GameObject> foods = new List<GameObject>();
-        foreach (Collider possibleCollider in possibleColliders) {
-            if (possibleCollider.gameObject.GetComponent<FoodBehavior>() != null) {
-                foods.Add(possibleCollider.gameObject);
-            }
-        }
-        return foods.ToArray();
-    }
-    
-    GameObject[] GetNearbyEnemies() {
-        Dictionary<Factions,GameObject[]> nearbyEntities = GetNearbyFactionGOs();
-        List<GameObject> enemies = new List<GameObject>();
-        Factions[] enemyFactions = GetComponent<Faction>().GetEnemyFactions();
-        foreach (Factions fact in nearbyEntities.Keys) {
-            if(enemyFactions.Contains(fact)) {
-                enemies.AddRange(nearbyEntities[fact]);
-            }
-        }
-        return enemies.ToArray();
-    }
-    
-    Dictionary<Factions,GameObject[]> GetNearbyFactionGOs() {
-        Dictionary<Factions,List<GameObject>> factLists = new Dictionary<Factions,List<GameObject>>();
-        Collider[] possibleColliders = Physics.OverlapSphere(transform.position,distToNotice);
-        foreach (Collider possibleCollider in possibleColliders) {
-            GameObject possibleGO = possibleCollider.gameObject;
-            Factions possibleFaction;
-            try {
-                possibleFaction = possibleGO.GetComponent<Faction>().faction;
-            }
-            catch {
-                continue;
-            }
-            if (!factLists.ContainsKey(possibleFaction)) {
-                factLists[possibleFaction] = new List<GameObject>();
-            }
-            factLists[possibleFaction].Add(possibleGO);
-        }
-        Dictionary<Factions,GameObject[]> factArrays = new Dictionary<Factions,GameObject[]>();
-        foreach(Factions fact in factLists.Keys) {
-            factArrays[fact] = factLists[fact].ToArray();
-        }
-        return factArrays;
-    }
 }

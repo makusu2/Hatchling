@@ -197,11 +197,8 @@ public class PlayerBehavior : MonoBehaviour {
             UseItem();
         }
         if (Input.GetKeyDown(KeyCode.Tab)) {
-            if (Hud.TraderMenuOpen) {
-                Hud.TraderMenuOpen = false;
-            }
-            else if (Hud.TownMenuOpen) {
-                Hud.TownMenuOpen = false;
+            if(Hud.AnySpecialPanelOpen()) {
+                Hud.CloseAllUI();
             }
             else {
                 Hud.InventoryMenuOpen = !Hud.InventoryMenuOpen;
@@ -265,10 +262,7 @@ public class PlayerBehavior : MonoBehaviour {
             Arms.GetComponent<Animator>().SetTrigger("Swing");
         }
         else {
-            //swing item
-            //HeldItemObject.GetComponent<HeldWeapon>().ActivateItem();
-            HeldItemObject.SendMessage("ActivateItem");
-            //TODO make it not send; can't currently do cuz only heldweapons works
+            HeldItemObject.GetComponent<ItemActivator>().ActivateItem(); //Searches for the interface and activates the corresponding method
         }
     }
     

@@ -19,20 +19,6 @@ public class CameraBehavior : MonoBehaviour {
         Vector3 fwd = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
         bool didHit = Physics.Raycast(pos,fwd,out hit,maxDistance: maxDist);
-        /*if(!didHit) {
-            print("Didn't hit");
-        }
-        else {
-            print("Did hit");
-        }*/
         return hit;
-        /*Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (!Physics.Raycast(ray, out hit)) {
-            //Transform objectHit = hit.transform;
-            
-            // Do something with the object that was hit by the raycast.
-        }
-        return hit;*/
     }
 }

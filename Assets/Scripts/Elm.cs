@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Elm : MonoBehaviour {
 
@@ -11,11 +12,29 @@ public class Elm : MonoBehaviour {
     private int currentWood;
     private int currentBranches;
     
-    private GameObject player;
+    private static GameObject player;
+    
+    public int Wood {
+        get {return currentWood;}
+        set {
+            currentWood = Math.Max(value,0);
+            if (currentWood == 0) {
+                Die();
+            }
+        }
+    }
+    public int Branches {
+        get { return currentBranches;}
+        set {
+            currentBranches = value;
+        }
+    }
     
 	// Use this for initialization
 	void Start () {
-        player = GameObject.FindWithTag("MainPlayer");
+        if(player == null) {
+            player = GameObject.FindWithTag("MainPlayer");
+        }
 		currentWood = MaxWood;
         currentBranches = MaxBranches;
 	}
@@ -39,24 +58,21 @@ public class Elm : MonoBehaviour {
         if(player.GetComponent<PlayerBehavior>().CurrentItem.Equals("Hatchet")) {
             player.GetComponent<PlayerBehavior>().inventory.AddItem("Wood");
             
-            currentWood -= 1;
-            if(currentWood <= 0) {
-                Die();
-            }
+            Wood -= 1;
         }
     }
     
     void GetClickedOn(GameObject player) {
-        if(currentBranches > 0) {
+        if(Branches > 0) {
             player.GetComponent<PlayerBehavior>().inventory.AddItem("Branch");
-            currentBranches -= 1;
+            Branches -= 1;
         }
     }
     
     public void Die() {
         Disappear();
-        currentWood = MaxWood;
-        currentBranches = MaxBranches;
+        Wood = MaxWood;
+        Branches = MaxBranches;
         Invoke("Reappear",RespawnTime);
     }
 }

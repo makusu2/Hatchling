@@ -4,7 +4,6 @@ Electrical system for town
 Swimming mechanic
 Maybe rewrite FPS script
 Make trees show some sort of dust or whatever when hit with a hatchet
-Add trader
 Add chest
 
 

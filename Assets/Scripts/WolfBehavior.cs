@@ -30,8 +30,12 @@ public class WolfBehavior : MonoBehaviour {
     [SerializeField] private AudioClip successBiteSound;
     [SerializeField] private AudioClip failBiteSound;
     
-    private static System.Random rnd = new System.Random();
     
+    private Animator ani {
+        get {
+            return GetComponent<Animator>();
+        }
+    }
     
     private GameObject teethPoint;
     private Vector3 teethPointLocation {
@@ -49,23 +53,20 @@ public class WolfBehavior : MonoBehaviour {
     private bool isAttacking = false;
     public bool IsAttacking {
         get {
-            return isAttacking || gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.hit") || gameObject.GetComponent<Animator>().GetBool("BeginAttack");
+            return isAttacking || ani.GetCurrentAnimatorStateInfo(0).IsName("Base.hit") || ani.GetBool("BeginAttack");
         }
-        set{}
     }
     
     public bool IsWalking {
         get {
-            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.walk") || gameObject.GetComponent<Animator>().GetBool("Walking");
+            return ani.GetCurrentAnimatorStateInfo(0).IsName("Base.walk") || ani.GetBool("Walking");
         }
-        set {}
     }
     
     public bool IsRunning {
         get {
-            return gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Base.run") || gameObject.GetComponent<Animator>().GetBool("Running");
+            return ani.GetCurrentAnimatorStateInfo(0).IsName("Base.run") || ani.GetBool("Running");
         }
-        set {}
     }
     
     
@@ -73,38 +74,38 @@ public class WolfBehavior : MonoBehaviour {
     
     void SetAction(string action) {
         if (action == "Walking") {
-            GetComponent<Animator>().SetBool("AllowIdle",false);
-            GetComponent<Animator>().SetBool("Walking",true);
-            GetComponent<Animator>().SetBool("Running",false);
-            GetComponent<Animator>().SetBool("Dead",false);
-            GetComponent<Animator>().ResetTrigger("BeginAttack");
+            ani.SetBool("AllowIdle",false);
+            ani.SetBool("Walking",true);
+            ani.SetBool("Running",false);
+            ani.SetBool("Dead",false);
+            ani.ResetTrigger("BeginAttack");
         }
         else if (action == "Idle") {
-            GetComponent<Animator>().SetBool("AllowIdle",true);
-            GetComponent<Animator>().SetBool("Walking",false);
-            GetComponent<Animator>().SetBool("Running",false);
-            GetComponent<Animator>().ResetTrigger("BeginAttack");
+            ani.SetBool("AllowIdle",true);
+            ani.SetBool("Walking",false);
+            ani.SetBool("Running",false);
+            ani.ResetTrigger("BeginAttack");
         }
         else if (action == "Running") {
-            GetComponent<Animator>().SetBool("AllowIdle",false);
-            GetComponent<Animator>().SetBool("Walking",false);
-            GetComponent<Animator>().SetBool("Running",true);
-            GetComponent<Animator>().SetBool("Dead",false);
-            GetComponent<Animator>().ResetTrigger("BeginAttack");
+            ani.SetBool("AllowIdle",false);
+            ani.SetBool("Walking",false);
+            ani.SetBool("Running",true);
+            ani.SetBool("Dead",false);
+            ani.ResetTrigger("BeginAttack");
         }
         else if (action == "Attack") {
-            GetComponent<Animator>().SetBool("AllowIdle",false);
-            GetComponent<Animator>().SetBool("Walking",false);
-            GetComponent<Animator>().SetBool("Running",false);
-            GetComponent<Animator>().SetBool("Dead",false);
-            GetComponent<Animator>().SetTrigger("BeginAttack");
+            ani.SetBool("AllowIdle",false);
+            ani.SetBool("Walking",false);
+            ani.SetBool("Running",false);
+            ani.SetBool("Dead",false);
+            ani.SetTrigger("BeginAttack");
         }
         else if (action == "Die") {
-            GetComponent<Animator>().SetBool("AllowIdle",false);
-            GetComponent<Animator>().SetBool("Walking",false);
-            GetComponent<Animator>().SetBool("Running",false);
-            GetComponent<Animator>().SetBool("Dead",true);
-            GetComponent<Animator>().ResetTrigger("BeginAttack");
+            ani.SetBool("AllowIdle",false);
+            ani.SetBool("Walking",false);
+            ani.SetBool("Running",false);
+            ani.SetBool("Dead",true);
+            ani.ResetTrigger("BeginAttack");
         }
         else {
             Debug.LogWarning("Tried to set action to "+action+" but it doesn't exist");
@@ -112,8 +113,8 @@ public class WolfBehavior : MonoBehaviour {
     }
     
     private Vector3 GetNewRoamDestination() {
-        int xDif = rnd.Next(-maxRoamDistance,maxRoamDistance);
-        int zDif = rnd.Next(-maxRoamDistance,maxRoamDistance);
+        int xDif = MakuUtil.rnd.Next(-maxRoamDistance,maxRoamDistance);
+        int zDif = MakuUtil.rnd.Next(-maxRoamDistance,maxRoamDistance);
         Vector3 newPos = spawnPoint;
         newPos.x += xDif;
         newPos.z += zDif;
