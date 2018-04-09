@@ -1,3 +1,4 @@
 Stonewall=10*Stone
 Woodwall=10*Wood
 Firepit=3*Wood,1*Branch,8*Stone
+Chest=10*Wood,1*Steel
