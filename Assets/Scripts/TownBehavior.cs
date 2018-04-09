@@ -23,9 +23,9 @@ public class TownBehavior : MonoBehaviour {
     
     public int CountOf(string item) {
         try {
-            return itemCounts[name];
+            return itemCounts[item];
         }
-        catch {
+        catch(KeyNotFoundException){
             return 0;
         }
     }

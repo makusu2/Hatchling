@@ -26,16 +26,7 @@ public class PlayerBehavior : MonoBehaviour {
             return inventory.CountOf("Coin");
         }
         set {
-            if(value > inventory.CountOf("Coin")) {
-                while (value > inventory.CountOf("Coin")) {
-                    inventory.AddItem("Coin");
-                }
-            }
-            else if (value < inventory.CountOf("Coin")){
-                while (value<inventory.CountOf("Coin")) {
-                    inventory.RemoveItem("Coin");
-                }
-            }
+            inventory.SetCount("Coin",value);
         }
     }
     

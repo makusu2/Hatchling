@@ -24,6 +24,7 @@ public class Inventory : MonoBehaviour {
         }
     }
     
+    
     public Dictionary<String,int> Counts { get { return counts;}} //TODO make this private and have all other stuff call CountOf
     public Dictionary<string,GameObject> VisibleBoxes {get {return visibleBoxes;}}
     
@@ -68,6 +69,21 @@ public class Inventory : MonoBehaviour {
     public bool ExtraInventoryFull {get {return CurrentExtraNumItems >= maxExtraNumItems;}}
     
     public bool TotalInventoryFull {get {return CurrentTotalNumItems >= maxTotalNumItems;}}
+    
+    public void SetCount(string item, int count) {
+        int deltaItem = count - CountOf(item);
+        if(deltaItem > 0) {
+            for (int i=0;i<deltaItem;i++) {
+                AddItem(item);
+            }
+        }
+        else if (deltaItem < 0){
+            for (int i=deltaItem;i<0;i++) {
+                RemoveItem(item);
+            }
+        }
+        
+    }
     
     Vector3 GetDiscardPosition() {
         int maxDist = 10;

@@ -37,17 +37,10 @@ public class Dragon : MonoBehaviour {
             }
             foreach (Transform child in transform) {
                 child.gameObject.SetActive(child == possibleTrans); //If it's the trans, active, otherwise inactive
-                /*if (child == possibleTrans) {
-                    child.gameObject.SetActive(true);
-                }
-                else {
-                    child.gameObject.SetActive(false);
-                }*/
             }
             body = possibleTrans.gameObject;
             
             FitColliderToChildren();
-            //Invoke("FitColliderToChildren",5);
             
             if(stage == DragonStage.Egg) {
                 GetComponent<Faction>().faction = Factions.None;
