@@ -18,7 +18,7 @@ public class CameraBehavior : MonoBehaviour {
         Vector3 pos = transform.position;
         Vector3 fwd = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
-        bool didHit = Physics.Raycast(pos,fwd,out hit,maxDistance: maxDist);
+        Physics.Raycast(pos,fwd,out hit,maxDistance: maxDist);
         return hit;
     }
 }

@@ -9,10 +9,12 @@ public class InfoHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public string infoStr;
     
     private GameObject player;
+    private HUD hud;
     
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         player = GameObject.FindWithTag("MainPlayer");
+        hud = player.GetComponent<HUD>();
 	}
 	
 	// Update is called once per frame
@@ -26,11 +28,20 @@ public class InfoHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             Debug.LogError("Info string was never initialized");
         }
         else {
-            player.GetComponent<HUD>().InfoStr = infoStr;
+            hud.InfoStr = infoStr;
         }
     }
 
     public void OnPointerExit(PointerEventData eventData){
-        player.GetComponent<HUD>().InfoStr = "";
+        hud.InfoStr = "";
+    }
+    
+    public void OnDisable() {
+        if (hud == null) {
+            return; //Means that start was never called, so we don't have to worry
+        }
+        if (hud.InfoStr == infoStr) {
+            hud.InfoStr = "";
+        }
     }
 }

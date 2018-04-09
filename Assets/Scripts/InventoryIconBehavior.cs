@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler{
+public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler, IPointerClickHandler{
 
     private GameObject player;
     
@@ -28,6 +28,22 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
     
     public void OnDrag(PointerEventData eventData) {
         transform.position = Input.mousePosition;//rayPoint;
+    }
+    
+    public void OnPointerClick(PointerEventData pointerEventData) {
+        if(Input.GetKey(KeyCode.LeftShift)) {
+            //TODO have the clicked item go to whatever it should go to
+            Rect rec = GetCurrentRect();
+            if ((rec == inventoryRect || rec == extraRect) && hud.TownMenuOpen) {
+                hud.Town.GetComponent<TownBehavior>().ItemMovedTo(Item);
+            }
+            else if (rec == inventoryRect) {
+                player.GetComponent<PlayerBehavior>().inventory.MoveToExtraInventory(Item);
+            }
+            else if (rec == extraRect) {
+                player.GetComponent<PlayerBehavior>().inventory.MoveToNormalInventory(Item);
+            }
+        }
     }
     
     public void OnEndDrag(PointerEventData eventData) {

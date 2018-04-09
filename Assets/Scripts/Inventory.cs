@@ -110,6 +110,12 @@ public class Inventory : MonoBehaviour {
             droppedGO.SetActive(true);
             Vector3 spawnPosition = GetDiscardPosition();
             droppedGO.transform.position = spawnPosition;
+            if (i == 0) { //Only do it for the first one
+                try {
+                    droppedGO.GetComponent<PickupBehavior>().GroupWithNearby();
+                }
+                catch(NullReferenceException) {}
+            }
         }
     }
     

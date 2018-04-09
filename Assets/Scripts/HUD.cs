@@ -83,7 +83,7 @@ public class HUD : MonoBehaviour {
     }
     
 	void Start () {
-        
+        InfoStr = "";
         BuildingMenuOpen = false;
         PauseMenuOpen = false;
         TownMenuOpen = false;
@@ -128,6 +128,10 @@ public class HUD : MonoBehaviour {
             DialogueText.GetComponent<Text>().text = nextDialogue.text;
         }
         
+    }
+   
+    public void ClearInfoBox() {
+        InfoStr = "";
     }
     
     public void CloseAllUI() {

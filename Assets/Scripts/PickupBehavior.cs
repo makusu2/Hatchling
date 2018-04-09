@@ -6,6 +6,9 @@ public class PickupBehavior : MonoBehaviour {
     
     public int RespawnTime = 5;
     
+    [System.NonSerialized]
+    public int StackCount = 1;
+    
     private Vector3 respawnLocation;
     
 	// Use this for initialization
@@ -40,12 +43,19 @@ public class PickupBehavior : MonoBehaviour {
         transform.position = respawnLocation;
     }
     
+    public void GroupWithNearby() {
+        //TODO group with nearby; or maybe don't, can't decide yet
+    }
+    
     void GetClickedOn(GameObject player) {
         //print("Hi, I was clicked on");
         player.GetComponent<PlayerBehavior>().inventory.AddItem(PickupName);
         Disappear();
         if(RespawnTime >= 0) {
             Invoke("Respawn",RespawnTime);
+        }
+        else {
+            Destroy(this);
         }
     }
     
