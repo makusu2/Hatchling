@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Elm : MonoBehaviour {
+public class Elm : MonoBehaviour, ReceiveSwing {
 
     public int MaxWood = 30;
     public int MaxBranches = 4;
@@ -11,6 +11,16 @@ public class Elm : MonoBehaviour {
     
     private int currentWood;
     private int currentBranches;
+    
+    [SerializeField]
+    private AudioClip successHitSound;
+    [SerializeField]
+    private AudioClip failHitSound;
+    [SerializeField]
+    private GameObject particles;
+    public AudioClip SuccessHitSound {get { return successHitSound;}}
+    public AudioClip FailHitSound {get {return failHitSound;}}
+    public GameObject Particles { get {return particles;}}
     
     private static GameObject player;
     
@@ -55,10 +65,21 @@ public class Elm : MonoBehaviour {
     }
     
     public void GetSwungAt() {
+        Transform strikePointTrans;
         if(player.GetComponent<PlayerBehavior>().CurrentItem.Equals("Hatchet")) {
             player.GetComponent<PlayerBehavior>().inventory.AddItem("Wood");
-            
             Wood -= 1;
+            strikePointTrans = player.GetComponent<PlayerBehavior>().HeldItemObject.transform.Find("StrikePoint");
+            if (strikePointTrans == null) {
+                Debug.LogWarning(player.GetComponent<PlayerBehavior>().CurrentItem+" does not have a StrikePoint");
+                return;
+            }
+            AudioSource.PlayClipAtPoint(SuccessHitSound,strikePointTrans.position);
+            //TODO play particles
+        }
+        else {
+            Vector3 audioPos = player.GetComponent<PlayerBehavior>().EquippedContainer.transform.position;
+            AudioSource.PlayClipAtPoint(FailHitSound,audioPos);
         }
     }
     

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEditor;
 using System.IO;
 
-public class TownBehavior : MonoBehaviour {
+public class TownBehavior : MonoBehaviour, ItemHolderInt{
     
     private GameObject player;
     private HUD hud;

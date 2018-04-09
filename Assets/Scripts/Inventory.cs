@@ -8,7 +8,7 @@ using System.IO;
 using System;
 using System.Collections.Specialized;
 
-public class Inventory : MonoBehaviour {
+public class Inventory : MonoBehaviour, ItemHolderInt {
     
 
     private Dictionary<string,int> counts = new Dictionary<string,int>();
@@ -59,16 +59,14 @@ public class Inventory : MonoBehaviour {
     
     
     public int CurrentNumItems { get {return itemOrder.ToArray().Length;}}
-    
     public int CurrentExtraNumItems {get {return visibleBoxes.Keys.ToArray().Length - itemOrder.ToArray().Length;}}
-    
     public int CurrentTotalNumItems {get {return visibleBoxes.Keys.ToArray().Length;}}
-    
     public bool NormalInventoryFull {get {return CurrentNumItems >= maxNumItems;}}
-    
+    public bool NormalInventoryOverflowing { get {return CurrentNumItems > maxNumItems;}}
     public bool ExtraInventoryFull {get {return CurrentExtraNumItems >= maxExtraNumItems;}}
-    
+    public bool ExtraInventoryOverflowing { get { return CurrentExtraNumItems > maxExtraNumItems;}}
     public bool TotalInventoryFull {get {return CurrentTotalNumItems >= maxTotalNumItems;}}
+    public bool TotalInventoryOverflowing{get{return CurrentTotalNumItems >= maxTotalNumItems;}}
     
     public void SetCount(string item, int count) {
         int deltaItem = count - CountOf(item);
@@ -230,8 +228,8 @@ public class Inventory : MonoBehaviour {
             
             CurrentlySelectedSlot = 0;
         }
-        if (NormalInventoryFull) {
-            if (ExtraInventoryFull) {
+        if (NormalInventoryOverflowing) {
+            if (ExtraInventoryOverflowing) {
                 DiscardItem(name);
             }
             else {

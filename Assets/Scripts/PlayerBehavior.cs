@@ -253,7 +253,14 @@ public class PlayerBehavior : MonoBehaviour {
             Arms.GetComponent<Animator>().SetTrigger("Swing");
         }
         else {
-            HeldItemObject.GetComponent<ItemActivator>().ActivateItem(); //Searches for the interface and activates the corresponding method
+            ItemActivator itemActivator = HeldItemObject.GetComponent<ItemActivator>();
+            if (itemActivator == null) {
+                //swing with fists
+                Arms.GetComponent<Animator>().SetTrigger("Swing");
+            }
+            else {
+                itemActivator.ActivateItem(); //Searches for the interface and activates the corresponding method
+            }
         }
     }
     

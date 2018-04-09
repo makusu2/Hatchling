@@ -17,6 +17,7 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
     private Rect inventoryRect;
     private Rect extraRect;
     private Rect townRect;
+    private Rect chestRect;
     
     public string Item;
     
@@ -32,10 +33,15 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
     
     public void OnPointerClick(PointerEventData pointerEventData) {
         if(Input.GetKey(KeyCode.LeftShift)) {
-            //TODO have the clicked item go to whatever it should go to
             Rect rec = GetCurrentRect();
             if ((rec == inventoryRect || rec == extraRect) && hud.TownMenuOpen) {
                 hud.Town.GetComponent<TownBehavior>().ItemMovedTo(Item);
+            }
+            else if ((rec == inventoryRect || rec == extraRect) && hud.ChestMenuOpen) {
+                hud.CurrentChest.GetComponent<ChestBehavior>().ItemMovedTo(Item);
+            }
+            else if (rec == chestRect) {
+                hud.CurrentChest.GetComponent<ChestBehavior>().ItemTakenFrom(Item);
             }
             else if (rec == inventoryRect) {
                 player.GetComponent<PlayerBehavior>().inventory.MoveToExtraInventory(Item);
@@ -51,11 +57,24 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
         if (rec == originalRect || originalRect == townRect) {
             transform.position = originalPosition;
         }
-        else if (rec == inventoryRect) {
+        else if (rec == inventoryRect && originalRect == extraRect) {
             player.GetComponent<PlayerBehavior>().inventory.MoveToNormalInventory(Item);
         }
-        else if (rec == extraRect) {
+        else if (rec == extraRect && originalRect == inventoryRect) {
             player.GetComponent<PlayerBehavior>().inventory.MoveToExtraInventory(Item);
+        }
+        else if (rec == inventoryRect && originalRect == chestRect) {
+            hud.CurrentChest.GetComponent<ChestBehavior>().ItemTakenFrom(Item);
+        }
+        else if (rec == extraRect && originalRect == chestRect) {
+            bool wasProbablyAlreadyMoved = player.GetComponent<PlayerBehavior>().inventory.NormalInventoryFull;
+            hud.CurrentChest.GetComponent<ChestBehavior>().ItemTakenFrom(Item);
+            if(!wasProbablyAlreadyMoved) {
+                player.GetComponent<PlayerBehavior>().inventory.MoveToExtraInventory(Item);
+            }
+        }
+        else if (rec == chestRect && (originalRect == extraRect || originalRect == inventoryRect)) {
+            hud.CurrentChest.GetComponent<ChestBehavior>().ItemMovedTo(Item);
         }
         else if (rec == townRect) {
             hud.Town.GetComponent<TownBehavior>().ItemMovedTo(Item);
@@ -64,7 +83,8 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
             player.GetComponent<PlayerBehavior>().inventory.DiscardItem(Item);
         }
         else {
-            Debug.LogError("This shouldn't happen");
+            //Debug.LogError("This shouldn't happen");
+            transform.position = originalPosition;
         }
     }
     
@@ -78,6 +98,9 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
         }
         else if (townRect.Contains(mp) && hud.TownMenuOpen) {
             return townRect;
+        }
+        else if (chestRect.Contains(mp) && hud.ChestMenuOpen) {
+            return chestRect;
         }
         else {
             return default(Rect);
@@ -100,6 +123,7 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
         inventoryRect = RectFromTrans(hud.InventoryPanel.GetComponent<RectTransform>());
         extraRect = RectFromTrans(hud.ExtraInventoryPanel.GetComponent<RectTransform>());
         townRect = RectFromTrans(hud.TownPanel.GetComponent<RectTransform>());
+        chestRect = RectFromTrans(hud.ChestPanel.GetComponent<RectTransform>());
 	}
 	
 }

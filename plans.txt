@@ -1,12 +1,13 @@
-Small ideas:
-
 Electrical system for town
 Swimming mechanic
-Maybe rewrite FPS script
 Make trees show some sort of dust or whatever when hit with a hatchet
 Add chest
 Dragon growth stages
 Commission models
+Have items combine if near others of the same type
+    Or don't
+    Or maybe have it happen on collision?
+Fix the held items hit twice issue (one on swing down one on swing up)
 
 
 

@@ -32,9 +32,10 @@ public class HUD : MonoBehaviour {
     }
     
     public GameObject CurrentTrader = null;
+    public GameObject CurrentChest = null;
     
     [System.NonSerialized]
-    public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, DialoguePanel, DialogueFace, DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText;
+    public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, ChestPanel, DialoguePanel, DialogueFace, DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText;
     [System.NonSerialized]
     public GameObject Player, Town, Cam;
     [System.NonSerialized]
@@ -67,6 +68,7 @@ public class HUD : MonoBehaviour {
         PausePanel = GameObject.FindWithTag("PausePanel");
         ArmorPanel = GameObject.FindWithTag("ArmorPanel");
         TownPanel = GameObject.FindWithTag("TownPanel");
+        ChestPanel = GameObject.FindWithTag("ChestPanel");
         DialoguePanel = GameObject.FindWithTag("DialoguePanel");
         DialogueFace = GameObject.FindWithTag("DialogueFace");
         DialogueText = GameObject.FindWithTag("DialogueText");
@@ -83,11 +85,11 @@ public class HUD : MonoBehaviour {
     }
     
 	void Start () {
-        InfoStr = "";
         BuildingMenuOpen = false;
         PauseMenuOpen = false;
         TownMenuOpen = false;
         TraderMenuOpen = false;
+        ChestMenuOpen = false;
         DialogueContinue(); //Unless we have dialogue at the start of the game, this just closes the pause menu
 	}
 	
@@ -135,11 +137,11 @@ public class HUD : MonoBehaviour {
     }
     
     public void CloseAllUI() {
-        InventoryMenuOpen = BuildingMenuOpen = PauseMenuOpen = TownMenuOpen = TraderMenuOpen = false;
+        InventoryMenuOpen = BuildingMenuOpen = PauseMenuOpen = TownMenuOpen = TraderMenuOpen = ChestMenuOpen = false;
     }
     
     public bool AnySpecialPanelOpen() {
-        return BuildingMenuOpen || PauseMenuOpen || TownMenuOpen || TraderMenuOpen;
+        return BuildingMenuOpen || PauseMenuOpen || TownMenuOpen || TraderMenuOpen || ChestMenuOpen;
     }
     
     private bool dialoguePanelOpen = false;
@@ -208,6 +210,27 @@ public class HUD : MonoBehaviour {
             CursorFree = value;
             TownPanel.SetActive(value);
             townMenuOpen = value;
+            ExtraInventoryPanel.SetActive(value);
+            UsingUI = value;
+        }
+    }
+    
+    private bool chestMenuOpen = false;
+    public bool ChestMenuOpen {
+        get { return chestMenuOpen;}
+        set {
+            if (value && CurrentChest == null) {
+                Debug.LogError("Attempted to open chest menu without CurrentChest being assigned in HUD");
+            }
+            if(value) {
+                CurrentChest.GetComponent<ChestBehavior>().CreateIcons();
+            }
+            else if (!value && CurrentChest != null) {
+                CurrentChest.GetComponent<ChestBehavior>().DestroyIcons();
+            }
+            CursorFree = value;
+            ChestPanel.SetActive(value);
+            chestMenuOpen = value;
             ExtraInventoryPanel.SetActive(value);
             UsingUI = value;
         }

@@ -8,7 +8,6 @@ public class HeldWeapon : MonoBehaviour, ItemActivator {
 
     public int AttackLevel = 1;
     
-    [SerializeField] private AudioClip hitSound;
     
     [SerializeField]
     public Action customActivateItem;
@@ -29,6 +28,10 @@ public class HeldWeapon : MonoBehaviour, ItemActivator {
         Health colHealth = col.gameObject.GetComponent<Health>();
         if (colHealth != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
             colHealth.GetDamaged(AttackLevel);
+        }
+        ReceiveSwing swungGO = col.gameObject.GetComponent<ReceiveSwing>();
+        if (swungGO != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
+            swungGO.GetSwungAt();
         }
     }
     
