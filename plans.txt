@@ -1,13 +1,15 @@
 Electrical system for town
 Swimming mechanic
 Make trees show some sort of dust or whatever when hit with a hatchet
-Add chest
 Dragon growth stages
 Commission models
-Have items combine if near others of the same type
-    Or don't
-    Or maybe have it happen on collision?
 Fix the held items hit twice issue (one on swing down one on swing up)
+Human models
+Fall damage
+Also combine pickups on awake (or start)
+1000 on inventoryicons showing as 100
+Bow and arrow combat
+Fix UI issue
 
 
 
@@ -144,6 +146,9 @@ Alright, graphic talk; fuckin, equipped items...
     Should there be an actual item that's a subclass of the player, or should there just be a mesh that's a component of the hands or something?
     
 
+Have items combine if near others of the same type
+    Or don't
+    Or maybe have it happen on collision?
 
 
 I really want to make the inventory standalone...

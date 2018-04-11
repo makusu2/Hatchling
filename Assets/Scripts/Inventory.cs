@@ -48,7 +48,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
     
     public readonly int maxExtraNumItems = 10;
     
-    public readonly int maxStack = 30;
+    public readonly int maxStack = 50; //Change to something around 50 later on
     public string[] noStackLimit = new string[] {"Coin",};
     
     public int maxTotalNumItems {
@@ -104,16 +104,19 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
         for (int i=0;i<numToDrop;i++) {
             //TODO add some sound to indicate dropping here
             RemoveItem(name);
+            
+            Vector3 spawnPosition = GetDiscardPosition();
             GameObject droppedGO = Instantiate(goTemplate);
             droppedGO.SetActive(true);
-            Vector3 spawnPosition = GetDiscardPosition();
             droppedGO.transform.position = spawnPosition;
-            if (i == 0) { //Only do it for the first one
-                try {
-                    droppedGO.GetComponent<PickupBehavior>().GroupWithNearby();
-                }
-                catch(NullReferenceException) {}
+            try {
+                droppedGO.GetComponent<PickupBehavior>().StackWithNearby();
             }
+            catch(NullReferenceException) {
+                Debug.LogError("Could not stack "+name+", didn't have pickupbehavior");
+            }
+            
+            
         }
     }
     

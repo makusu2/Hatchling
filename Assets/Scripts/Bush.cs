@@ -12,7 +12,9 @@ public class Bush : MonoBehaviour {
         Vector3 fruitPos = new Vector3(this.transform.position.x+Random.Range(-1.0f,1.0f),
                                        this.transform.position.y+Random.Range(0.0f,1.0f),
                                        this.transform.position.z+Random.Range(-1.0f,1.0f));
-        Instantiate(fruit,fruitPos,Quaternion.identity).transform.SetParent(transform);
+        GameObject fruitInstance = Instantiate(fruit,fruitPos,Quaternion.identity);
+        fruitInstance.transform.SetParent(transform);
+        fruitInstance.GetComponent<PickupBehavior>().RespawnTime = 5;
     }
     
 	// Use this for initialization

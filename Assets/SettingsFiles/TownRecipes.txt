@@ -1,2 +1,3 @@
 VillagerHome=30*Wood,30*Stone
 TradingPost=30*Wood,30*Stone,100*Coin
+Wall=200*Stone

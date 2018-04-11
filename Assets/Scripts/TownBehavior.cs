@@ -151,7 +151,9 @@ public class TownBehavior : MonoBehaviour, ItemHolderInt{
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
             string ingredient = ingredientPair.Key;
             int count = ingredientPair.Value;
-            return(CountOf(ingredient) >= count);
+            if(CountOf(ingredient) < count) {
+                return false;
+            }
         }
         return true;
     }

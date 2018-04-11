@@ -1,20 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class PickupBehavior : MonoBehaviour {
     
-    public int RespawnTime = 5;
+    public int RespawnTime = -1;
     
     [System.NonSerialized]
     public int StackCount = 1;
     
     private Vector3 respawnLocation;
     
+    public bool PreparingCombine = false; //Only true if another gameobject is preparing to combine with it. If true, don't combine with that gameobject.
+    
 	// Use this for initialization
 	void Start () {
 		respawnLocation = transform.position;
 	}
+    
+    public bool DoesRespawn { get { return RespawnTime>0;}}
     
     public string PickupName;
     
@@ -43,15 +48,61 @@ public class PickupBehavior : MonoBehaviour {
         transform.position = respawnLocation;
     }
     
-    public void GroupWithNearby() {
-        //TODO group with nearby; or maybe don't, can't decide yet
+    public void OnCollisionEnter(Collision col) {
+        if(!DoesRespawn) { //Only combine if they don't respawn
+            PickupBehavior otherPickupBehavior = col.gameObject.GetComponent<PickupBehavior>();
+            if (otherPickupBehavior != null && !otherPickupBehavior.DoesRespawn && otherPickupBehavior.PickupName == this.PickupName && !this.PreparingCombine && !otherPickupBehavior.PreparingCombine) {
+                this.PreparingCombine = otherPickupBehavior.PreparingCombine = true;
+                this.StackCount = this.StackCount + otherPickupBehavior.StackCount;
+                Destroy(otherPickupBehavior.gameObject);
+                this.PreparingCombine = false;
+            }
+        }
+    }
+    
+    public void StackWithNearby() {
+        foreach(GameObject nearbyGO in GetNearbyStackables()) {
+            AbsorbStackable(nearbyGO);
+        }
+    }
+    
+    public GameObject[] GetNearbyStackables() {
+        int overlapTestDist = 1;
+        Collider[] possibleColliders = Physics.OverlapSphere(transform.position,overlapTestDist);
+        List<GameObject> GOs = new List<GameObject>();
+        foreach (Collider possibleCollider in possibleColliders) {
+            if (this.CanCombineWith(possibleCollider.gameObject)) {
+                GOs.Add(possibleCollider.gameObject);
+            }
+        }
+        return GOs.ToArray();
+        
+    }
+    
+    public bool CanCombineWith(GameObject go) {
+        PickupBehavior otherPB = go.GetComponent<PickupBehavior>();
+        return (this.gameObject != go && otherPB != null && !DoesRespawn && !otherPB.DoesRespawn && otherPB.PickupName == this.PickupName && !this.PreparingCombine && !otherPB.PreparingCombine);
+    }
+    
+    public void AbsorbStackable(GameObject go) {
+        if (!CanCombineWith(go)) {
+            throw new ArgumentException("Tried to absorb stackable but wasn't compatible");
+        }
+        else {
+            PickupBehavior otherPB = go.GetComponent<PickupBehavior>();
+            this.PreparingCombine = otherPB.PreparingCombine = true;
+            this.StackCount = this.StackCount + otherPB.StackCount;
+            Destroy(otherPB.gameObject);
+            this.PreparingCombine = false;
+        }
     }
     
     void GetClickedOn(GameObject player) {
-        //print("Hi, I was clicked on");
-        player.GetComponent<PlayerBehavior>().inventory.AddItem(PickupName);
-        Disappear();
-        if(RespawnTime >= 0) {
+        for (int i=0;i<StackCount;i++) {
+            player.GetComponent<PlayerBehavior>().inventory.AddItem(PickupName);
+        }
+        if(DoesRespawn) {
+            Disappear();
             Invoke("Respawn",RespawnTime);
         }
         else {
