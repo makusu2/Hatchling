@@ -6,7 +6,7 @@ using System;
 
 public class Health : MonoBehaviour {
     
-    public enum DamageTypes {unknown, fire, }
+    public enum DamageTypes {unknown, fire, fall,}
 
     public int maxHealth;
     
