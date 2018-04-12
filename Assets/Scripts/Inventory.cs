@@ -48,7 +48,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
     
     public readonly int maxExtraNumItems = 10;
     
-    public readonly int maxStack = 50; //Change to something around 50 later on
+    public readonly int maxStack = 50;
     public string[] noStackLimit = new string[] {"Coin",};
     
     public int maxTotalNumItems {
@@ -202,8 +202,8 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
 	// Use this for initialization
 	void Start () {
         player = GameObject.FindWithTag("MainPlayer");
-        craftingRecipes = LoadCraftingRecipes();
-        buildingRecipes = LoadBuildingRecipes();
+        craftingRecipes = MakuUtil.LoadRecipeFile("Assets/SettingsFiles/CraftingRecipes.txt");
+        buildingRecipes = MakuUtil.LoadRecipeFile("Assets/SettingsFiles/BuildingRecipes.txt");
         hud = player.GetComponent<HUD>();
         hud.InventoryMenuOpen = false;
 	}
@@ -332,30 +332,26 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
         foreach(KeyValuePair<string,int> ingredientPair in ingredients) {
             string ingredient = ingredientPair.Key;
             int count = ingredientPair.Value;
-                for (int i=0;i<count;i++) {
-                    RemoveItem(ingredient);
-                }
+            for (int i=0;i<count;i++) {
+                RemoveItem(ingredient);
+            }
         }
         //might need to do more here
     }
     
-    public string[] GetPossibleCrafts() {
-        List<string> possibleCrafts = new List<string>();
+    public IEnumerable<string> GetPossibleCrafts() {
         foreach(string possibleCraft in craftingRecipes.Keys) {
             if(CanCraftItem(possibleCraft)) {
-                possibleCrafts.Add(possibleCraft);
+                yield return possibleCraft;
             }
         }
-        return possibleCrafts.ToArray();
     }
-    public string[] GetPossibleBuilds() {
-        List<string> possibleBuilds = new List<string>();
+    public IEnumerable<string> GetPossibleBuilds() {
         foreach(string possibleBuild in buildingRecipes.Keys) {
             if(CanBuildItem(possibleBuild)) {
-                possibleBuilds.Add(possibleBuild);
+                yield return possibleBuild;
             }
         }
-        return possibleBuilds.ToArray();
     }
         
     public bool CanCraftItem(string possibleCraft) {
@@ -386,7 +382,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
             Debug.Assert(child.GetComponent<Button>() != null);
             Destroy(child.gameObject);
         }
-        string[] possibleCrafts = GetPossibleCrafts();
+        IEnumerable<string> possibleCrafts = GetPossibleCrafts();
         foreach(string possibleCraft in possibleCrafts) {
             GameObject possibleCraftButton = Instantiate(Resources.Load("CraftingSelectionButton") as GameObject);
             possibleCraftButton.transform.SetParent(hud.CraftingPanel.transform,false);
@@ -400,7 +396,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
             Debug.Assert(child.GetComponent<Button>() != null);
             Destroy(child.gameObject);
         }
-        string[] possibleBuilds = GetPossibleBuilds();
+        IEnumerable<string> possibleBuilds = GetPossibleBuilds();
         foreach(string possibleBuild in possibleBuilds) {
             GameObject possibleBuildButton = Instantiate(Resources.Load("BuildingSelectionButton") as GameObject);
             possibleBuildButton.transform.SetParent(hud.BuildingPanel.transform,false);
@@ -408,12 +404,5 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
             possibleBuildButton.transform.Find("Text").GetComponent<Text>().text = possibleBuild;
             possibleBuildButton.GetComponent<BuildingSelection>().itemName = possibleBuild;
         }
-    }
-    
-    static Dictionary<string,Dictionary<string,int>> LoadCraftingRecipes() {
-        return MakuUtil.LoadRecipeFile("Assets/SettingsFiles/CraftingRecipes.txt");
-    }
-    static Dictionary<string,Dictionary<string,int>> LoadBuildingRecipes() {
-        return MakuUtil.LoadRecipeFile("Assets/SettingsFiles/BuildingRecipes.txt");
     }
 }

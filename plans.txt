@@ -5,17 +5,55 @@ Dragon growth stages
 Commission models
 Fix the held items hit twice issue (one on swing down one on swing up)
 Human models
-Fall damage
-Also combine pickups on awake (or start)
-1000 on inventoryicons showing as 100
 Bow and arrow combat
 Fix UI issue
+Add guards to town
+Better hand model
 
 
 
 
+Growth:
+    Stage 0:
+        Egg
+        Can't do SHIT
+        Needs food preparation and fire to grow
+            Maybe if you hatch it with fire but don't have food it DIES
+    Stage 1:
+        Newborn
+        VERY cute
+        Don't be afraid to stay on this step for a much longer time than the others
+        Eats food to grow
+    Stage 2:
+        Toddler
+        Should do something to help at this point; maybe keeps the fire lit or something
+        During this step, have it disappear
+            Have a trail into the woods or something to let the player know it's not a bug
+            Goal of this is to make the user miss the hatchling
+    Stage 3: Adult
+        Some drama should happen at this stage; dunno what yet
+        Maybe leaves every other day to go hunting, then comes back and spends the other day eating what it got at home?
+            Or it's every third day, and on the third day it accompanies you on your travels
+                Maybe in the future make it so that you decide whether it follows you
+        Keeps the fire lit
+        Accompanies you
+        Very long stage
+        This stage should have it helping you out a lot, allowing you to build a lot, including a little village around your home
+    Stage 4: Middle aged
+        Defense should go down quite a bit; therefore, when you're out exploring with the hatchling, it'll get hurt easily
+    Stage 5: Elder
+        Stays at home
+        The children of the village should play with them
+        Another long stage
+    Stage 6: Dying
+        Heavy breathing
+        Clearly struggling
 
-Dragon growth:
+        
+        
+        
+        
+Old Dragon growth:
     Stage 0:
         Egg
         Can't do SHIT
@@ -99,6 +137,8 @@ Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" 
 Pause menu
 
 Armor slots
+Also combine pickups on awake (or start)
+    Actually, test for combine on discard function
 
 Hunger and thirst system
 
@@ -116,6 +156,8 @@ Maybe each item should be a class; contains the inventory icon and 3d object and
         OH! What if I just set the equipped item model to CurrentlyEquippedItem, and on collision, have it send a "ItemCollideWith" to parent, which then looks at the actual item class to get information on what to do?
 
 Enemies
+
+Fall damage
 
 Building System
 

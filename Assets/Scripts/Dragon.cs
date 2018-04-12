@@ -145,7 +145,6 @@ public class Dragon : MonoBehaviour {
         lastAttackTime = Time.time - attackCooldown;
         Stage = DragonStage.Egg; 
         SetDestination(transform.position);
-        //DoDelayedActions();
         TestForNearbyTargets();
         Invoke("CheckGrowDragon",5);
 	}
@@ -376,8 +375,8 @@ public class Dragon : MonoBehaviour {
        if(Vector3.Distance(foodGO.transform.position,transform.position) > 10) {
            Debug.LogWarning("Food was WAY too far away when hatchling tried to eat it!");
        }
-       Destroy(foodGO);
        newbornFoodEaten += 1;
+       Destroy(foodGO);
        foodGO = null;
    }
    

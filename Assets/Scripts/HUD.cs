@@ -31,8 +31,8 @@ public class HUD : MonoBehaviour {
         AttackText.GetComponent<Text>().text = attackStat.ToString();
     }
     
-    public GameObject CurrentTrader = null;
-    public GameObject CurrentChest = null;
+    public GameObject CurrentTrader;
+    public GameObject CurrentChest;
     
     [System.NonSerialized]
     public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, ChestPanel, DialoguePanel, DialogueFace, DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText;
@@ -85,11 +85,7 @@ public class HUD : MonoBehaviour {
     }
     
 	void Start () {
-        BuildingMenuOpen = false;
-        PauseMenuOpen = false;
-        TownMenuOpen = false;
-        TraderMenuOpen = false;
-        ChestMenuOpen = false;
+        BuildingMenuOpen = PauseMenuOpen = TownMenuOpen = TraderMenuOpen = ChestMenuOpen = false;
         DialogueContinue(); //Unless we have dialogue at the start of the game, this just closes the pause menu
 	}
 	

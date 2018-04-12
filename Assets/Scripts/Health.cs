@@ -69,10 +69,7 @@ public class Health : MonoBehaviour {
 		
 	}
     public void GetDamaged(int dmg,DamageTypes damageType = DamageTypes.unknown) {
-        if (immunities.Contains(damageType)) {
-            return; //Immune to damage
-        }
-        else {
+        if (!immunities.Contains(damageType)) {
             health -= dmg;
         }
     }

@@ -14,21 +14,16 @@ public class EnemyFinder : MonoBehaviour {
     }
     
     public GameObject GetClosestWithProp(Func<GameObject,bool> qualificationFunc) {
-        GameObject[] nearbyQualifiers = GetNearbyWithProp(qualificationFunc);
-        if (nearbyQualifiers.Length > 0) {
-            return GetClosestGameObject(nearbyQualifiers);
-        }
-        return null;
+        IEnumerable<GameObject> nearbyQualifiers = GetNearbyWithProp(qualificationFunc);
+        return GetClosestGameObject(nearbyQualifiers);
     }
-    public GameObject[] GetNearbyWithProp(Func<GameObject,bool> qualificationFunc) {
-        Collider[] possibleColliders = Physics.OverlapSphere(transform.position,distToNotice);
-        List<GameObject> GOs = new List<GameObject>();
-        foreach (Collider possibleCollider in possibleColliders) {
+    public IEnumerable<GameObject> GetNearbyWithProp(Func<GameObject,bool> qualificationFunc) {
+        foreach (Collider possibleCollider in Physics.OverlapSphere(transform.position,distToNotice)) {
             if (qualificationFunc(possibleCollider.gameObject)) {
-                GOs.Add(possibleCollider.gameObject);
+                yield return possibleCollider.gameObject;
             }
         }
-        return GOs.ToArray();
+        yield break;
     }
     
     public bool IsEnemy(GameObject go) {
@@ -47,20 +42,14 @@ public class EnemyFinder : MonoBehaviour {
     }
     
     
-    GameObject GetClosestGameObject(GameObject[] GOs) {
-        if (GOs.Length == 0) {
+    GameObject GetClosestGameObject(IEnumerable<GameObject> GOs) {
+        try {
+            return GOs.OrderBy(go => Vector3.Distance(transform.position,go.transform.position)).First();
+        }
+        catch(InvalidOperationException) {
             return null;
         }
-        float minDist = Vector3.Distance(transform.position,GOs[0].transform.position);
-        GameObject minGO = GOs[0];
-        foreach (GameObject go in GOs) {
-            float dist = Vector3.Distance(transform.position,go.transform.position);
-            if (dist < minDist) {
-                minDist = dist;
-                minGO = go;
-            }
-        }
-        return minGO;
+        
     }
     
 }

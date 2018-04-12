@@ -12,8 +12,6 @@ public class PlayerBehavior : MonoBehaviour {
     public Inventory inventory;
     public HUD Hud;
     
-    //public Factions faction = Factions.player;
-    
     
     private int currentUpdate = 0;
     [SerializeField]
@@ -46,14 +44,8 @@ public class PlayerBehavior : MonoBehaviour {
     
     public GameObject HeldItemObject {
         get {
-            foreach(Transform transChild in EquippedContainer.transform) {
-                if (transChild.gameObject.activeInHierarchy) {
-                    return transChild.gameObject;
-                }
-            }
-            throw new NullReferenceException();
+            return EquippedContainer.transform.Cast<Transform>().Select(t=>t.gameObject).First(go => go.activeInHierarchy);
         }
-        set {}
     }
             
     
@@ -67,7 +59,6 @@ public class PlayerBehavior : MonoBehaviour {
         get {
             return Arms.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Punch") || Arms.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Swing");
         }
-        set{}
     }
     
     void CorrectHeldItems() {
@@ -75,9 +66,7 @@ public class PlayerBehavior : MonoBehaviour {
             try {
                 transChild.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ;
             }
-            catch(MissingComponentException) {
-                
-            }
+            catch(MissingComponentException) {}
         }
     }
     
@@ -180,9 +169,7 @@ public class PlayerBehavior : MonoBehaviour {
             try {
                 ClickOn(hit.transform.gameObject);
             }
-            catch (NullReferenceException) {
-                //Nothing was hit, don't need to do anything
-            }
+            catch (NullReferenceException) {/*Nothing was hit, don't need to do anything*/}
         }
         if (!Hud.UsingUI && Input.GetButtonDown("Fire2")) { 
             UseItem();
