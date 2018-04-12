@@ -9,7 +9,7 @@ Bow and arrow combat
 Fix UI issue
 Add guards to town
 Better hand model
-
+On unpause, lock cursor back to screen
 
 
 
