@@ -7,8 +7,8 @@ public class WolfBehavior : MonoBehaviour {
     public int attackLevel = 2;
     
     private int distToNotice = 15;
-    private int distToAttack = 2;
-    private float distToDamage = 0.2f;
+    private float distToAttack = 1.0f;
+    private float distToDamage = 0.8f;
     
     private UnityEngine.AI.NavMeshAgent nav;
     
@@ -48,67 +48,52 @@ public class WolfBehavior : MonoBehaviour {
     
     private string drop = "1*Coin,2*UncookedMeat";
     
-    
-    
-    private bool isAttacking = false;
-    public bool IsAttacking {
+    private enum aniActions{Unknown,Idle,Walking,Running,Dead,Attacking};
+    private aniActions aniAction {
         get {
-            return isAttacking || ani.GetCurrentAnimatorStateInfo(0).IsName("Base.hit") || ani.GetBool("BeginAttack");
+            AnimatorStateInfo aniInfo = ani.GetCurrentAnimatorStateInfo(0);
+            if (aniInfo.IsTag("attack")) {return aniActions.Attacking;}
+            else if (aniInfo.IsTag("walk")) {return aniActions.Walking;}
+            else if (aniInfo.IsTag("run")) {return aniActions.Running;}
+            else if (aniInfo.IsTag("die")) {return aniActions.Dead;}
+            else if (aniInfo.IsTag("idle")) {return aniActions.Idle;}
+            else {
+                Debug.LogWarning("Tried to get aniAction but didn't match any");
+                return aniActions.Unknown;
+            }
         }
-    }
-    
-    public bool IsWalking {
-        get {
-            return ani.GetCurrentAnimatorStateInfo(0).IsName("Base.walk") || ani.GetBool("Walking");
-        }
-    }
-    
-    public bool IsRunning {
-        get {
-            return ani.GetCurrentAnimatorStateInfo(0).IsName("Base.run") || ani.GetBool("Running");
-        }
-    }
-    
-    
-    
-    
-    void SetAction(string action) {
-        if (action == "Walking") {
-            ani.SetBool("AllowIdle",false);
-            ani.SetBool("Walking",true);
-            ani.SetBool("Running",false);
-            ani.SetBool("Dead",false);
-            ani.ResetTrigger("BeginAttack");
-        }
-        else if (action == "Idle") {
-            ani.SetBool("AllowIdle",true);
-            ani.SetBool("Walking",false);
-            ani.SetBool("Running",false);
-            ani.ResetTrigger("BeginAttack");
-        }
-        else if (action == "Running") {
-            ani.SetBool("AllowIdle",false);
-            ani.SetBool("Walking",false);
-            ani.SetBool("Running",true);
-            ani.SetBool("Dead",false);
-            ani.ResetTrigger("BeginAttack");
-        }
-        else if (action == "Attack") {
-            ani.SetBool("AllowIdle",false);
-            ani.SetBool("Walking",false);
-            ani.SetBool("Running",false);
-            ani.SetBool("Dead",false);
-            ani.SetTrigger("BeginAttack");
-        }
-        else if (action == "Die") {
-            ani.SetBool("AllowIdle",false);
-            ani.SetBool("Walking",false);
-            ani.SetBool("Running",false);
-            ani.SetBool("Dead",true);
-            ani.ResetTrigger("BeginAttack");
-        }
-        else {
-            Debug.LogWarning("Tried to set action to "+action+" but it doesn't exist");
+        set {
+            if (value == aniActions.Walking) {
+                ani.SetBool("AllowIdle",false);
+                ani.SetBool("Walking",true);
+                ani.SetBool("Running",false);
+                ani.SetBool("Dead",false);
+            }
+            else if (value == aniActions.Idle) {
+                ani.SetBool("AllowIdle",true);
+                ani.SetBool("Walking",false);
+                ani.SetBool("Running",false);
+                
+            }
+            else if (value == aniActions.Running) {
+                ani.SetBool("AllowIdle",false);
+                ani.SetBool("Walking",false);
+                ani.SetBool("Running",true);
+                ani.SetBool("Dead",false);
+                
+            }
+            else if (value == aniActions.Attacking) {
+                ani.Play("hit",0);
+            }
+            else if (value == aniActions.Dead) {
+                ani.SetBool("AllowIdle",false);
+                ani.SetBool("Walking",false);
+                ani.SetBool("Running",false);
+                ani.SetBool("Dead",true);
+            }
+            else {
+                Debug.LogWarning("Tried to set action to "+value.ToString()+" but it doesn't exist");
+            }
         }
     }
     
@@ -124,7 +109,6 @@ public class WolfBehavior : MonoBehaviour {
     
 	// Use this for initialization
 	void Start () {
-        //Health = maxHealth;
         loot = GetComponent<Loot>();
         loot.Setup(drop);
         health = GetComponent<Health>();
@@ -136,7 +120,6 @@ public class WolfBehavior : MonoBehaviour {
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
         GetComponent<EnemyFinder>().Setup(distToNotice: this.distToNotice);
         TestForNearbyEnemies();
-        //gameObject.GetComponent<Animator>().SetBool("AllowIdle",true);
 	}
 	
 	// Update is called once per frame
@@ -146,20 +129,29 @@ public class WolfBehavior : MonoBehaviour {
     
     
     float DistToDest() {
-        return nav.pathPending?Vector3.Distance(transform.position, nav.destination):nav.remainingDistance;
+        return Vector3.Distance(teethPointLocation, nav.destination);
     }
     
     void Bleed() {
-        bloodGO.SetActive(true);
+        bleeding = true;
         Invoke("StopBleeding",bleedTime);
     }
     void StopBleeding() {
-        bloodGO.SetActive(false);
+        bleeding = false;
+    }
+    
+    private bool bleeding {
+        get {
+            return bloodGO.activeInHierarchy;
+        }
+        set {
+            bloodGO.SetActive(value);
+        }
     }
     
     
     void FixedUpdate() {
-        if (IsAttacking) {
+        if (aniAction == aniActions.Attacking) {
             return;
         }
         else {
@@ -172,8 +164,9 @@ public class WolfBehavior : MonoBehaviour {
                     return;
                 }
                 SetDestination(targetEnemy.transform.position,isRunning:true);
-                if(DistToDest() < 2) {
+                if(DistToDest() < distToAttack) {
                     nav.isStopped = true;
+                    nav.velocity = Vector3.zero;
                     if (LookingNearTarget()) {
                         BeginAttack();
                     }
@@ -187,7 +180,7 @@ public class WolfBehavior : MonoBehaviour {
     
     
     void TurnTowardTarget() {
-        SetAction("Walking");
+        aniAction = aniActions.Walking;
             
         Vector3 targetDir = targetEnemy.transform.position - transform.position;
         float step = turnSpeed * Time.deltaTime;
@@ -222,20 +215,20 @@ public class WolfBehavior : MonoBehaviour {
     
     void SetDestination(Vector3 position, bool isRunning = true) {
         nav.destination = position;
-        
-        bool closeEnough = DistToDest() < distToAttack;
+        float distToDest = DistToDest();
+        bool closeEnough = distToDest < distToAttack;
         if(closeEnough) {
             nav.isStopped = true;
-            SetAction("Idle");
+            aniAction = aniActions.Idle;
         }
         else {
             nav.isStopped = false;
             nav.speed = isRunning?runSpeed:walkSpeed;
             if(isRunning) {
-                SetAction("Running");
+                aniAction = aniActions.Running;
             }
             else {
-                SetAction("Walking");
+                aniAction = aniActions.Walking;
             }
         }
     }
@@ -257,20 +250,26 @@ public class WolfBehavior : MonoBehaviour {
         if (GetComponent<UnityEngine.AI.NavMeshAgent>().remainingDistance < 2) {
             GetComponent<UnityEngine.AI.NavMeshAgent>().destination = GetNewRoamDestination();
             GetComponent<UnityEngine.AI.NavMeshAgent>().speed = walkSpeed;
-            SetAction("Walking");
+            aniAction = aniActions.Walking;
         }
     }
     
     void BeginAttack() {
-        if (!IsAttacking) {
-            SetAction("Attack");
+        if (aniAction != aniActions.Attacking) {
+            aniAction = aniActions.Attacking;
             Invoke("TestHit",0.5f);
-            isAttacking = true;
         }
+    }
+    
+    void OnCollisionEnter(Collision col) {
+        
     }
     
     void TestHit() {
         //float dist = Vector3.Distance(transform.position,player.transform.position);
+        if (targetEnemy == null) {
+            return;
+        }
         Vector3 targetPos = targetEnemy.GetComponent<Collider>().ClosestPointOnBounds(teethPointLocation);
         float dist = Vector2.Distance(new Vector2(targetPos.x,targetPos.z),new Vector2(teethPointLocation.x,teethPointLocation.z));
         if (dist < distToDamage) {
@@ -281,7 +280,6 @@ public class WolfBehavior : MonoBehaviour {
         else {
             AudioSource.PlayClipAtPoint(failBiteSound,teethPointLocation);
         }
-        isAttacking = false;
     }
     
     

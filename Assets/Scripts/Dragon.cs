@@ -21,6 +21,18 @@ public class Dragon : MonoBehaviour {
         }
     }
     
+    private Vector3 teethPosition {
+        get {
+            try {
+                return Body.transform.Find("MouthLocation").position;
+            }
+            catch(NullReferenceException) {
+                Debug.LogWarning("Tried to get mouth position but couldn't find it");
+                return transform.position;
+            }
+        }
+    }
+    
     private readonly int newbornFoodToEvolve = 10;
     private int newbornFoodEaten = 0;
     
@@ -125,6 +137,50 @@ public class Dragon : MonoBehaviour {
         }
     }
     
+    private enum aniActions{Unknown,Idle,Walking,Running,Dead,Attacking};
+    private aniActions aniAction {
+        get {
+            AnimatorStateInfo aniInfo = ani.GetCurrentAnimatorStateInfo(0);
+            if (aniInfo.IsTag("die")) { return aniActions.Dead;}
+            else if (aniInfo.IsTag("idle")) { return aniActions.Idle;}
+            else if (aniInfo.IsTag("run")) { return aniActions.Running;}
+            else if (aniInfo.IsTag("walk")) { return aniActions.Walking;}
+            else {
+                Debug.LogWarning("Tried to get aniAction but didn't match any");
+                return aniActions.Unknown;
+            }
+        }
+        set {
+            if (value == aniActions.Walking) {
+                ani.SetBool("Walking",true);
+                ani.SetBool("Running",false);
+            }
+            else if (value == aniActions.Idle) {
+                ani.SetBool("Walking",false);
+                ani.SetBool("Running",false);
+            }
+            else if (value == aniActions.Running) {
+                ani.SetBool("Walking",false);
+                ani.SetBool("Running",true);
+            }
+            else if (value == aniActions.Attacking) {
+                /*ani.SetBool("Walking",false);
+                ani.SetBool("Running",false);
+                //TODO have it do some mini animation*/
+                ani.Play("hit",0);
+            }
+            else if (value == aniActions.Dead) {
+                ani.SetBool("Walking",false);
+                ani.SetBool("Running",false);
+                ani.SetBool("Dead",true);
+                
+            }
+            else {
+                Debug.LogWarning("Tried to set action to "+value.ToString()+" but it doesn't exist");
+            }
+        }
+    }
+    
     private Vector3 GetNewRoamDestination() {
         int xDif = MakuUtil.rnd.Next(-maxRoamDistance,maxRoamDistance);
         int zDif = MakuUtil.rnd.Next(-maxRoamDistance,maxRoamDistance);
@@ -172,11 +228,8 @@ public class Dragon : MonoBehaviour {
             return;
         }
         else {
+            UpdateAllTargets();
             if (targetEnemy != null) {
-                if (targetEnemy.GetComponent<Health>().IsDead) {
-                    targetEnemy = null;
-                    return;
-                }
                 SetDestination(targetEnemy.transform.position, isRunning: true);
                 if (DistToDest() < 5) {
                     nav.isStopped = true;
@@ -230,7 +283,7 @@ public class Dragon : MonoBehaviour {
         }
     }
     float DistToDest() {
-        return nav.pathPending?Vector3.Distance(transform.position, nav.destination):nav.remainingDistance;
+        return Vector3.Distance(teethPosition, nav.destination);
     }
     
     void ContinueRoaming() {
@@ -251,7 +304,7 @@ public class Dragon : MonoBehaviour {
     void ThrowFireball() {
         GameObject fireball = Instantiate(Resources.Load("InWorld/Fireball") as GameObject);
         fireball.SetActive(true);
-        fireball.transform.position = Body.transform.Find("MouthLocation").position;
+        fireball.transform.position = teethPosition;
         fireball.GetComponent<FireballBehavior>().GetShot(transform.forward);
     }
     
@@ -324,6 +377,12 @@ public class Dragon : MonoBehaviour {
         Invoke("TestForNearbyTargets",2);
     }
     
+    
+    void UpdateAllTargets() {
+        UpdateTargetFood();
+        UpdateTargetEnemy();
+    }
+    
     void UpdateTargetFood() {
         if(targetFood == null) {
             GameObject targetGO = GetComponent<EnemyFinder>().GetClosestFood();
@@ -375,9 +434,14 @@ public class Dragon : MonoBehaviour {
        if(Vector3.Distance(foodGO.transform.position,transform.position) > 10) {
            Debug.LogWarning("Food was WAY too far away when hatchling tried to eat it!");
        }
-       newbornFoodEaten += 1;
-       Destroy(foodGO);
-       foodGO = null;
+       newbornFoodEaten += foodGO.GetComponent<PickupBehavior>().StackCount;
+       //Destroy(foodGO);
+       foodGO.GetComponent<PickupBehavior>().GetTaken();
+       if (foodGO == targetFood) {
+           targetFood = null;
+       }
+       //foodGO = null;
+       UpdateAllTargets();
    }
    
     public enum DragonStage { Egg, Newborn, Toddler, };

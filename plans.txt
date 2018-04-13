@@ -10,6 +10,8 @@ Fix UI issue
 Add guards to town
 Better hand model
 On unpause, lock cursor back to screen
+Could we maybe only have one "special" panel; like, since you'll never have townpanel, craftingpanel, chestpanel, or traderpanel open at the same time, we could combine them all...? Would it be worth it?
+Maybe switch animations to ani.Play rather than using transitions
 
 
 

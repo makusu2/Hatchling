@@ -86,7 +86,7 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
     }
     
     bool IsUIPanel(GameObject go) {
-        return go.name.Contains("Panel");
+        return go.name.Contains("Panel"); //TODO improve this
     }
     
     public GameObject GetCurrentPanel() {

@@ -97,10 +97,7 @@ public class PickupBehavior : MonoBehaviour {
         }
     }
     
-    void GetClickedOn(GameObject player) {
-        for (int i=0;i<StackCount;i++) {
-            player.GetComponent<PlayerBehavior>().inventory.AddItem(PickupName);
-        }
+    public void GetTaken() {
         if(DoesRespawn) {
             Disappear();
             Invoke("Respawn",RespawnTime);
@@ -108,6 +105,14 @@ public class PickupBehavior : MonoBehaviour {
         else {
             Destroy(this);
         }
+        
+    }
+    
+    void GetClickedOn(GameObject player) {
+        for (int i=0;i<StackCount;i++) {
+            player.GetComponent<PlayerBehavior>().inventory.AddItem(PickupName);
+        }
+        GetTaken();
     }
     
     void Respawn() {
