@@ -4,8 +4,15 @@ timeCreated: 18446744011573954816
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
+    100000: //RootNode
+    100002: beach_plant
+    400000: //RootNode
+    400002: beach_plant
+    2300000: beach_plant
+    3300000: beach_plant
     4300000: flower_beach
     4300002: beach_plant
+    11100000: //RootNode
   externalObjects: {}
   materials:
     importMaterials: 1

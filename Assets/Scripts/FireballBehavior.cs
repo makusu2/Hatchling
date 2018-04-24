@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class FireballBehavior : MonoBehaviour {
 
-    private readonly int lifetime = 4; //lifetime in seconds
-    private readonly int maxHits = 3;
+    private readonly int lifetime = 2; //lifetime in seconds
+    private readonly int maxHits = 1;
     private int currentHits = 0;
     private int damage = 10;
 	// Use this for initialization

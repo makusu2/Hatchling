@@ -4,7 +4,14 @@ timeCreated: 18446744011573954816
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
+    100000: //RootNode
+    100002: forest_plant6
+    400000: //RootNode
+    400002: forest_plant6
+    2300000: forest_plant6
+    3300000: forest_plant6
     4300000: forest_plant6
+    11100000: //RootNode
   externalObjects: {}
   materials:
     importMaterials: 1

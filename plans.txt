@@ -12,6 +12,13 @@ Better hand model
 On unpause, lock cursor back to screen
 Could we maybe only have one "special" panel; like, since you'll never have townpanel, craftingpanel, chestpanel, or traderpanel open at the same time, we could combine them all...? Would it be worth it?
 Maybe switch animations to ani.Play rather than using transitions
+Use navmeshpath and calculatepath for pathfinding (stops from getting stuck)
+Think about what will make things easier when adding towns and shit; modularize stuff for fewest lines of code in high-level (specific NPC or whatever) scripts. 
+	Especially for dialogue
+Maybe make dying enemies ragdoll like in TES, and have player "activate" them to loot
+Look up how to use unity in a more script-y manner rather than GUI-yzd
+
+
 
 
 

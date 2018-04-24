@@ -6,10 +6,11 @@ using System.Linq;
 
 public class EnemyFinder : MonoBehaviour {
     
-    private int distToNotice;
+    private float distToNotice;
     
     
-    public void Setup(int distToNotice = 10) {
+    
+    public void Setup(float distToNotice = 10.0f) {
         this.distToNotice = distToNotice;
     }
     
@@ -17,7 +18,10 @@ public class EnemyFinder : MonoBehaviour {
         IEnumerable<GameObject> nearbyQualifiers = GetNearbyWithProp(qualificationFunc);
         return GetClosestGameObject(nearbyQualifiers);
     }
-    public IEnumerable<GameObject> GetNearbyWithProp(Func<GameObject,bool> qualificationFunc) {
+    public IEnumerable<GameObject> GetNearbyWithProp(Func<GameObject,bool> qualificationFunc, float? requiredDist = null) {
+        if (requiredDist == null) {
+            requiredDist = distToNotice;
+        }
         foreach (Collider possibleCollider in Physics.OverlapSphere(transform.position,distToNotice)) {
             if (qualificationFunc(possibleCollider.gameObject)) {
                 yield return possibleCollider.gameObject;
@@ -29,7 +33,7 @@ public class EnemyFinder : MonoBehaviour {
     public bool IsEnemy(GameObject go) {
         Factions[] enemyFactions = GetComponent<Faction>().GetEnemyFactions();
         Faction enemyFaction = go.GetComponent<Faction>();
-        return (enemyFaction != null && enemyFactions.Contains(enemyFaction.faction));
+        return (enemyFaction != null && enemyFactions.Contains(enemyFaction.faction) && !go.GetComponent<Health>().IsDead);
     }
     public GameObject GetClosestEnemy() {
         Func<GameObject,bool> qualFunc = (GameObject go) => IsEnemy(go);
@@ -38,6 +42,14 @@ public class EnemyFinder : MonoBehaviour {
     
     public GameObject GetClosestFood() {
         Func<GameObject,bool> qualFunc = (GameObject go) => go.GetComponent<FoodBehavior>() != null;
+        return GetClosestWithProp(qualFunc);
+    }
+    
+    public GameObject GetClosestFire(float? requiredDist = null, int minHeatLevel = 3) {
+        if (requiredDist == null) {
+            requiredDist = distToNotice;
+        }
+        Func<GameObject,bool> qualFunc = (GameObject go) => go.GetComponent<Heated>() != null && go.GetComponent<Heated>().HeatLevel >= minHeatLevel;
         return GetClosestWithProp(qualFunc);
     }
     

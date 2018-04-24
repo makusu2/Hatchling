@@ -4,7 +4,14 @@ timeCreated: 18446744011573954816
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
+    100000: //RootNode
+    100002: stinging_nettle
+    400000: //RootNode
+    400002: stinging_nettle
+    2300000: stinging_nettle
+    3300000: stinging_nettle
     4300000: stinging_nettle
+    11100000: //RootNode
   externalObjects: {}
   materials:
     importMaterials: 1
