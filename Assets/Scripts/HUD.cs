@@ -219,10 +219,10 @@ public class HUD : MonoBehaviour {
                 Debug.LogError("Attempted to open chest menu without CurrentChest being assigned in HUD");
             }
             if(value) {
-                CurrentChest.GetComponent<ChestBehavior>().CreateIcons();
+                CurrentChest.GetComponent<ContainerInt>().CreateIcons();
             }
             else if (!value && CurrentChest != null) {
-                CurrentChest.GetComponent<ChestBehavior>().DestroyIcons();
+                CurrentChest.GetComponent<ContainerInt>().DestroyIcons();
             }
             CursorFree = value;
             ChestPanel.SetActive(value);

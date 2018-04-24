@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEditor;
 using System.Linq;
 
-public class ChestBehavior : MonoBehaviour, ItemHolderInt {
+public class ChestBehavior : MonoBehaviour, ContainerInt {
 
 
     

@@ -47,6 +47,10 @@ public class TownBehavior : MonoBehaviour, ItemHolderInt{
         
     }
     
+    
+    public void CreateIcons() { /*C# is fucking stupid*/}
+    public void DestroyIcons() { /*C# is fucking stupid*/}
+    
 	// Use this for initialization
 	void Start () {
         hud = player.GetComponent<HUD>();

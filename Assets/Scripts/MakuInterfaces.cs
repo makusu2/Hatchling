@@ -9,6 +9,13 @@ interface ItemHolderInt {
     void RemoveItem(string item);
 }
 
+interface ContainerInt : ItemHolderInt{
+    void CreateIcons();
+    void DestroyIcons();
+    void ItemMovedTo(string item);
+    void ItemTakenFrom(string item);
+}
+
 interface ItemActivator {
     void ActivateItem();
 }

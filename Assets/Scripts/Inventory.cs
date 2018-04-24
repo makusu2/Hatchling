@@ -58,6 +58,9 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
     }
     
     
+    public void CreateIcons() { /*C# is fucking stupid*/}
+    public void DestroyIcons() { /*C# is fucking stupid*/}
+    
     public int CurrentNumItems { get {return itemOrder.ToArray().Length;}}
     public int CurrentExtraNumItems {get {return visibleBoxes.Keys.ToArray().Length - itemOrder.ToArray().Length;}}
     public int CurrentTotalNumItems {get {return visibleBoxes.Keys.ToArray().Length;}}

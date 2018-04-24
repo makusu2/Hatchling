@@ -36,10 +36,10 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
                 hud.Town.GetComponent<TownBehavior>().ItemMovedTo(Item);
             }
             else if ((currentPanel == inventoryPanel || currentPanel == extraPanel) && hud.ChestMenuOpen) {
-                hud.CurrentChest.GetComponent<ChestBehavior>().ItemMovedTo(Item);
+                hud.CurrentChest.GetComponent<ContainerInt>().ItemMovedTo(Item);
             }
             else if (currentPanel == chestPanel) {
-                hud.CurrentChest.GetComponent<ChestBehavior>().ItemTakenFrom(Item);
+                hud.CurrentChest.GetComponent<ContainerInt>().ItemTakenFrom(Item);
             }
             else if (currentPanel == inventoryPanel) {
                 player.GetComponent<PlayerBehavior>().inventory.MoveToExtraInventory(Item);
@@ -62,17 +62,17 @@ public class InventoryIconBehavior : MonoBehaviour, IDragHandler, IEndDragHandle
             player.GetComponent<PlayerBehavior>().inventory.MoveToExtraInventory(Item);
         }
         else if (currentPanel == inventoryPanel && originalPanel == chestPanel) {
-            hud.CurrentChest.GetComponent<ChestBehavior>().ItemTakenFrom(Item);
+            hud.CurrentChest.GetComponent<ContainerInt>().ItemTakenFrom(Item);
         }
         else if (currentPanel == extraPanel && originalPanel == chestPanel) {
             bool wasProbablyAlreadyMoved = player.GetComponent<PlayerBehavior>().inventory.NormalInventoryFull;
-            hud.CurrentChest.GetComponent<ChestBehavior>().ItemTakenFrom(Item);
+            hud.CurrentChest.GetComponent<ContainerInt>().ItemTakenFrom(Item);
             if(!wasProbablyAlreadyMoved) {
                 player.GetComponent<PlayerBehavior>().inventory.MoveToExtraInventory(Item);
             }
         }
         else if (currentPanel == chestPanel && (originalPanel == extraPanel || originalPanel == inventoryPanel)) {
-            hud.CurrentChest.GetComponent<ChestBehavior>().ItemMovedTo(Item);
+            hud.CurrentChest.GetComponent<ContainerInt>().ItemMovedTo(Item);
         }
         else if (currentPanel == townPanel) {
             hud.Town.GetComponent<TownBehavior>().ItemMovedTo(Item);
