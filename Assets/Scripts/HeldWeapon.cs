@@ -8,7 +8,6 @@ public class HeldWeapon : MonoBehaviour, ItemActivator {
 
     public int AttackLevel = 1;
     
-    
     [SerializeField]
     public Action customActivateItem;
     
@@ -25,14 +24,21 @@ public class HeldWeapon : MonoBehaviour, ItemActivator {
         
 	}
     void OnTriggerEnter(Collider col) {
+        bool heldByCol = transform.IsChildOf(col.gameObject.transform);
+        if (heldByCol) {
+            return;
+        }
         Health colHealth = col.gameObject.GetComponent<Health>();
         if (colHealth != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
             colHealth.GetDamaged(AttackLevel);
+            Vector3 contactPoint = col.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
+            MakuUtil.PlayBloodAt(contactPoint);
         }
         ReceiveSwing swungGO = col.gameObject.GetComponent<ReceiveSwing>();
         if (swungGO != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
             swungGO.GetSwungAt();
         }
+        
     }
     
     void Setup(Action usageFunc) {
@@ -48,6 +54,7 @@ public class HeldWeapon : MonoBehaviour, ItemActivator {
         }
     }
     void Swing() {
-            player.GetComponent<PlayerBehavior>().Arms.GetComponent<Animator>().SetTrigger("Swing");
+            player.GetComponent<PlayerBehavior>().HandAnimator.Play("swingWeapon",0);
     }
+    
 }

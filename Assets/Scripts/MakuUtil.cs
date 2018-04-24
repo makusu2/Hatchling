@@ -1,8 +1,18 @@
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
+using UnityEditor;
+using System.Collections;
 
-public class MakuUtil {
+public class MakuUtil : MonoBehaviour {
     public static System.Random rnd = new System.Random();
+    static GameObject bloodTemplate;
+    
+    static MakuUtil FuckYouCSharp;
+    
+    void Awake() {
+        FuckYouCSharp = this;
+    }
     
     public static Dictionary<string,Dictionary<string,int>> LoadRecipeFile(string path) {
         Dictionary<string,Dictionary<string,int>> recipes = new Dictionary<string,Dictionary<string,int>>();
@@ -29,5 +39,17 @@ public class MakuUtil {
         }
         reader.Close();
         return(recipes);
+    }
+    
+    
+    public static void PlayBloodAt(Vector3 position) {
+       FuckYouCSharp.StartCoroutine(PlayAndStopBloodAt(position));
+    }
+    static IEnumerator PlayAndStopBloodAt(Vector3 position) {
+        bloodTemplate = bloodTemplate??Resources.Load("InWorld/Blood") as GameObject;
+        GameObject blood = Instantiate(bloodTemplate);
+        blood.transform.position = position;
+        yield return new WaitForSeconds(.3f);
+        Destroy(blood);
     }
 }

@@ -6,6 +6,7 @@ public class FistBehavior : MonoBehaviour {
 
     private GameObject player;
     
+    private int AttackLevel = 1;
     
 	// Use this for initialization
 	void Start () {
@@ -18,9 +19,21 @@ public class FistBehavior : MonoBehaviour {
 		
 	}
     void OnTriggerEnter(Collider col) {
-        if(player.GetComponent<PlayerBehavior>().UsingHands && !col.gameObject.CompareTag("Ground") && player.GetComponent<PlayerBehavior>().IsSwinging) {
-            col.gameObject.SendMessage("GetSwungAt",player,SendMessageOptions.DontRequireReceiver);
-            player.GetComponent<PlayerBehavior>().Arms.GetComponent<Animator>().SetTrigger("CancelSwing"); //NOT WORKING
+        bool heldByCol = transform.IsChildOf(col.gameObject.transform);
+        if (heldByCol) {
+            return;
+        }
+        if (player.GetComponent<PlayerBehavior>().UsingHands) {
+            Health colHealth = col.gameObject.GetComponent<Health>();
+            if (colHealth != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
+                colHealth.GetDamaged(AttackLevel);
+                Vector3 contactPoint = col.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
+                MakuUtil.PlayBloodAt(contactPoint);
+            }
+            ReceiveSwing swungGO = col.gameObject.GetComponent<ReceiveSwing>();
+            if (swungGO != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
+                swungGO.GetSwungAt();
+            }
         }
     }
 }

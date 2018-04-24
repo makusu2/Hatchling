@@ -12,7 +12,7 @@ public class PlayerBehavior : MonoBehaviour {
     public Inventory inventory;
     public HUD Hud;
     
-    
+    public Animator HandAnimator;
     private int currentUpdate = 0;
     [SerializeField]
     private int hungerDecreasePeriod = 200;
@@ -52,12 +52,14 @@ public class PlayerBehavior : MonoBehaviour {
     public GameObject EquippedContainer;
     
     public GameObject Arms;
+    public GameObject HandLeft;
+    public GameObject HandRight;
     
     public bool UsingHands = true;
     
     public bool IsSwinging {
         get {
-            return Arms.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Punch") || Arms.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Swing");
+            return HandAnimator.GetCurrentAnimatorStateInfo(0).IsName("punch") || HandAnimator.GetCurrentAnimatorStateInfo(0).IsName("swingWeapon");
         }
     }
     
@@ -91,7 +93,7 @@ public class PlayerBehavior : MonoBehaviour {
         
         if (wasFound) {
             UsingHands = false;
-            Arms.GetComponent<Animator>().SetBool("WeaponIsOn",true);
+            HandAnimator.SetBool("holdingWeapon",true);
         }
         else {
             //load resource and equip
@@ -108,13 +110,13 @@ public class PlayerBehavior : MonoBehaviour {
                     AttackLevel = 1;
                 }
                 UsingHands = false;
-                Arms.GetComponent<Animator>().SetBool("WeaponIsOn",true);
+                HandAnimator.SetBool("holdingWeapon",true);
                 
             }
             catch(ArgumentException) {
                 //Item doesn't have an equippable version
                 UsingHands = true;
-                Arms.GetComponent<Animator>().SetBool("WeaponIsOn",false);
+                HandAnimator.SetBool("holdingWeapon",false);
                 AttackLevel = 1;
             }
         }
@@ -132,6 +134,9 @@ public class PlayerBehavior : MonoBehaviour {
     
     void Awake() {
         Arms = GameObject.FindWithTag("Arms");
+        HandLeft = GameObject.FindWithTag("HandLeft");
+        HandRight = GameObject.FindWithTag("HandRight");
+        HandAnimator = HandRight.GetComponent<Animator> ();
         Hud = GetComponent<HUD>();
         
         health = GetComponent<Health>();
@@ -237,13 +242,13 @@ public class PlayerBehavior : MonoBehaviour {
     void UseItem() {
         if (UsingHands) {
             //swing with fists
-            Arms.GetComponent<Animator>().SetTrigger("Swing");
+            HandAnimator.Play("punch",0);
         }
         else {
             ItemActivator itemActivator = HeldItemObject.GetComponent<ItemActivator>();
             if (itemActivator == null) {
                 //swing with fists
-                Arms.GetComponent<Animator>().SetTrigger("Swing");
+                HandAnimator.Play("punch",0);
             }
             else {
                 itemActivator.ActivateItem(); //Searches for the interface and activates the corresponding method

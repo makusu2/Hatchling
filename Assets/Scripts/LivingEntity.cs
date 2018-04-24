@@ -140,7 +140,9 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     }
     
     
-    
+    protected void OnTriggerEnter() {
+        
+    }
     
     
     protected Vector3 GetNewRoamDestination() {
