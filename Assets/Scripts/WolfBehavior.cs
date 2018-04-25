@@ -8,49 +8,20 @@ public class WolfBehavior : LivingEntity {
 
     
     
-    //private float bleedTime = 0.5f;
     
-    //[SerializeField] private AudioClip successBiteSound;
-    //[SerializeField] private AudioClip failBiteSound;
+    [SerializeField] private AudioClip successBiteSound;
+    [SerializeField] private AudioClip failBiteSound;
     
-    //private GameObject bloodGO;
-    
-    
-            
     
 	// Use this for initialization
 	void Start () {
-        base.Prepare(drop: "1*Coin,2*UncookedMeat");
+        base.Prepare(drop: "1*Coin,2*UncookedMeat",fac:Factions.wolf);
         foreach (Transform testMouth in gameObject.GetComponentsInChildren<Transform>()) {
             if (testMouth.CompareTag("MouthGO")) {
                 mouthGO = testMouth.gameObject;
             }
         }
-        mouthGO.GetComponent<EntityMouth>().Setup(this,attackLevel:2);
-        //mouthGO = .Where(
-        //transform.Find("TeethPoint").gameObject;
-        /*bloodGO = mouthGO.transform.Find("BloodSprayEffect").gameObject;
-        bloodGO.SetActive(false);*/
 	}
-    
-    
-    
-    /*void Bleed() {
-        bleeding = true;
-        Invoke("StopBleeding",bleedTime);
-    }
-    void StopBleeding() {
-        bleeding = false;
-    }*/
-    
-    /*private bool bleeding {
-        get {
-            return bloodGO.activeInHierarchy;
-        }
-        set {
-            bloodGO.SetActive(value);
-        }
-    }*/
     
     
     void FixedUpdate() {
@@ -69,17 +40,17 @@ public class WolfBehavior : LivingEntity {
                     targetEnemy = null;
                     return;
                 }
-                bool closeEnoughToAttack = DistToGO(targetEnemy) < distToAttack;
+                bool closeEnoughToAttack = DistToGOSimple(targetEnemy) < distToAttack;
                 if(closeEnoughToAttack) {
                     nav.isStopped = true;
                     nav.velocity = Vector3.zero;
-                    if (LookingNearTarget()) {
-                        if (CanBeginAttack()) {
+                    if (EnemyInFrontOfTeeth() != null /*&& LookingNearTarget()*/){
+                        if(CanBeginAttack()) {
                             BeginAttack();
                         }
                     }
                     else {
-                        TurnTowardTarget();
+                        TurnToward(targetEnemy);
                     }
                 }
                 else {
@@ -101,28 +72,51 @@ public class WolfBehavior : LivingEntity {
     void BeginAttack() {
         if (CanBeginAttack()) {
             aniAction = aniActions.Attacking;
-            //Invoke("TestHit",0.5f);
+            Invoke("TestHit",0.3f);
         }
     }
-    
-    /*void OnCollisionEnter(Collision col) {
-        
-    }*/
-    
-    /*void TestHit() {
-        if (targetEnemy == null) {
-            return;
-        }
+    GameObject EnemyInFrontOfTeeth() { //Returns the gameobject that has a health component or null if none
         Vector3 mouthPos = mouthGO.transform.position;
-        Vector3 targetPos = targetEnemy.GetComponent<Collider>().ClosestPointOnBounds(mouthPos);
-        float dist = Vector2.Distance(new Vector2(targetPos.x,targetPos.z),new Vector2(mouthPos.x,mouthPos.z));
-        if (dist < distToDamage) {
-            targetEnemy.GetComponent<Health>().GetDamaged(attackLevel);
-            //MakuUtil.PlayBloodAt(mouthGO.transform.position);//Bleed();
-            AudioSource.PlayClipAtPoint(successBiteSound,mouthPos);
+        
+        RaycastHit hit;
+        
+        if (Physics.Raycast(mouthPos,transform.forward,out hit,maxDistance:distToDamage)) {
+            Collider col = hit.collider;
+            GameObject hitGO = col.gameObject;
+            Health enemyHealth;
+            try {
+                enemyHealth = hitGO.GetComponent<Health>();
+                if (enemyHealth == null) {
+                    Component[] possibleComponents = hitGO.GetComponentsInParent(typeof(Health));
+                    if (possibleComponents.Length > 1) {
+                        Debug.LogWarning("Got more than one health in parents");
+                    }
+                    Component firstComponent = possibleComponents[0];
+                    enemyHealth = (Health)firstComponent;
+                    return enemyHealth.gameObject;
+                }
+            }
+            catch(IndexOutOfRangeException) {
+                //Don't do anything, go to out of if block
+            }
+        }
+        Collider[] colliders = Physics.OverlapSphere(mouthPos, 0.01f /* Radius */);
+        foreach (Collider col in colliders) {
+            if(col.gameObject != this.gameObject && col.gameObject.GetComponent<Health>() != null) {
+                return col.gameObject;
+            }
+        }
+        return null;
+    }
+    void TestHit() {
+        GameObject hitGO = EnemyInFrontOfTeeth();
+        if (hitGO != null) {
+            hitGO.GetComponent<Health>().GetDamaged(attackLevel);
+            MakuUtil.PlayBloodAt(mouthGO.transform.position);
+            AudioSource.PlayClipAtPoint(successBiteSound,mouthGO.transform.position);
         }
         else {
-            AudioSource.PlayClipAtPoint(failBiteSound,mouthPos);
+            AudioSource.PlayClipAtPoint(failBiteSound,mouthGO.transform.position);
         }
-    }*/
+    }
 }

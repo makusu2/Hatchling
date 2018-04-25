@@ -31,9 +31,18 @@ public class EnemyFinder : MonoBehaviour {
     }
     
     public bool IsEnemy(GameObject go) {
-        Factions[] enemyFactions = GetComponent<Faction>().GetEnemyFactions();
-        Faction enemyFaction = go.GetComponent<Faction>();
-        return (enemyFaction != null && enemyFactions.Contains(enemyFaction.faction) && !go.GetComponent<Health>().IsDead);
+        Factions enemyFaction;
+        if(go.GetComponent<PlayerBehavior>() != null) {
+            enemyFaction = Factions.player;
+        }
+        else if (go.GetComponent<LivingEntity>() == null || go.GetComponent<LivingEntity>().IsDead) {
+            return false;
+        }
+        else {
+            enemyFaction = go.GetComponent<LivingEntity>().Fac;
+        }
+        Factions[] enemyFactions = GetComponent<LivingEntity>().GetEnemyFactions();
+        return enemyFactions.Contains(enemyFaction);
     }
     public GameObject GetClosestEnemy() {
         Func<GameObject,bool> qualFunc = (GameObject go) => IsEnemy(go);

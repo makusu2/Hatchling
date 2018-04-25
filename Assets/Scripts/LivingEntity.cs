@@ -6,19 +6,26 @@ using UnityEngine.UI;
 using System.Linq;
 using UnityEditor;
 
+
+public enum Factions { None, player, wolf, };
+
 public class LivingEntity : MonoBehaviour, ContainerInt{
 
     public int attackLevel = 2;
     
     protected float distToNotice = 15.0f;
-    protected float distToAttack = 0.01f;
-    protected float distToDamage = 0.8f;
+    protected float distToAttack = 0.04f;
+    protected float distToDamage = 0.5f;
     
     protected int foodEaten = 0;
     
+    public Factions Fac;
     
     protected  GameObject targetEnemy = null;
     protected  GameObject targetFood = null;
+    
+    protected Collider mainBodyCol = null;
+    public Collider MainBodyCol { get{return mainBodyCol;}}
     
     protected UnityEngine.AI.NavMeshAgent nav;
     
@@ -44,6 +51,15 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     
     protected static GameObject player;
     protected static HUD hud;
+    
+    public Factions[] GetEnemyFactions() {
+        return enemyFactions[Fac];
+    }
+    public static Dictionary<Factions,Factions[]> enemyFactions = new Dictionary<Factions,Factions[]>(){
+        {Factions.player, new Factions[]{Factions.wolf,}},
+        {Factions.wolf, new Factions[]{Factions.player,}},
+        {Factions.None,new Factions[]{}},
+    };
     
     
     protected void UpdateTargetFood() {
@@ -106,8 +122,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     
     
     
-    
-    protected void Prepare(float distToNotice = 15.0f, float distToAttack = 1.0f, float distToDamage = 0.8f, float walkSpeed = 2, float runSpeed = 5, float turnSpeed = 3, float maxRoamDistance = 20, int attackLevel = 2, int maxHealth = 100,Health.DamageTypes[] immunities = null, string drop = "1*Coin", bool doesRespawn = false) {
+    protected void Prepare(float distToNotice = 15.0f, float distToAttack = 1.0f, float distToDamage = 0.8f, float walkSpeed = 2, float runSpeed = 5, float turnSpeed = 3, float maxRoamDistance = 20, int attackLevel = 2, int maxHealth = 100,Health.DamageTypes[] immunities = null, string drop = "1*Coin", bool doesRespawn = false, Factions fac = Factions.None) {
         this.distToNotice = distToNotice;
         this.distToAttack = distToAttack;
         this.distToDamage = distToDamage;
@@ -133,10 +148,17 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         this.spawnPoint = transform.position;
         player = player??GameObject.FindWithTag("MainPlayer");
         hud = hud??player.GetComponent<HUD>();
-        TestForNearbyTargets();
+        Invoke("TestForNearbyTargets",0.1f);
         container = gameObject.AddComponent<ContainerCls>();
         container.Prepare();
         PrepareEntityInventory(drop);
+        foreach (Transform mainColTest in gameObject.GetComponentsInChildren<Transform>()) {
+            if (mainColTest.CompareTag("MainBodyCollider")) {
+                mainBodyCol = mainColTest.gameObject.GetComponent<Collider>();
+            }
+        }
+        mainBodyCol = mainBodyCol??GetComponent<Collider>();
+        this.Fac = fac;
     }
     
     
@@ -232,18 +254,34 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         }
     }
     
+    protected void TurnToward(GameObject destGO) {
+        TurnToward(destGO.transform.position);
+    }
+    protected void TurnToward(Vector3 destVec){
+        aniAction = aniActions.Walking;
+        InstantlyTurn(destVec);
+    }
     protected void TurnTowardTarget() {
         
         aniAction = aniActions.Walking;
             
-        Vector3 targetDir = Vector3.Normalize(nav.destination - transform.position);
+        /*Vector3 targetDir = Vector3.Normalize(nav.destination - transform.position);
         float step = turnSpeed * Time.deltaTime;
         Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
         Quaternion newRotation = Quaternion.LookRotation(newDir);
         newRotation.x = 0.0f;
         newRotation.z = 0.0f;
-        transform.rotation = newRotation;
+        transform.rotation = newRotation;*/
+        InstantlyTurn(nav.destination);
     }
+     private void InstantlyTurn(Vector3 destination) {
+         //When on target -> dont rotate!
+         if ((destination - transform.position).magnitude < 0.1f) return; 
+         
+         Vector3 direction = (destination - transform.position).normalized;
+         Quaternion  qDir= Quaternion.LookRotation(direction);
+         transform.rotation = Quaternion.Slerp(transform.rotation, qDir, Time.deltaTime * turnSpeed);
+     }
     protected float DistToDest() {
         Vector3 closestBodyPoint = GetComponent<Collider>().ClosestPointOnBounds(nav.destination);
         return Vector3.Distance(closestBodyPoint, nav.destination);
@@ -252,6 +290,10 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         Vector3 myClosest = GetComponent<Collider>().ClosestPointOnBounds(other.transform.position);
         Vector3 otherClosest = other.GetComponent<Collider>().ClosestPointOnBounds(myClosest);
         return Vector3.Distance(myClosest,otherClosest);
+    }
+    protected float DistToGOSimple(GameObject other) { //Should return same result as DistToDest(). DistToGO gives a more accurate result.
+        Vector3 closestBodyPoint = GetComponent<Collider>().ClosestPointOnBounds(other.transform.position);
+        return Vector3.Distance(closestBodyPoint, other.transform.position);
     }
     protected void ContinueRoaming() {
         if (DistToDest() < 2) {

@@ -50,10 +50,10 @@ public class Dragon : LivingEntity {
             aniAction = previousAction; //Make the new animator play the current animation;
             
             if(stage == DragonStage.Egg) {
-                GetComponent<Faction>().faction = Factions.None;
+                Fac = Factions.None;
             }
             else {
-                GetComponent<Faction>().faction = Factions.player;
+                Fac = Factions.player;
             }
         }
     }
@@ -74,7 +74,7 @@ public class Dragon : LivingEntity {
            
 	// Use this for initialization
 	void Start () {
-        base.Prepare(distToNotice:30,walkSpeed:5,runSpeed:8,turnSpeed:10,maxRoamDistance:20,maxHealth:100, immunities:new Health.DamageTypes[]{Health.DamageTypes.fire});
+        base.Prepare(distToNotice:30,walkSpeed:5,runSpeed:8,turnSpeed:10,maxRoamDistance:20,maxHealth:100, immunities:new Health.DamageTypes[]{Health.DamageTypes.fire},fac:Factions.player);
         lastAttackTime = Time.time - attackCooldown;
         Stage = DragonStage.Egg;
         Invoke("CheckGrowDragon",5);

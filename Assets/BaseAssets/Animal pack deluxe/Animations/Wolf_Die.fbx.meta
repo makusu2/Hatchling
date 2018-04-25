@@ -3,7 +3,7 @@ guid: 1464a90bc2e007a4f9e108c0f64a57e8
 timeCreated: 1503920792
 licenseType: Store
 ModelImporter:
-  serializedVersion: 21
+  serializedVersion: 22
   fileIDToRecycleName:
     100000: //RootNode
     100002: Wolf_Head_JawEndSHJnt
@@ -113,10 +113,12 @@ ModelImporter:
     400104: Wolf_Tongue_01_04SHJnt
     7400000: die
     9500000: //RootNode
+  externalObjects: {}
   materials:
     importMaterials: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -129,6 +131,7 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
@@ -140,7 +143,7 @@ ModelImporter:
     - serializedVersion: 16
       name: die
       takeName: Take 001
-      firstFrame: 1
+      firstFrame: 54
       lastFrame: 125
       wrapMode: 0
       orientationOffsetY: 0
@@ -181,6 +184,8 @@ ModelImporter:
     optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
