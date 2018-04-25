@@ -11,7 +11,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     public int attackLevel = 2;
     
     protected float distToNotice = 15.0f;
-    protected float distToAttack = 1.0f;
+    protected float distToAttack = 0.01f;
     protected float distToDamage = 0.8f;
     
     protected int foodEaten = 0;
@@ -195,6 +195,8 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
                 
             }
             else if (value == aniActions.Attacking) {
+                ani.SetBool("Walking",false);
+                ani.SetBool("Running",false);
                 ani.Play("hit",0);
             }
             else if (value == aniActions.Dead) {
@@ -245,6 +247,11 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     protected float DistToDest() {
         Vector3 closestBodyPoint = GetComponent<Collider>().ClosestPointOnBounds(nav.destination);
         return Vector3.Distance(closestBodyPoint, nav.destination);
+    }
+    protected float DistToGO(GameObject other) {
+        Vector3 myClosest = GetComponent<Collider>().ClosestPointOnBounds(other.transform.position);
+        Vector3 otherClosest = other.GetComponent<Collider>().ClosestPointOnBounds(myClosest);
+        return Vector3.Distance(myClosest,otherClosest);
     }
     protected void ContinueRoaming() {
         if (DistToDest() < 2) {
