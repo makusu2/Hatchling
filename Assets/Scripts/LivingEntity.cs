@@ -173,8 +173,8 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     }
     
     protected virtual void FixedUpdate() {
-        GetComponent<Rigidbody>().AddForce(9.8f*Time.deltaTime*-Vector3.up);
-        nav.velocity = nav.velocity + GetComponent<Rigidbody>().velocity;
+        //GetComponent<Rigidbody>().AddForce(9.8f*Time.deltaTime*-Vector3.up);
+        //nav.velocity = nav.velocity + GetComponent<Rigidbody>().velocity;
     }
     
     
