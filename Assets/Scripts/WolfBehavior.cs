@@ -28,7 +28,8 @@ public class WolfBehavior : LivingEntity {
     
     
     
-    void FixedUpdate() {
+    protected override void FixedUpdate() {
+        base.FixedUpdate();
         if (IsDead) {
            return;
         }

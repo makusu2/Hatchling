@@ -87,7 +87,8 @@ public class Dragon : LivingEntity {
     
     
     
-    void FixedUpdate() {
+    protected override void FixedUpdate() {
+        base.FixedUpdate();
         if (Stage == DragonStage.Egg || OnCooldown || IsDead) {
             return;
         }

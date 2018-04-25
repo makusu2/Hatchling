@@ -5,11 +5,9 @@ Dragon growth stages
 Commission models
 Fix the held items hit twice issue (one on swing down one on swing up)
 Human models
+	Or maybe just make some cute equivalent?
 Bow and arrow combat
-Fix UI issue
 Add guards to town
-Better hand model
-On unpause, lock cursor back to screen
 Could we maybe only have one "special" panel; like, since you'll never have townpanel, craftingpanel, chestpanel, or traderpanel open at the same time, we could combine them all...? Would it be worth it?
 Use navmeshpath and calculatepath for pathfinding (stops from getting stuck)
 Think about what will make things easier when adding towns and shit; modularize stuff for fewest lines of code in high-level (specific NPC or whatever) scripts. 
@@ -142,6 +140,7 @@ Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" 
     
 Pause menu
 
+Fix UI issue
 Armor slots
 Also combine pickups on awake (or start)
     Actually, test for combine on discard function
@@ -163,6 +162,8 @@ Maybe each item should be a class; contains the inventory icon and 3d object and
 
 Enemies
 
+On unpause, lock cursor back to screen
+	Only an issue with esc in editor
 Fall damage
 
 Building System
@@ -201,6 +202,7 @@ Have items combine if near others of the same type
 
 I really want to make the inventory standalone...
 
+Better hand model
     
 Maybe make dying enemies ragdoll like in TES, and have player "activate" them to loot
 Look up how to use unity in a more script-y manner rather than GUI-y

@@ -172,6 +172,11 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         
     }
     
+    protected virtual void FixedUpdate() {
+        GetComponent<Rigidbody>().AddForce(9.8f*Time.deltaTime*-Vector3.up);
+        nav.velocity = nav.velocity + GetComponent<Rigidbody>().velocity;
+    }
+    
     
     protected Vector3 GetNewRoamDestination() {
         float xDif = UnityEngine.Random.Range(-maxRoamDistance,maxRoamDistance);
@@ -241,6 +246,9 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     
    
     protected virtual void SetDestination(Vector3 position, bool isRunning = true) {
+        if(!nav.enabled) {
+            return;
+        }
         nav.destination = position;
         float distToDest = DistToDest();
         bool closeEnough = distToDest < distToAttack;
@@ -383,6 +391,30 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
             
         }
     }
+    
+    /*protected void OnCollisionEnter(Collision col) {
+        if(col.gameObject.CompareTag("Ground")) {
+            SwitchToNav();
+        }
+    }
+    protected void OnCollisionExit(Collision col) {
+        if(col.gameObject.CompareTag("Ground")) {
+            SwitchToRigidbody();
+        }
+    }
+    
+    protected void SwitchToRigidbody() {
+        GetComponent<Rigidbody>().useGravity = true;
+        GetComponent<Rigidbody>().isKinematic = false;
+        nav.enabled = false;
+    }
+    protected void SwitchToNav() {
+        Vector3 prevPos = transform.position;
+        GetComponent<Rigidbody>().useGravity = false;
+        GetComponent<Rigidbody>().isKinematic = true;
+        nav.enabled = true;
+        transform.position = prevPos;
+    }*/
     
     
     
