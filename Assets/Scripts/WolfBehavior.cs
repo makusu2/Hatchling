@@ -7,6 +7,8 @@ using System.Linq;
 public class WolfBehavior : LivingEntity {
 
     
+    private float lastAttackTime;
+    private float cooldownTime = 1f;
     
     
     [SerializeField] private AudioClip successBiteSound;
@@ -21,7 +23,9 @@ public class WolfBehavior : LivingEntity {
                 mouthGO = testMouth.gameObject;
             }
         }
+        lastAttackTime = Time.time;
 	}
+    
     
     
     void FixedUpdate() {
@@ -44,12 +48,11 @@ public class WolfBehavior : LivingEntity {
                 if(closeEnoughToAttack) {
                     nav.isStopped = true;
                     nav.velocity = Vector3.zero;
-                    if (EnemyInFrontOfTeeth() != null /*&& LookingNearTarget()*/){
-                        if(CanBeginAttack()) {
-                            BeginAttack();
-                        }
+                    if (EnemyInFrontOfTeeth() != null && CanBeginAttack() /*&& LookingNearTarget()*/){
+                        //print("Enemy in front of teeth isn't null, it's: "+EnemyInFrontOfTeeth().name);
+                        BeginAttack();
                     }
-                    else {
+                    else if(!LookingAt(targetEnemy)) {
                         TurnToward(targetEnemy);
                     }
                 }
@@ -61,7 +64,7 @@ public class WolfBehavior : LivingEntity {
     }
     
     bool CanBeginAttack() {
-        return aniAction != aniActions.Attacking;
+        return Time.time - lastAttackTime > cooldownTime && aniAction != aniActions.Attacking;
     }
     
         
@@ -71,11 +74,12 @@ public class WolfBehavior : LivingEntity {
     
     void BeginAttack() {
         if (CanBeginAttack()) {
+            lastAttackTime = Time.time;
             aniAction = aniActions.Attacking;
             Invoke("TestHit",0.3f);
         }
     }
-    GameObject EnemyInFrontOfTeeth() { //Returns the gameobject that has a health component or null if none
+    GameObject EnemyInFrontOfTeeth(float sphereRadius = 0.03f) { //Returns the gameobject that has a health component or null if none
         Vector3 mouthPos = mouthGO.transform.position;
         
         RaycastHit hit;
@@ -100,10 +104,25 @@ public class WolfBehavior : LivingEntity {
                 //Don't do anything, go to out of if block
             }
         }
-        Collider[] colliders = Physics.OverlapSphere(mouthPos, 0.01f /* Radius */);
+        Collider[] colliders = Physics.OverlapSphere(mouthPos, sphereRadius/* Radius */);
         foreach (Collider col in colliders) {
             if(col.gameObject != this.gameObject && col.gameObject.GetComponent<Health>() != null) {
                 return col.gameObject;
+            }
+        }
+        if (targetEnemy != null) {
+            //Last check, see if targetenemy is insanely close
+            /*Vector2 pos2 = new Vector2(mouthPos.x,mouthPos.z);
+            Vector2 enemyPos2 = new Vector2(targetEnemy.transform.position.x,targetEnemy.transform.position.z);
+            float distToEnemy = Vector2.Distance(pos2,enemyPos2);
+            if (distToEnemy < 0.02) {
+                print("Got with dist: "+distToEnemy.ToString());
+                return targetEnemy;
+            }*/
+            foreach(Collider col in targetEnemy.GetComponentsInChildren<Collider>()) {
+                if(col.bounds.Contains(mouthPos)) {
+                    return targetEnemy;
+                }
             }
         }
         return null;

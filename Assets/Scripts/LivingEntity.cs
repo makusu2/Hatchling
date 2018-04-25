@@ -258,12 +258,9 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         TurnToward(destGO.transform.position);
     }
     protected void TurnToward(Vector3 destVec){
-        aniAction = aniActions.Walking;
         InstantlyTurn(destVec);
     }
     protected void TurnTowardTarget() {
-        
-        aniAction = aniActions.Walking;
             
         /*Vector3 targetDir = Vector3.Normalize(nav.destination - transform.position);
         float step = turnSpeed * Time.deltaTime;
@@ -274,13 +271,34 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         transform.rotation = newRotation;*/
         InstantlyTurn(nav.destination);
     }
+    protected bool LookingAt(GameObject destGO) {
+        return LookingAt(destGO.transform.position);
+    }
+    protected bool LookingAt(Vector3 destination) {
+        Vector3 destVec = destination;
+        Vector3 myVec = transform.position;
+        destVec.y = 0;
+        myVec.y = 0;
+        float angleBetween = Vector3.Angle((destVec-myVec),transform.forward);
+        //print("mag thingie: "+(destVec-myVec).magnitude.ToString());
+        return angleBetween < 1;
+    }
+    
      private void InstantlyTurn(Vector3 destination) {
          //When on target -> dont rotate!
-         if ((destination - transform.position).magnitude < 0.1f) return; 
+         if (LookingAt(destination)) return; 
+         
+         //bool wasIdle = aniAction == aniActions.Idle;
+         aniAction = aniActions.Walking;
+         
          
          Vector3 direction = (destination - transform.position).normalized;
          Quaternion  qDir= Quaternion.LookRotation(direction);
          transform.rotation = Quaternion.Slerp(transform.rotation, qDir, Time.deltaTime * turnSpeed);
+         
+         /*if(wasIdle) {
+             aniAction = aniActions.Idle;
+         }*/
      }
     protected float DistToDest() {
         Vector3 closestBodyPoint = GetComponent<Collider>().ClosestPointOnBounds(nav.destination);
