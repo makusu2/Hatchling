@@ -111,14 +111,6 @@ public class WolfBehavior : LivingEntity {
             }
         }
         if (targetEnemy != null) {
-            //Last check, see if targetenemy is insanely close
-            /*Vector2 pos2 = new Vector2(mouthPos.x,mouthPos.z);
-            Vector2 enemyPos2 = new Vector2(targetEnemy.transform.position.x,targetEnemy.transform.position.z);
-            float distToEnemy = Vector2.Distance(pos2,enemyPos2);
-            if (distToEnemy < 0.02) {
-                print("Got with dist: "+distToEnemy.ToString());
-                return targetEnemy;
-            }*/
             foreach(Collider col in targetEnemy.GetComponentsInChildren<Collider>()) {
                 if(col.bounds.Contains(mouthPos)) {
                     return targetEnemy;

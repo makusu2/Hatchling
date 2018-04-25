@@ -35,6 +35,8 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     
     protected GameObject mouthGO;
     
+    protected Collider hitbox;
+    
     protected bool doesRespawn;
     protected int respawnTime = -1;
     
@@ -152,11 +154,15 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         container = gameObject.AddComponent<ContainerCls>();
         container.Prepare();
         PrepareEntityInventory(drop);
-        foreach (Transform mainColTest in gameObject.GetComponentsInChildren<Transform>()) {
-            if (mainColTest.CompareTag("MainBodyCollider")) {
-                mainBodyCol = mainColTest.gameObject.GetComponent<Collider>();
+        foreach (Transform keyTest in gameObject.GetComponentsInChildren<Transform>()) {
+            if (keyTest.CompareTag("MainBodyCollider")) {
+                mainBodyCol = keyTest.gameObject.GetComponent<Collider>();
+            }
+            if(keyTest.CompareTag("Hitbox")) {
+                this.hitbox = keyTest.gameObject.GetComponent<Collider>();
             }
         }
+        hitbox = hitbox??GetComponent<Collider>();
         mainBodyCol = mainBodyCol??GetComponent<Collider>();
         this.Fac = fac;
     }
@@ -261,14 +267,6 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         InstantlyTurn(destVec);
     }
     protected void TurnTowardTarget() {
-            
-        /*Vector3 targetDir = Vector3.Normalize(nav.destination - transform.position);
-        float step = turnSpeed * Time.deltaTime;
-        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
-        Quaternion newRotation = Quaternion.LookRotation(newDir);
-        newRotation.x = 0.0f;
-        newRotation.z = 0.0f;
-        transform.rotation = newRotation;*/
         InstantlyTurn(nav.destination);
     }
     protected bool LookingAt(GameObject destGO) {
@@ -280,7 +278,6 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         destVec.y = 0;
         myVec.y = 0;
         float angleBetween = Vector3.Angle((destVec-myVec),transform.forward);
-        //print("mag thingie: "+(destVec-myVec).magnitude.ToString());
         return angleBetween < 1;
     }
     
@@ -288,7 +285,6 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
          //When on target -> dont rotate!
          if (LookingAt(destination)) return; 
          
-         //bool wasIdle = aniAction == aniActions.Idle;
          aniAction = aniActions.Walking;
          
          
@@ -296,21 +292,18 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
          Quaternion  qDir= Quaternion.LookRotation(direction);
          transform.rotation = Quaternion.Slerp(transform.rotation, qDir, Time.deltaTime * turnSpeed);
          
-         /*if(wasIdle) {
-             aniAction = aniActions.Idle;
-         }*/
      }
     protected float DistToDest() {
-        Vector3 closestBodyPoint = GetComponent<Collider>().ClosestPointOnBounds(nav.destination);
+        Vector3 closestBodyPoint = hitbox.ClosestPointOnBounds(nav.destination);
         return Vector3.Distance(closestBodyPoint, nav.destination);
     }
     protected float DistToGO(GameObject other) {
-        Vector3 myClosest = GetComponent<Collider>().ClosestPointOnBounds(other.transform.position);
+        Vector3 myClosest = hitbox.ClosestPointOnBounds(other.transform.position);
         Vector3 otherClosest = other.GetComponent<Collider>().ClosestPointOnBounds(myClosest);
         return Vector3.Distance(myClosest,otherClosest);
     }
     protected float DistToGOSimple(GameObject other) { //Should return same result as DistToDest(). DistToGO gives a more accurate result.
-        Vector3 closestBodyPoint = GetComponent<Collider>().ClosestPointOnBounds(other.transform.position);
+        Vector3 closestBodyPoint = hitbox.ClosestPointOnBounds(other.transform.position);
         return Vector3.Distance(closestBodyPoint, other.transform.position);
     }
     protected void ContinueRoaming() {
@@ -335,10 +328,20 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     
     protected void FitColliderToChildren ()
     {
-        BoxCollider bc = gameObject.GetComponent<BoxCollider>();
+        transform.rotation = Quaternion.identity; //Set rotation to (0,0,0). Messes bounds up if you don't.
+        BoxCollider bc;
+        if (hitbox != null) {
+            bc = (BoxCollider)hitbox;
+        }
+        else {
+            bc = gameObject.GetComponent<BoxCollider>();
+        }
         Bounds bounds = new Bounds (Vector3.zero, Vector3.zero);
         bool hasBounds = false;
         Renderer[] renderers =  gameObject.GetComponentsInChildren<Renderer>();
+        foreach(SkinnedMeshRenderer ren in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()) {
+            ren.updateWhenOffscreen = true;
+        }
         foreach (Renderer render in renderers) {
             if (hasBounds) {
                 bounds.Encapsulate(render.bounds);
@@ -355,6 +358,9 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
             bc.size = bc.center = Vector3.zero;
             bc.size = Vector3.zero;
         }
+        foreach(SkinnedMeshRenderer ren in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>()) {
+            ren.updateWhenOffscreen = false;
+        }
    }
     
     public void Respawn() {
@@ -369,6 +375,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     
     protected virtual void Die() {
         aniAction = aniActions.Dead;
+        Invoke("FitColliderToChildren",1);
         if(doesRespawn) {
             Invoke("Respawn",respawnTime);
         }
