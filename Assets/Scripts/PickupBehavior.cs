@@ -103,7 +103,7 @@ public class PickupBehavior : MonoBehaviour {
             Invoke("Respawn",RespawnTime);
         }
         else {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
         
     }

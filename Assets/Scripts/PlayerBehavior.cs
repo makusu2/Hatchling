@@ -206,6 +206,15 @@ public class PlayerBehavior : MonoBehaviour {
         if (currentUpdate % thirstDecreasePeriod == 0) {
             ThirstLevel--;
         }
+        if(!Hud.UsingUI) {
+            RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
+            try {
+                Hud.InfoStr = hit.transform.gameObject.name;
+            }
+            catch(NullReferenceException) {
+                Hud.InfoStr = "";
+            }
+        }
     }
     
     private int hungerLevel;

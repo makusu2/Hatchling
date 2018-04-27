@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class CameraBehavior : MonoBehaviour {
 
@@ -17,8 +18,15 @@ public class CameraBehavior : MonoBehaviour {
     public RaycastHit GetRayHit(float maxDist = Mathf.Infinity) {
         Vector3 pos = transform.position;
         Vector3 fwd = transform.TransformDirection(Vector3.forward);
-        RaycastHit hit;
+        /*RaycastHit hit;
         Physics.Raycast(pos,fwd,out hit,maxDistance: maxDist);
-        return hit;
+        return hit;*/
+        RaycastHit[] hits = Physics.RaycastAll(pos, fwd,maxDist).OrderBy(h=>h.distance).ToArray();
+        foreach(RaycastHit hit in hits) {
+            if(!hit.transform.CompareTag("MainPlayer")) {
+                return hit;//return hits[0];
+            }
+        }
+        return default(RaycastHit);
     }
 }
