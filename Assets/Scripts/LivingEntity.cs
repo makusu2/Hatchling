@@ -238,7 +238,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
             }
         }
         set {
-            if (ani == null) {
+            if (ani == null || aniAction == value) {
                 return;
             }
             if (value == aniActions.Walking) {

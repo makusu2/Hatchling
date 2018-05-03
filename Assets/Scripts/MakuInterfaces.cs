@@ -24,7 +24,7 @@ interface ReceiveSwing {
     void GetSwungAt();
     AudioClip SuccessHitSound {get;}
     AudioClip FailHitSound{get;}
-    GameObject Particles{get;}
+    //GameObject Particles{get;}
 }
 
 interface WaterEnterer {

@@ -128,7 +128,7 @@ public class WolfBehavior : LivingEntity {
         GameObject hitGO = EnemyInFrontOfTeeth();
         if (hitGO != null) {
             hitGO.GetComponent<Health>().GetDamaged(attackLevel);
-            MakuUtil.PlayBloodAt(mouthGO.transform.position);
+            MakuUtil.PlayBloodAtPoint(mouthGO.transform.position);
             AudioSource.PlayClipAtPoint(successBiteSound,mouthGO.transform.position);
         }
         else {

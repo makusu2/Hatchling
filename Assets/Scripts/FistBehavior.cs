@@ -28,7 +28,7 @@ public class FistBehavior : MonoBehaviour {
             if (colHealth != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
                 colHealth.GetDamaged(AttackLevel);
                 Vector3 contactPoint = col.gameObject.GetComponent<LivingEntity>().MainBodyCol. ClosestPointOnBounds(transform.position);
-                MakuUtil.PlayBloodAt(contactPoint);
+                MakuUtil.PlayBloodAtPoint(contactPoint);
             }
             ReceiveSwing swungGO = col.gameObject.GetComponent<ReceiveSwing>();
             if (swungGO != null && player.GetComponent<PlayerBehavior>().IsSwinging) {

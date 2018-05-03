@@ -339,6 +339,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
                 RemoveItem(ingredient);
             }
         }
+        PrepareBuildObject.AddComponent<UnityEngine.AI.NavMeshObstacle>();
         //might need to do more here
     }
     

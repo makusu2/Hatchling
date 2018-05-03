@@ -10,6 +10,8 @@ public class MakuUtil : MonoBehaviour {
     
     static MakuUtil FuckYouCSharp;
     
+    static Dictionary<string,GameObject> parts = new Dictionary<string,GameObject>();
+    
     void Awake() {
         FuckYouCSharp = this;
     }
@@ -41,15 +43,20 @@ public class MakuUtil : MonoBehaviour {
         return(recipes);
     }
     
-    
-    public static void PlayBloodAt(Vector3 position) {
-       FuckYouCSharp.StartCoroutine(PlayAndStopBloodAt(position));
+    public static void PlayBloodAtPoint(Vector3 position) {
+       PlayParticlesAtPoint("Blood",position);
     }
-    static IEnumerator PlayAndStopBloodAt(Vector3 position) {
-        bloodTemplate = bloodTemplate??Resources.Load("InWorld/Blood") as GameObject;
-        GameObject blood = Instantiate(bloodTemplate);
-        blood.transform.position = position;
+    public static void PlayParticlesAtPoint( string particlesName,Vector3 position) {
+        if(!parts.ContainsKey(particlesName)){
+            parts[particlesName] = Instantiate(Resources.Load("InWorld/"+particlesName) as GameObject);
+            parts[particlesName].SetActive(false);
+        }
+        FuckYouCSharp.StartCoroutine(PlayAndStopParticlesAtPoint(parts[particlesName],position));
+    }
+    static IEnumerator PlayAndStopParticlesAtPoint(GameObject particles,Vector3 position) {
+        particles.SetActive(true);
+        particles.transform.position = position;
         yield return new WaitForSeconds(.3f);
-        Destroy(blood);
+        particles.SetActive(false);
     }
 }

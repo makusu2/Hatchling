@@ -20,7 +20,6 @@ public class Elm : MonoBehaviour, ReceiveSwing {
     private GameObject particles;
     public AudioClip SuccessHitSound {get { return successHitSound;}}
     public AudioClip FailHitSound {get {return failHitSound;}}
-    public GameObject Particles { get {return particles;}}
     
     private static GameObject player;
     
@@ -75,6 +74,7 @@ public class Elm : MonoBehaviour, ReceiveSwing {
     public void GetSwungAt() {
         Transform strikePointTrans;
         if(player.GetComponent<PlayerBehavior>().CurrentItem.Equals("Hatchet")) {
+            
             player.GetComponent<PlayerBehavior>().inventory.AddItem("Wood");
             Wood -= 1;
             strikePointTrans = player.GetComponent<PlayerBehavior>().HeldItemObject.transform.Find("StrikePoint");
@@ -83,7 +83,7 @@ public class Elm : MonoBehaviour, ReceiveSwing {
                 return;
             }
             AudioSource.PlayClipAtPoint(SuccessHitSound,strikePointTrans.position);
-            //TODO play particles
+            MakuUtil.PlayParticlesAtPoint("Sparks",strikePointTrans.position);
         }
         else {
             Vector3 audioPos = player.GetComponent<PlayerBehavior>().EquippedContainer.transform.position;

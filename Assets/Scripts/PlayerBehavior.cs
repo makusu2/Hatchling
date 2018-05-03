@@ -19,6 +19,8 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
     [SerializeField]
     private int thirstDecreasePeriod = 100;
     
+    static int scrollSensitivity = 10;
+    
     public int Money {
         get {
             return inventory.CountOf("Coin");
@@ -75,6 +77,18 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
     public bool IsSwinging {
         get {
             return HandAnimator.GetCurrentAnimatorStateInfo(0).IsName("punch") || HandAnimator.GetCurrentAnimatorStateInfo(0).IsName("swingWeapon");
+        }
+    }
+    
+    public bool IsSwingingValid {
+        get {
+            if (!IsSwinging) {
+                return false;
+            }
+            else {
+                float aniPct = HandAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                return aniPct > 0.35 && aniPct < 0.5; //It's in the swinging part of the animation
+            }
         }
     }
     
@@ -169,18 +183,31 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         ThirstLevel = 100;
 	}
 	
-	// Update is called once per frame
+	bool wasSuccessfulLastUpdate = false;
 	void Update () {
         if (inventory.PreparingBuild) {
             if (Input.GetButtonDown("Fire1")) {
-                inventory.CompleteBuildItem();
+                if(wasSuccessfulLastUpdate) {
+                    inventory.CompleteBuildItem();
+                }
+                else {
+                    //play failure sound
+                }
             }
             else {
+                float scrollChange = Input.GetAxis("Mouse ScrollWheel");
+                inventory.PrepareBuildObject.transform.Rotate(new Vector3(0,scrollChange*scrollSensitivity,0));
                 RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
-                Vector3 newPosition = hit.point;
-                newPosition.y = newPosition.y + inventory.PrepareBuildOffset;
-                inventory.PrepareBuildObject.transform.position = newPosition;
-                //Update location
+                if(hit.collider != null && hit.collider.gameObject.CompareTag("Ground")) {
+                    Vector3 newPosition = hit.point;
+                    newPosition.y = newPosition.y + inventory.PrepareBuildOffset;
+                    inventory.PrepareBuildObject.transform.position = newPosition;
+                    wasSuccessfulLastUpdate = true;
+                }
+                else {
+                    wasSuccessfulLastUpdate = false;
+                    //Make it red or something
+                }
             }
             return;
         }

@@ -29,13 +29,13 @@ public class HeldWeapon : MonoBehaviour, ItemActivator {
             return;
         }
         Health colHealth = col.gameObject.GetComponent<Health>();
-        if (colHealth != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
+        if (colHealth != null && player.GetComponent<PlayerBehavior>().IsSwingingValid) {
             colHealth.GetDamaged(AttackLevel);
             Vector3 contactPoint = col.gameObject.GetComponent<LivingEntity>().MainBodyCol.ClosestPointOnBounds(transform.position);
-            MakuUtil.PlayBloodAt(contactPoint);
+            MakuUtil.PlayBloodAtPoint(contactPoint);
         }
         ReceiveSwing swungGO = col.gameObject.GetComponent<ReceiveSwing>();
-        if (swungGO != null && player.GetComponent<PlayerBehavior>().IsSwinging) {
+        if (swungGO != null && player.GetComponent<PlayerBehavior>().IsSwingingValid) {
             swungGO.GetSwungAt();
         }
         
