@@ -1,5 +1,4 @@
 Electrical system for town
-Swimming mechanic
 Make trees show some sort of dust or whatever when hit with a hatchet
 Dragon growth stages
 Commission models
@@ -16,7 +15,6 @@ Scripts should be in your own language, bash-style; C# should allow the file to 
 GetComponent<Renderer>().isVisible returns true if the object is in view of the camera
 Use profiler window to find what's using processing power
 So it looks like, we should have class variables before methods, rather than static method variables. This is a lot faster cuz of garbage collection.
-OnWaterEnter and OnWaterExit functions
 
 
 
@@ -148,6 +146,8 @@ Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" 
 Use navmeshpath and calculatepath for pathfinding (stops from getting stuck)
 Pause menu
 
+OnWaterEnter and OnWaterExit functions
+Fix fall damage; have it be logarithmic or whatever, where infinite height -> all fall damage, so if you fall a great (near inf) distance it'll ALMOST kill you (if you start at full health)
 Fix UI issue
 Armor slots
 Also combine pickups on awake (or start)
@@ -170,6 +170,7 @@ Maybe each item should be a class; contains the inventory icon and 3d object and
 
 Enemies
 
+Swimming mechanic
 On unpause, lock cursor back to screen
 	Only an issue with esc in editor
 Fall damage

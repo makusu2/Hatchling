@@ -7,7 +7,7 @@ using System.Linq;
 using UnityEditor;
 
 
-public class PlayerBehavior : MonoBehaviour {
+public class PlayerBehavior : MonoBehaviour, WaterEnterer {
 
     public Inventory inventory;
     public HUD Hud;
@@ -41,6 +41,21 @@ public class PlayerBehavior : MonoBehaviour {
         }
     }
     
+    bool inWater;
+    public bool InWater{
+        get {
+            return inWater;
+        }
+        set {
+            inWater = value;
+        }
+    }
+    public void OnWaterEnter() {
+        InWater = true;
+    }
+    public void OnWaterExit() {
+        InWater = false;
+    }
     
     public GameObject HeldItemObject {
         get {

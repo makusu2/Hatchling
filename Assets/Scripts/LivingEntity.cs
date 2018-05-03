@@ -9,7 +9,7 @@ using UnityEditor;
 
 public enum Factions { None, player, wolf, };
 
-public class LivingEntity : MonoBehaviour, ContainerInt{
+public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
 
     public int attackLevel = 2;
     
@@ -18,6 +18,9 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
     protected float distToDamage = 0.5f;
     
     protected int foodEaten = 0;
+    
+    protected int delayedUpdateFrameDelay;
+    protected int delayedUpdateFrameDelayIndex;
     
     public Factions Fac;
     
@@ -63,18 +66,46 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         {Factions.None,new Factions[]{}},
     };
     
+    bool inWater;
+    public bool InWater{
+        get {
+            return inWater;
+        }
+        set {
+            inWater = value;
+        }
+    }
+    public void OnWaterEnter() {
+        InWater = true;
+        print(gameObject.name+" entered water");
+    }
+    
+    public void OnWaterExit() {
+        InWater = false;
+        print(gameObject.name+" exited water");
+    }
+    
     
     protected void UpdateTargetFood() {
         if(targetFood == null) {
-            GameObject targetGO = GetComponent<EnemyFinder>().GetClosestFood();
-            targetFood = targetGO;
+            targetFood = GetComponent<EnemyFinder>().GetClosestFood();
+        }
+    }
+    protected void UpdateTargetEnemy() {
+        if (targetEnemy != null) {
+            if (targetEnemy.GetComponent<Health>().IsDead || Vector3.Distance(targetEnemy.transform.position,transform.position) > distToNotice) {
+                targetEnemy = null;
+            }
+        }
+        if (targetEnemy == null) {
+            targetEnemy = GetComponent<EnemyFinder>().GetClosestEnemy();
         }
     }
     
-    protected void TestForNearbyTargets() {
+    /*protected void TestForNearbyTargets() {
         UpdateAllTargets();
         Invoke("TestForNearbyTargets",2);
-    }
+    }*/
     
     
     protected void UpdateAllTargets() {
@@ -109,22 +140,11 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
    }
     
     
-    protected void UpdateTargetEnemy() {
-        if (targetEnemy != null) {
-            if (targetEnemy.GetComponent<Health>().IsDead || Vector3.Distance(targetEnemy.transform.position,transform.position) > distToNotice) {
-                targetEnemy = null;
-            }
-        }
-        if (targetEnemy == null) {
-            GameObject targetGO = GetComponent<EnemyFinder>().GetClosestEnemy();
-            targetEnemy = targetGO;
-        }
-    }
         
     
     
     
-    protected void Prepare(float distToNotice = 15.0f, float distToAttack = 1.0f, float distToDamage = 0.8f, float walkSpeed = 2, float runSpeed = 5, float turnSpeed = 3, float maxRoamDistance = 20, int attackLevel = 2, int maxHealth = 100,Health.DamageTypes[] immunities = null, string drop = "1*Coin", bool doesRespawn = false, Factions fac = Factions.None) {
+    protected void Prepare(float distToNotice = 15.0f, float distToAttack = 1.0f, float distToDamage = 0.8f, float walkSpeed = 2, float runSpeed = 5, float turnSpeed = 3, float maxRoamDistance = 20, int attackLevel = 2, int maxHealth = 100,Health.DamageTypes[] immunities = null, string drop = "1*Coin", bool doesRespawn = false, Factions fac = Factions.None, int delayedUpdateFrameDelay = 1000) {
         this.distToNotice = distToNotice;
         this.distToAttack = distToAttack;
         this.distToDamage = distToDamage;
@@ -150,7 +170,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         this.spawnPoint = transform.position;
         player = player??GameObject.FindWithTag("MainPlayer");
         hud = hud??player.GetComponent<HUD>();
-        Invoke("TestForNearbyTargets",0.1f);
+        //Invoke("TestForNearbyTargets",0.1f);
         container = gameObject.AddComponent<ContainerCls>();
         container.Prepare();
         PrepareEntityInventory(drop);
@@ -165,6 +185,8 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         hitbox = hitbox??GetComponent<Collider>();
         mainBodyCol = mainBodyCol??GetComponent<Collider>();
         this.Fac = fac;
+        this.delayedUpdateFrameDelay = delayedUpdateFrameDelay;
+        this.delayedUpdateFrameDelayIndex = MakuUtil.rnd.Next(this.delayedUpdateFrameDelay);
     }
     
     
@@ -172,9 +194,18 @@ public class LivingEntity : MonoBehaviour, ContainerInt{
         
     }
     
+    int fixedUpdateCount = 0;
     protected virtual void FixedUpdate() {
+        fixedUpdateCount++;
+        if(fixedUpdateCount%this.delayedUpdateFrameDelay == this.delayedUpdateFrameDelayIndex) {
+            DelayedUpdate();
+        }
         //GetComponent<Rigidbody>().AddForce(9.8f*Time.deltaTime*-Vector3.up);
         //nav.velocity = nav.velocity + GetComponent<Rigidbody>().velocity;
+    }
+    
+    protected virtual void DelayedUpdate(){
+        UpdateAllTargets();
     }
     
     

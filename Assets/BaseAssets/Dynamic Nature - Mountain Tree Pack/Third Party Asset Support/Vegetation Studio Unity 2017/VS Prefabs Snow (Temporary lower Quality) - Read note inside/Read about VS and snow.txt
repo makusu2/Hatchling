@@ -1,0 +1,5 @@
+Dont enable billboards - our cross will be last LOD and increase max tree distance
+They look alot worse because VS support only 0,1,2 lod so we lost 1 lod for cross.
+If you want manage snow amount at runtime you have to get acces to VS materials in memory and change 
+Snow_Amount value. It's because VS create coppy of materials.
+Number of LOD's will be solved soon.

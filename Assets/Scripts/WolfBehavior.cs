@@ -37,10 +37,7 @@ public class WolfBehavior : LivingEntity {
             return;
         }
         else {
-            if (targetEnemy == null) {
-                ContinueRoaming();
-            }
-            else {
+            if (targetEnemy != null) {
                 if (targetEnemy.GetComponent<Health>().IsDead) {
                     targetEnemy = null;
                     return;
@@ -62,6 +59,13 @@ public class WolfBehavior : LivingEntity {
                 }
             }
         }
+    }
+    
+    protected override void DelayedUpdate() {
+       base.DelayedUpdate();
+       if(targetEnemy == null) {
+           ContinueRoaming();
+       }
     }
     
     bool CanBeginAttack() {

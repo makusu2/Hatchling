@@ -26,3 +26,9 @@ interface ReceiveSwing {
     AudioClip FailHitSound{get;}
     GameObject Particles{get;}
 }
+
+interface WaterEnterer {
+    void OnWaterEnter();
+    void OnWaterExit();
+    bool InWater{get;set;}
+}

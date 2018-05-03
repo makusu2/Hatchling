@@ -5,12 +5,12 @@ using System;
 
 public class Elm : MonoBehaviour, ReceiveSwing {
 
-    public int MaxWood = 30;
-    public int MaxBranches = 4;
-    public int RespawnTime = 20;
+    static int MaxWood = 30;
+    static int MaxBranches = 4;
+    int RespawnTime = 20;
     
-    private int currentWood;
-    private int currentBranches;
+    private int currentWood = MaxWood;
+    private int currentBranches = MaxBranches;
     
     [SerializeField]
     private AudioClip successHitSound;
@@ -45,23 +45,31 @@ public class Elm : MonoBehaviour, ReceiveSwing {
         if(player == null) {
             player = GameObject.FindWithTag("MainPlayer");
         }
-		currentWood = MaxWood;
-        currentBranches = MaxBranches;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+		//currentWood = MaxWood;
+        //currentBranches = MaxBranches;
 	}
     
     void Disappear() {
         this.GetComponent<Collider>().enabled = false;
-        this.GetComponent<MeshRenderer>().enabled = false;
+        /*try {
+            this.GetComponent<MeshRenderer>().enabled = false;
+        }
+        catch(MissingComponentException) {
+            this.GetComponent<LODGroup>().enabled = false;
+        }*/
+        this.GetComponent<Renderer>().enabled = false;
     }
     
     void Reappear() {
         this.GetComponent<Collider>().enabled = true;
-        this.GetComponent<MeshRenderer>().enabled = true;
+        /*try {
+            this.GetComponent<MeshRenderer>().enabled = true;
+        }
+        catch(MissingComponentException) {
+            this.GetComponent<LODGroup>().enabled = true;
+        }*/
+        this.GetComponent<Renderer>().enabled = true;
+        
     }
     
     public void GetSwungAt() {

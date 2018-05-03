@@ -35,26 +35,12 @@ public class FallDamageTaker : MonoBehaviour {
 	void Start () {
 		previousPoses = new Vector3[] {currentPos,currentPos,currentPos};
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
     
     void FixedUpdate() {
-        /*print("Current: "+currentVelocity.ToString());
-        print("Previous: "+previousVelocity.ToString());
-        print("fixedDeltaTime: "+Time.fixedDeltaTime.ToString());*/
-        //Vector3 acceleration = (currentVelocity-previousVelocity)/Time.fixedDeltaTime;
-        //print(acceleration.ToString());
-        
-        /*if(currentJerk.y > 3000) {
-            print(currentJerk.ToString());
-        }*/
         if (testDamageNextRound) {
             //500 should be min to damage
             if (vertAcceleration > minToDamage) {
-                int damageToTake = (int)(vertAcceleration-500.0f);
+                int damageToTake = (int)((vertAcceleration-500.0f)/2);
                 GetComponent<Health>().GetDamaged(damageToTake,damageType: Health.DamageTypes.fall);
             }
         }

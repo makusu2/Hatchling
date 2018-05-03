@@ -3,17 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class CameraBehavior : MonoBehaviour {
+public class CameraBehavior : MonoBehaviour, WaterEnterer {
 
 	// Use this for initialization
 	void Start () {
-		
+        RenderSettings.fog = true;
+        RenderSettings.fogDensity=0;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    
+    static Color normalColor = new Color (0.5f, 0.5f, 0.5f, 0.5f);
+    static Color underwaterColor = new Color (0.22f, 0.65f, 0.77f, 0.5f);
+    
+    bool inWater;
+    public bool InWater{
+        get {
+            return inWater;
+        }
+        set {
+            inWater = value;
+        }
+    }
+    public void OnWaterEnter() {
+        InWater = true;
+        RenderSettings.fogColor = underwaterColor;
+        RenderSettings.fogDensity = 0.1f;
+    }
+    public void OnWaterExit() {
+        InWater = false;
+        RenderSettings.fogColor = normalColor;
+        RenderSettings.fogDensity=0;
+    }
     
     public RaycastHit GetRayHit(float maxDist = Mathf.Infinity) {
         Vector3 pos = transform.position;
