@@ -26,7 +26,7 @@ public class CameraBehavior : MonoBehaviour, WaterEnterer {
     public void OnWaterEnter() {
         InWater = true;
         RenderSettings.fogColor = underwaterColor;
-        RenderSettings.fogDensity = 0.1f;
+        RenderSettings.fogDensity = 0.01f;
     }
     public void OnWaterExit() {
         InWater = false;

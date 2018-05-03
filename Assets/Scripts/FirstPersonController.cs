@@ -43,6 +43,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
+        private WaterEnterer waterEnterer;
+        
+        private bool InWater {
+            get {
+                return waterEnterer.InWater;
+            }
+        }
 
         // Use this for initialization
         private void Start()
@@ -57,13 +64,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+            waterEnterer = GetComponent<WaterEnterer>();
         }
 
 
         // Update is called once per frame
         private void Update()
         {
-            bool inWater = GetComponent<WaterEnterer>().InWater;
+            //bool inWater = GetComponent<WaterEnterer>().InWater;
             
             if(m_MouseLook.lockCursor) { //added maku
                 RotateView();
@@ -74,14 +82,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
 
-            if (!inWater && !m_PreviouslyGrounded && m_CharacterController.isGrounded)
+            if (!InWater && !m_PreviouslyGrounded && m_CharacterController.isGrounded)
             {
                 StartCoroutine(m_JumpBob.DoBobCycle());
                 PlayLandingSound();
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
             }
-            if (!inWater && !m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
+            if (!InWater && !m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
             {
                 m_MoveDir.y = 0f;
             }
@@ -100,7 +108,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
-            bool inWater = GetComponent<WaterEnterer>().InWater;
+            //bool inWater = GetComponent<WaterEnterer>().InWater;
             
             
             float speed;
@@ -108,20 +116,22 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // always move along the camera forward as it is the direction that it being aimed at
             Vector3 desiredMove = transform.forward*m_Input.z + transform.right*m_Input.x;
             
-            if(inWater) {
+            if(InWater) {
                 desiredMove += transform.up*m_Input.y;
             }
 
-            // get a normal for the surface that is being touched to move along it
-            RaycastHit hitInfo;
-            Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
-                               m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
+            if(!InWater) {
+                // get a normal for the surface that is being touched to move along it
+                RaycastHit hitInfo;
+                Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
+                                   m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
+            }
 
             m_MoveDir.x = desiredMove.x*speed;
             m_MoveDir.z = desiredMove.z*speed;
             
-            if(inWater) {
+            if(InWater) {
                 m_MoveDir.y = desiredMove.y*speed;
             }
             else {
