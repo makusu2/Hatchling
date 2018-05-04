@@ -15,10 +15,9 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
     
     public Animator HandAnimator;
     private int currentUpdate = 0;
-    [SerializeField]
-    private int hungerDecreasePeriod = 200;
-    [SerializeField]
-    private int thirstDecreasePeriod = 100;
+    private int hungerDecreasePeriod = 500;
+    private int thirstDecreasePeriod = 200;
+    private int oxygenDecreasePeriod = 20;
     
     [SerializeField]
     private AudioClip NatureSound;
@@ -63,13 +62,17 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         PlayFXAudio(audioClips[MakuUtil.rnd.Next(audioClips.Length)]);
     }
     
+    public bool HeadUnderwater = false;
+    
     public void OnHeadUnderwater() {
         PlayFXAudio(DiveUnderwaterSound);
         PlayBackgroundAudio(UnderwaterSound);
+        HeadUnderwater = true;
     }
     public void OnHeadOverwater() {
         PlayFXAudio(SurfaceUnderwaterSound);
         PlayBackgroundAudio(NatureSound);
+        HeadUnderwater = false;
     }
     
     static int scrollSensitivity = 10;
@@ -234,6 +237,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         CorrectHeldItems();
         HungerLevel = 100;
         ThirstLevel = 100;
+        OxygenLevel = 100;
         PlayBackgroundAudio(NatureSound);
 	}
     
@@ -311,6 +315,14 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         if (currentUpdate % thirstDecreasePeriod == 0) {
             ThirstLevel--;
         }
+        if(currentUpdate % oxygenDecreasePeriod == 0) {
+            if(HeadUnderwater) {
+                OxygenLevel--;
+            }
+            else {
+                OxygenLevel += 5;
+            }
+        }
         if(!Hud.UsingUI) {
             RaycastHit hit = Cam.GetRayHit();
             try {
@@ -350,6 +362,21 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
                 Die();
             }
             Hud.ThirstText.GetComponent<Text>().text = thirstLevel.ToString();
+        }
+    }
+    private int oxygenLevel;
+    public int OxygenLevel {
+        get { return oxygenLevel;}
+        set {
+            oxygenLevel = value;
+            if(oxygenLevel > 100) {
+                oxygenLevel = 100;
+            }
+            if(oxygenLevel <= 0) {
+                oxygenLevel = 0;
+                Die();
+            }
+            Hud.OxygenText.GetComponent<Text>().text = oxygenLevel.ToString();
         }
     }
     

@@ -38,7 +38,7 @@ public class HUD : MonoBehaviour {
     public GameObject CurrentChest;
     
     [System.NonSerialized]
-    public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, ChestPanel, DialoguePanel, DialogueFace, DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText;
+    public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, ChestPanel, DialoguePanel, DialogueFace, DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText, OxygenText;
     [System.NonSerialized]
     public GameObject Player, Town, Cam;
     [System.NonSerialized]
@@ -82,6 +82,7 @@ public class HUD : MonoBehaviour {
         AttackText = GameObject.FindWithTag("AttackText");
         HungerText = GameObject.FindWithTag("HungerText");
         ThirstText = GameObject.FindWithTag("ThirstText");
+        OxygenText = GameObject.FindWithTag("OxygenText");
 		infoText = GameObject.FindWithTag("InfoText");
         Town = GameObject.FindWithTag("Town");
         Inventory = Player.GetComponent<Inventory>();
