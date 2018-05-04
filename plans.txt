@@ -1,5 +1,4 @@
 Electrical system for town
-Make trees show some sort of dust or whatever when hit with a hatchet
 Bow and arrow combat
 Could we maybe only have one "special" panel; like, since you'll never have townpanel, craftingpanel, chestpanel, or traderpanel open at the same time, we could combine them all...? Would it be worth it?
 Think about what will make things easier when adding towns and shit; modularize stuff for fewest lines of code in high-level (specific NPC or whatever) scripts. 
@@ -13,6 +12,7 @@ So it looks like, we should have class variables before methods, rather than sta
 Oxygen underwater system
 Building snap system
 Have hands always show in front of objects
+Add a console
 
 Difficult to do now:
 Dragon growth stages

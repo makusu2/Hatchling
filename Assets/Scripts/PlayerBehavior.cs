@@ -11,6 +11,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
 
     public Inventory inventory;
     public HUD Hud;
+    public CameraBehavior Cam;
     
     public Animator HandAnimator;
     private int currentUpdate = 0;
@@ -18,6 +19,57 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
     private int hungerDecreasePeriod = 200;
     [SerializeField]
     private int thirstDecreasePeriod = 100;
+    
+    [SerializeField]
+    private AudioClip NatureSound;
+    [SerializeField]
+    private AudioClip UnderwaterSound;
+    [SerializeField]
+    private AudioClip DiveUnderwaterSound;
+    [SerializeField]
+    private AudioClip SurfaceUnderwaterSound;
+    [SerializeField]
+    private AudioClip ErrorSound;
+    [SerializeField]
+    private AudioClip BuildingSound;
+    [SerializeField]
+    private AudioClip CraftingSound;
+    [SerializeField]
+    private AudioClip TradingSound;
+    [SerializeField]
+    private AudioClip HurtSound;
+    [SerializeField] public AudioClip[] FootstepSounds;
+    public AudioClip JumpSound;
+    public AudioClip LandSound;
+    
+    
+    [SerializeField]
+    AudioSource backgroundAudioPlayer;
+    [SerializeField]
+    AudioSource fxAudioPlayer;
+    
+    public void PlayBackgroundAudio(AudioClip audio, bool repeat = true) {
+        backgroundAudioPlayer.clip = audio;
+        backgroundAudioPlayer.Play();
+        backgroundAudioPlayer.loop = repeat;
+    }
+    public void PlayFXAudio(AudioClip audio, bool repeat = false) {
+        fxAudioPlayer.clip = audio;
+        fxAudioPlayer.Play();
+        fxAudioPlayer.loop = repeat;
+    }
+    public void PlayFXAudio(AudioClip[] audioClips, bool repeat = false) {
+        PlayFXAudio(audioClips[MakuUtil.rnd.Next(audioClips.Length)]);
+    }
+    
+    public void OnHeadUnderwater() {
+        PlayFXAudio(DiveUnderwaterSound);
+        PlayBackgroundAudio(UnderwaterSound);
+    }
+    public void OnHeadOverwater() {
+        PlayFXAudio(SurfaceUnderwaterSound);
+        PlayBackgroundAudio(NatureSound);
+    }
     
     static int scrollSensitivity = 10;
     
@@ -167,7 +219,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         HandRight = GameObject.FindWithTag("HandRight");
         HandAnimator = HandRight.GetComponent<Animator> ();
         Hud = GetComponent<HUD>();
-        
+        Cam = GetComponentInChildren<CameraBehavior>();
         health = GetComponent<Health>();
         health.Setup(maxHealth:100,isPlayer:true, hud:Hud,deathMethod:Die);
         
@@ -181,6 +233,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         CorrectHeldItems();
         HungerLevel = 100;
         ThirstLevel = 100;
+        PlayBackgroundAudio(NatureSound);
 	}
 	
 	bool wasSuccessfulLastUpdate = false;
@@ -197,7 +250,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
             else {
                 float scrollChange = Input.GetAxis("Mouse ScrollWheel");
                 inventory.PrepareBuildObject.transform.Rotate(new Vector3(0,scrollChange*scrollSensitivity,0));
-                RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
+                RaycastHit hit = Cam.GetRayHit();
                 if(hit.collider != null && hit.collider.gameObject.CompareTag("Ground")) {
                     Vector3 newPosition = hit.point;
                     newPosition.y = newPosition.y + inventory.PrepareBuildOffset;
@@ -212,7 +265,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
             return;
         }
         if (!Hud.UsingUI && Input.GetButtonDown("Fire1")) {
-            RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
+            RaycastHit hit = Cam.GetRayHit();
             try {
                 ClickOn(hit.transform.gameObject);
             }
@@ -249,7 +302,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
             ThirstLevel--;
         }
         if(!Hud.UsingUI) {
-            RaycastHit hit = GetComponentInChildren<CameraBehavior>().GetRayHit();
+            RaycastHit hit = Cam.GetRayHit();
             try {
                 Hud.InfoStr = hit.transform.gameObject.name;
             }

@@ -5,10 +5,12 @@ using System.Linq;
 
 public class CameraBehavior : MonoBehaviour, WaterEnterer {
 
+    PlayerBehavior pb;
 	// Use this for initialization
 	void Start () {
         RenderSettings.fog = true;
         RenderSettings.fogDensity=0;
+        pb = transform.parent.GetComponent<PlayerBehavior>();
 	}
     
     static Color normalColor = new Color (0.5f, 0.5f, 0.5f, 0.5f);
@@ -24,14 +26,22 @@ public class CameraBehavior : MonoBehaviour, WaterEnterer {
         }
     }
     public void OnWaterEnter() {
+        bool wasInWater = InWater;
         InWater = true;
         RenderSettings.fogColor = underwaterColor;
         RenderSettings.fogDensity = 0.01f;
+        if(!wasInWater) {
+            pb.OnHeadUnderwater();
+        }
     }
     public void OnWaterExit() {
+        bool wasInWater = InWater;
         InWater = false;
         RenderSettings.fogColor = normalColor;
         RenderSettings.fogDensity=0;
+        if(wasInWater) {
+            pb.OnHeadOverwater();
+        }
     }
     
     public RaycastHit GetRayHit(float maxDist = Mathf.Infinity) {

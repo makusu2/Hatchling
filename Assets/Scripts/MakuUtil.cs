@@ -59,4 +59,8 @@ public class MakuUtil : MonoBehaviour {
         yield return new WaitForSeconds(.3f);
         particles.SetActive(false);
     }
+    
+    public static void ExecuteLine(string s) {
+        //TODO execute s as a command
+    }
 }
