@@ -4,12 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 using System.IO;
+using CardboardKeep;
 
 public class HUD : MonoBehaviour {
     
     public bool UsingUI;
     
     private Queue<Dialogue> dialogueQueue = new Queue<Dialogue>();
+    
+    
     
     private GameObject infoText;
     public string InfoStr {
@@ -42,6 +45,8 @@ public class HUD : MonoBehaviour {
     public Inventory Inventory;
     [System.NonSerialized]
     public CameraBehavior CamBehavior;
+    [System.NonSerialized]
+    public UConsole console;
     
     public bool CursorFree {
         get {
@@ -82,6 +87,7 @@ public class HUD : MonoBehaviour {
         Inventory = Player.GetComponent<Inventory>();
         Cam = GameObject.FindWithTag("MainCamera");
         CamBehavior = Cam.GetComponent<CameraBehavior>();
+        console = GameObject.FindWithTag("ConsolePanel").GetComponent<UConsole>();
     }
     
 	void Start () {
@@ -249,6 +255,11 @@ public class HUD : MonoBehaviour {
             TraderPanelView.SetActive(value);
             traderMenuOpen = value;
             UsingUI = value;
+        }
+    }
+    public bool ConsoleMenuOpen {
+        get {
+            return console.on;
         }
     }
 

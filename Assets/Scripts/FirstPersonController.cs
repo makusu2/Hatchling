@@ -69,6 +69,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            if(pb.MovementLocked) {
+                return;
+            }
+            
             
             if(m_MouseLook.lockCursor) { //added maku
                 RotateView();
@@ -79,14 +83,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
 
-            if (!InWater && !m_PreviouslyGrounded && m_CharacterController.isGrounded)
+            if (!InWater && !pb.noclip && !m_PreviouslyGrounded && m_CharacterController.isGrounded)
             {
                 StartCoroutine(m_JumpBob.DoBobCycle());
                 PlayLandingSound();
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
             }
-            if (!InWater && !m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
+            if (!InWater && !pb.noclip && !m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
             {
                 m_MoveDir.y = 0f;
             }
@@ -106,6 +110,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
+            if(pb.MovementLocked) {
+                return;
+            }
+            
             //bool inWater = GetComponent<WaterEnterer>().InWater;
             
             
@@ -114,11 +122,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // always move along the camera forward as it is the direction that it being aimed at
             Vector3 desiredMove = transform.forward*m_Input.z + transform.right*m_Input.x;
             
-            if(InWater) {
+            if(InWater || pb.noclip) {
                 desiredMove += transform.up*m_Input.y;
             }
 
-            if(!InWater) {
+            if(!InWater && !pb.noclip) {
                 // get a normal for the surface that is being touched to move along it
                 RaycastHit hitInfo;
                 Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
@@ -129,7 +137,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MoveDir.x = desiredMove.x*speed;
             m_MoveDir.z = desiredMove.z*speed;
             
-            if(InWater) {
+            if(InWater || pb.noclip) {
                 m_MoveDir.y = desiredMove.y*speed;
             }
             else {

@@ -33,7 +33,7 @@ namespace CardboardKeep
         string oldInputText, inputMethod;
         [HideInInspector]
         public string inputArgument; // <- public so it can be accessed by UConsoleCommands
-        bool on;
+        public bool on;
 
         void Start()
         {

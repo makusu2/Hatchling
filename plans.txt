@@ -12,7 +12,6 @@ So it looks like, we should have class variables before methods, rather than sta
 Oxygen underwater system
 Building snap system
 Have hands always show in front of objects
-Add a console
 
 Difficult to do now:
 Dragon growth stages

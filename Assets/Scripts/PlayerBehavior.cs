@@ -42,6 +42,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
     public AudioClip JumpSound;
     public AudioClip LandSound;
     
+    public bool noclip = false;
     
     [SerializeField]
     AudioSource backgroundAudioPlayer;
@@ -235,9 +236,18 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         ThirstLevel = 100;
         PlayBackgroundAudio(NatureSound);
 	}
+    
+    public bool MovementLocked {
+        get {
+            return Hud.ConsoleMenuOpen;
+        }
+    }
 	
 	bool wasSuccessfulLastUpdate = false;
 	void Update () {
+        if(Hud.ConsoleMenuOpen) {
+            return; //Console takes priority
+        }
         if (inventory.PreparingBuild) {
             if (Input.GetButtonDown("Fire1")) {
                 if(wasSuccessfulLastUpdate) {

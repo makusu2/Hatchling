@@ -2,6 +2,7 @@
 {
 	using UnityEngine;
 	using System.Collections;
+    using System;
 	/// <summary>
 	/// UConsole - A Valve-style in-game runtime command console for Unity games
 	/// Author: Calum Spring
@@ -11,11 +12,19 @@
 	/// License: You may modify these works and package them in a game release, commercial or otherwise, but you may not redistribute or resell this code, with or without modifications. This code is copyright Cardboard Keep PTY LTD and is protected by the Unity Asset Store commercial license (http://unity3d.com/legal/as_terms)
 	/// Usage: Drag the Console prefab into your scene, press tilde (~) to activate, extend or add functions to the UConsoleCommands script to make them callable from the console. Requires Unity 4.6 or higher due to use of uGUI.
 	/// </summary>
+    
+    
 	public class UConsoleCommands : MonoBehaviour
 	{
+        private GameObject player;
+        private PlayerBehavior pb;
 		protected UConsole console;
 
-		protected void Start() { console = GetComponent<UConsole>(); }
+		protected void Start() { 
+            console = GetComponent<UConsole>(); 
+            player = GameObject.FindWithTag("MainPlayer");
+            pb = player.GetComponent<PlayerBehavior>();
+        }
 
 		// Have game specific things you want to happen when the console is turned on and off? 
 		// Add them to these functions or their equivalents in your extended script
@@ -56,5 +65,24 @@
 		{
 			UConsole.NewEvent("New Function was called.");
 		}
+        public void noclip() {
+            pb.noclip = !pb.noclip;
+        }
+        
+        string itemToGive;
+        int numToGive;
+        public void give() {
+            string[] args = console.inputArgument.Split(' ');
+            itemToGive = args[0];
+            if(args.Length == 1) {
+                numToGive = 1;
+            }
+            else if (args.Length == 2) {
+                numToGive = Int32.Parse(args[1]);
+            }
+            for (int i=0;i<numToGive;i++) {
+                pb.inventory.AddItem(itemToGive);
+            }
+        }
 	}
 }
