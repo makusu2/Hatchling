@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace UnityStandardAssets.Water
 {
-    //[ExecuteInEditMode] // Make water live-update even when not in play mode
+    [ExecuteInEditMode] // Make water live-update even when not in play mode
     public class Water : MonoBehaviour
     {
         public bool IsBottomWater = false; //Might not be used
@@ -15,6 +15,19 @@ namespace UnityStandardAssets.Water
             Reflective = 1,
             Refractive = 2,
         };
+        
+        private Renderer ren;
+        public Renderer Ren {
+            get {
+                if (ren == null) {
+                    ren = GetComponent<Renderer>();
+                }
+                return ren;
+            }
+            set {
+                ren = value;
+            }
+        }
         
         Dictionary<WaterEnterer,int> waterEnterersCurrentlyContained = new Dictionary<WaterEnterer,int>();
         void OnTriggerEnter(Collider col) {
@@ -79,10 +92,12 @@ namespace UnityStandardAssets.Water
         // camera will just work!
         public void OnWillRenderObject()
         {
-            if (!enabled || !GetComponent<Renderer>() || !GetComponent<Renderer>().sharedMaterial ||
-                !GetComponent<Renderer>().enabled)
+            if (!enabled || !Ren || !Ren.sharedMaterial || !Ren.enabled)
             {
                 return;
+            }
+            if(!Ren.isVisible) {
+                print("Ren isn't visible but passed other tests");
             }
 
             Camera cam = Camera.current;
@@ -149,10 +164,11 @@ namespace UnityStandardAssets.Water
                 reflectionCamera.transform.position = newpos;
                 Vector3 euler = cam.transform.eulerAngles;
                 reflectionCamera.transform.eulerAngles = new Vector3(-euler.x, euler.y, euler.z);
+                //print("Water stuff 1: "+reflectionCamera.transform.eulerAngles.ToString());
                 reflectionCamera.Render();
                 reflectionCamera.transform.position = oldpos;
                 GL.invertCulling = oldCulling;
-                GetComponent<Renderer>().sharedMaterial.SetTexture("_ReflectionTex", m_ReflectionTexture);
+                Ren.sharedMaterial.SetTexture("_ReflectionTex", m_ReflectionTexture);
             }
 
             // Render refraction
@@ -173,7 +189,7 @@ namespace UnityStandardAssets.Water
                 refractionCamera.transform.position = cam.transform.position;
                 refractionCamera.transform.rotation = cam.transform.rotation;
                 refractionCamera.Render();
-                GetComponent<Renderer>().sharedMaterial.SetTexture("_RefractionTex", m_RefractionTexture);
+                Ren.sharedMaterial.SetTexture("_RefractionTex", m_RefractionTexture);
             }
 
             // Restore pixel light count
@@ -236,11 +252,11 @@ namespace UnityStandardAssets.Water
         // old cards to make water texture scroll.
         void Update()
         {
-            if (!GetComponent<Renderer>())
+            if (!Ren)
             {
                 return;
             }
-            Material mat = GetComponent<Renderer>().sharedMaterial;
+            Material mat = Ren.sharedMaterial;
             if (!mat)
             {
                 return;
@@ -382,12 +398,12 @@ namespace UnityStandardAssets.Water
 
         WaterMode FindHardwareWaterSupport()
         {
-            if (!GetComponent<Renderer>())
+            if (!Ren)
             {
                 return WaterMode.Simple;
             }
 
-            Material mat = GetComponent<Renderer>().sharedMaterial;
+            Material mat = Ren.sharedMaterial;
             if (!mat)
             {
                 return WaterMode.Simple;

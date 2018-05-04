@@ -9,7 +9,6 @@ Scripts should be in your own language, bash-style; C# should allow the file to 
 GetComponent<Renderer>().isVisible returns true if the object is in view of the camera
 Use profiler window to find what's using processing power
 So it looks like, we should have class variables before methods, rather than static method variables. This is a lot faster cuz of garbage collection.
-Oxygen underwater system
 Building snap system
 Have hands always show in front of objects
 

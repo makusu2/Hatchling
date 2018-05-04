@@ -32,6 +32,8 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
     
     protected UnityEngine.AI.NavMeshAgent nav;
     
+    protected EnemyFinder enemyFinder;
+    
     protected ContainerCls container;
     
     protected Animator ani;
@@ -88,7 +90,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
     
     protected void UpdateTargetFood() {
         if(targetFood == null) {
-            targetFood = GetComponent<EnemyFinder>().GetClosestFood();
+            targetFood = enemyFinder.GetClosestFood();
         }
     }
     protected void UpdateTargetEnemy() {
@@ -98,7 +100,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
             }
         }
         if (targetEnemy == null) {
-            targetEnemy = GetComponent<EnemyFinder>().GetClosestEnemy();
+            targetEnemy = enemyFinder.GetClosestEnemy();
         }
     }
     
@@ -187,6 +189,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
         this.Fac = fac;
         this.delayedUpdateFrameDelay = delayedUpdateFrameDelay;
         this.delayedUpdateFrameDelayIndex = MakuUtil.rnd.Next(this.delayedUpdateFrameDelay);
+        enemyFinder = GetComponent<EnemyFinder>();
     }
     
     
@@ -356,7 +359,7 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
         float minEquivDist = 1;
         int minHeatLevel = 1;
         Func<GameObject,bool> qualFunc = (GameObject go) => go.GetComponent<Heated>() != null && go.GetComponent<Heated>().HeatLevel >= minHeatLevel;
-        IEnumerable<GameObject> fireyGOs = GetComponent<EnemyFinder>().GetNearbyWithProp(qualFunc, requiredDist:maxDist);
+        IEnumerable<GameObject> fireyGOs = enemyFinder.GetNearbyWithProp(qualFunc, requiredDist:maxDist);
         float totalHeat = 0;
         foreach (GameObject fireyGO in fireyGOs) {
             float dist = Math.Max(minEquivDist,Vector3.Distance(transform.position,fireyGO.transform.position));
@@ -422,30 +425,6 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
             
         }
     }
-    
-    /*protected void OnCollisionEnter(Collision col) {
-        if(col.gameObject.CompareTag("Ground")) {
-            SwitchToNav();
-        }
-    }
-    protected void OnCollisionExit(Collision col) {
-        if(col.gameObject.CompareTag("Ground")) {
-            SwitchToRigidbody();
-        }
-    }
-    
-    protected void SwitchToRigidbody() {
-        GetComponent<Rigidbody>().useGravity = true;
-        GetComponent<Rigidbody>().isKinematic = false;
-        nav.enabled = false;
-    }
-    protected void SwitchToNav() {
-        Vector3 prevPos = transform.position;
-        GetComponent<Rigidbody>().useGravity = false;
-        GetComponent<Rigidbody>().isKinematic = true;
-        nav.enabled = true;
-        transform.position = prevPos;
-    }*/
     
     
     

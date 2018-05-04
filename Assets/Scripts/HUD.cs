@@ -14,31 +14,36 @@ public class HUD : MonoBehaviour {
     
     
     
-    private GameObject infoText;
+    private Text infoText;
     public string InfoStr {
         get {
-            return infoText.GetComponent<Text>().text;
+            return infoText.text;
         }
         set {
-            infoText.GetComponent<Text>().text = value;
+            infoText.text = value;
         }
     }
     
     public void SetHealthStat(int healthStat) {
-        HealthText.GetComponent<Text>().text = healthStat.ToString();
+        HealthText.text = healthStat.ToString();
     }
     public void SetDefenseStat(int defenseStat) {
-        DefenseText.GetComponent<Text>().text = defenseStat.ToString();
+        DefenseText.text = defenseStat.ToString();
     }
     public void SetAttackStat(int attackStat) {
-        AttackText.GetComponent<Text>().text = attackStat.ToString();
+        AttackText.text = attackStat.ToString();
+    }
+    public void SetHungerStat(int hungerStat) {
+        HungerText.text = hungerStat.ToString();
     }
     
     public GameObject CurrentTrader;
     public GameObject CurrentChest;
     
     [System.NonSerialized]
-    public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, ChestPanel, DialoguePanel, DialogueFace, DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText, OxygenText;
+    public GameObject InventoryPanel, ExtraInventoryPanel, CraftingPanel, CraftingPanelView, TraderPanel, TraderPanelView, BuildingPanel, BuildingPanelView, PausePanel, ArmorPanel, TownPanel, ChestPanel, DialoguePanel, DialogueFace;
+    [System.NonSerialized]
+    public Text DialogueText, HealthText, DefenseText, AttackText, HungerText, ThirstText, OxygenText;
     [System.NonSerialized]
     public GameObject Player, Town, Cam;
     [System.NonSerialized]
@@ -47,6 +52,8 @@ public class HUD : MonoBehaviour {
     public CameraBehavior CamBehavior;
     [System.NonSerialized]
     public UConsole console;
+    [System.NonSerialized]
+    public UnityStandardAssets.Characters.FirstPerson.FirstPersonController FPC;
     
     public bool CursorFree {
         get {
@@ -55,7 +62,7 @@ public class HUD : MonoBehaviour {
         set {
             Cursor.lockState = value?CursorLockMode.None:CursorLockMode.Locked;
             Cursor.visible = value;
-            gameObject.GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController> ().m_MouseLook.lockCursor = !value;
+            FPC.m_MouseLook.lockCursor = !value;
         }
     }
     
@@ -76,19 +83,20 @@ public class HUD : MonoBehaviour {
         ChestPanel = GameObject.FindWithTag("ChestPanel");
         DialoguePanel = GameObject.FindWithTag("DialoguePanel");
         DialogueFace = GameObject.FindWithTag("DialogueFace");
-        DialogueText = GameObject.FindWithTag("DialogueText");
-        HealthText = GameObject.FindWithTag("HealthText");
-        DefenseText = GameObject.FindWithTag("DefenseText");
-        AttackText = GameObject.FindWithTag("AttackText");
-        HungerText = GameObject.FindWithTag("HungerText");
-        ThirstText = GameObject.FindWithTag("ThirstText");
-        OxygenText = GameObject.FindWithTag("OxygenText");
-		infoText = GameObject.FindWithTag("InfoText");
+        DialogueText = GameObject.FindWithTag("DialogueText").GetComponent<Text>();
+        HealthText = GameObject.FindWithTag("HealthText").GetComponent<Text>();
+        DefenseText = GameObject.FindWithTag("DefenseText").GetComponent<Text>();
+        AttackText = GameObject.FindWithTag("AttackText").GetComponent<Text>();
+        HungerText = GameObject.FindWithTag("HungerText").GetComponent<Text>();
+        ThirstText = GameObject.FindWithTag("ThirstText").GetComponent<Text>();
+        OxygenText = GameObject.FindWithTag("OxygenText").GetComponent<Text>();
+		infoText = GameObject.FindWithTag("InfoText").GetComponent<Text>();
         Town = GameObject.FindWithTag("Town");
         Inventory = Player.GetComponent<Inventory>();
         Cam = GameObject.FindWithTag("MainCamera");
         CamBehavior = Cam.GetComponent<CameraBehavior>();
         console = GameObject.FindWithTag("ConsolePanel").GetComponent<UConsole>();
+        FPC = GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController> ();
     }
     
 	void Start () {
