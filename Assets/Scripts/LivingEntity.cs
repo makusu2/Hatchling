@@ -199,10 +199,10 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
     
     int fixedUpdateCount = 0;
     protected virtual void FixedUpdate() {
-        fixedUpdateCount++;
-        if(fixedUpdateCount%this.delayedUpdateFrameDelay == this.delayedUpdateFrameDelayIndex) {
+        if(fixedUpdateCount == 0 || fixedUpdateCount%this.delayedUpdateFrameDelay == this.delayedUpdateFrameDelayIndex) {
             DelayedUpdate();
         }
+        fixedUpdateCount++;
         //GetComponent<Rigidbody>().AddForce(9.8f*Time.deltaTime*-Vector3.up);
         //nav.velocity = nav.velocity + GetComponent<Rigidbody>().velocity;
     }
@@ -218,6 +218,8 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
         Vector3 newPos = spawnPoint;
         newPos.x += xDif;
         newPos.z += zDif;
+        float heightDiff = Terrain.activeTerrain.SampleHeight(new Vector3(newPos.x,0,newPos.z));
+        newPos.y = Terrain.activeTerrain.transform.position.y+heightDiff;
         return newPos;
     }
     protected enum aniActions{Unknown,Idle,Walking,Running,Dead,Attacking};
@@ -279,11 +281,11 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
     }
     
    
-    protected virtual void SetDestination(Vector3 position, bool isRunning = true) {
+    protected virtual void SetDestination(Vector3 dest, bool isRunning = true) {
         if(!nav.enabled) {
             return;
         }
-        nav.destination = position;
+        nav.destination = dest;
         float distToDest = DistToDest();
         bool closeEnough = distToDest < distToAttack;
         if(closeEnough) {
@@ -300,6 +302,17 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
                 aniAction = aniActions.Walking;
             }
         }
+        UnityEngine.AI.NavMeshPath path = new UnityEngine.AI.NavMeshPath();
+        UnityEngine.AI.NavMesh.CalculatePath(transform.position,nav.destination, UnityEngine.AI.NavMesh.AllAreas, path);
+        
+        for (int i = 0; i < path.corners.Length - 1; i++)
+         {
+             Vector3 corn1 = path.corners[i];
+            Vector3 corn2= path.corners[i+1];
+            corn1 = new Vector3(corn1.x,corn1.y+1,corn1.z);
+            corn2 = new Vector3(corn2.x,corn2.y+1,corn2.z);
+             Debug.DrawLine(corn1,corn2, Color.red,10);
+         }
     }
     
     protected void TurnToward(GameObject destGO) {
@@ -337,6 +350,9 @@ public class LivingEntity : MonoBehaviour, ContainerInt, WaterEnterer{
      }
     protected float DistToDest() {
         Vector3 closestBodyPoint = hitbox.ClosestPointOnBounds(nav.destination);
+        /*print("Pos: "+transform.position.ToString());
+        print("Closest body point: "+closestBodyPoint.ToString());
+        print("Dest: "+nav.destination.ToString());*/
         return Vector3.Distance(closestBodyPoint, nav.destination);
     }
     protected float DistToGO(GameObject other) {

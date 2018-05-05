@@ -26,6 +26,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private CurveControlledBob m_HeadBob = new CurveControlledBob();
         [SerializeField] private LerpControlledBob m_JumpBob = new LerpControlledBob();
         [SerializeField] private float m_StepInterval;
+        
+        public float WalkSpeed {
+            get { return m_WalkSpeed;}
+            set { m_WalkSpeed = value;}
+        }
+        public float RunSpeed {
+            get { return m_RunSpeed;}
+            set { m_RunSpeed = value;}
+        }
 
         private Camera m_Camera;
         private bool m_Jump;

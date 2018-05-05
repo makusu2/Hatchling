@@ -84,5 +84,12 @@
                 pb.inventory.AddItem(itemToGive);
             }
         }
+        public void setspeed() {
+            int speed = Int32.Parse(console.inputArgument);
+            pb.RunSpeed = (float)speed;
+        }
+        public void tgm() {
+            pb.godmode = !pb.godmode;
+        }
 	}
 }

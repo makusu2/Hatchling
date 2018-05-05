@@ -10,6 +10,8 @@ public class Health : MonoBehaviour {
 
     public int maxHealth;
     
+    public bool godmode = false;
+    
     public bool IsPlayer;
     
     public Action deathMethod;
@@ -21,6 +23,9 @@ public class Health : MonoBehaviour {
     public float health {
         get{return currentHealth;}
         set {
+            if(godmode) {
+                return;
+            }
             if(value<=0) {
                 currentHealth = 0;
                 if(IsPlayer) {

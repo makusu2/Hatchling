@@ -27,7 +27,7 @@ public class WolfBehavior : LivingEntity {
 	}
     
     
-    
+    bool roamPathWasComplete = false;
     protected override void FixedUpdate() {
         base.FixedUpdate();
         if (IsDead) {
@@ -59,6 +59,16 @@ public class WolfBehavior : LivingEntity {
                 }
             }
         }
+        bool roamPathIsComplete = AtDestination();
+        if(roamPathIsComplete && !roamPathWasComplete) {
+            OnArriveRoam();
+        }
+        roamPathWasComplete = roamPathIsComplete;
+        
+    }
+    
+    bool AtDestination() {
+        return nav.remainingDistance <= 1;
     }
     
     protected override void DelayedUpdate() {
@@ -70,6 +80,12 @@ public class WolfBehavior : LivingEntity {
     
     bool CanBeginAttack() {
         return Time.time - lastAttackTime > cooldownTime && aniAction != aniActions.Attacking;
+    }
+    
+    void OnArriveRoam() {
+        if(targetEnemy == null) {
+            ContinueRoaming();
+        }
     }
     
         

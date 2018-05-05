@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 using UnityEditor;
+using UnityStandardAssets.Characters.FirstPerson;
 
 
 public class PlayerBehavior : MonoBehaviour, WaterEnterer {
@@ -42,6 +43,9 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
     public AudioClip LandSound;
     
     public bool noclip = false;
+    public bool godmode {get { return health.godmode;} set { health.godmode = value;}}
+    
+    FirstPersonController fpc;
     
     [SerializeField]
     AudioSource backgroundAudioPlayer;
@@ -73,6 +77,15 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         PlayFXAudio(SurfaceUnderwaterSound);
         PlayBackgroundAudio(NatureSound);
         HeadUnderwater = false;
+    }
+    
+    public float WalkSpeed {
+        get { return fpc.WalkSpeed;}
+        set { fpc.WalkSpeed = value;}
+    }
+    public float RunSpeed {
+        get { return fpc.RunSpeed;}
+        set { fpc.RunSpeed = value;}
     }
     
     static int scrollSensitivity = 10;
@@ -226,6 +239,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
         Cam = GetComponentInChildren<CameraBehavior>();
         health = GetComponent<Health>();
         health.Setup(maxHealth:100,isPlayer:true, hud:Hud,deathMethod:Die);
+        fpc = GetComponent<FirstPersonController>();
         
     }
 	// Use this for initialization
