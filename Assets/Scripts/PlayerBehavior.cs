@@ -21,23 +21,23 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
     private int oxygenDecreasePeriod = 20;
     
     [SerializeField]
-    private AudioClip NatureSound;
+    public AudioClip NatureSound;
     [SerializeField]
-    private AudioClip UnderwaterSound;
+    public AudioClip UnderwaterSound;
     [SerializeField]
-    private AudioClip DiveUnderwaterSound;
+    public AudioClip DiveUnderwaterSound;
     [SerializeField]
-    private AudioClip SurfaceUnderwaterSound;
+    public AudioClip SurfaceUnderwaterSound;
     [SerializeField]
-    private AudioClip ErrorSound;
+    public AudioClip ErrorSound;
     [SerializeField]
-    private AudioClip BuildingSound;
+    public AudioClip BuildingSound;
     [SerializeField]
-    private AudioClip CraftingSound;
+    public AudioClip CraftingSound;
     [SerializeField]
-    private AudioClip TradingSound;
+    public AudioClip TradingSound;
     [SerializeField]
-    private AudioClip HurtSound;
+    public AudioClip HurtSound;
     [SerializeField] public AudioClip[] FootstepSounds;
     public AudioClip JumpSound;
     public AudioClip LandSound;
@@ -270,6 +270,7 @@ public class PlayerBehavior : MonoBehaviour, WaterEnterer {
             if (Input.GetButtonDown("Fire1")) {
                 if(wasSuccessfulLastUpdate) {
                     inventory.CompleteBuildItem();
+                    PlayFXAudio(BuildingSound);
                 }
                 else {
                     //play failure sound

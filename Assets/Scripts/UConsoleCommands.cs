@@ -74,6 +74,7 @@
         public void give() {
             string[] args = console.inputArgument.Split(' ');
             itemToGive = args[0];
+            itemToGive = char.ToUpper(itemToGive[0]) + itemToGive.Substring(1);
             if(args.Length == 1) {
                 numToGive = 1;
             }

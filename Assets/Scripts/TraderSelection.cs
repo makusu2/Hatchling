@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TraderSelection : MonoBehaviour {
 
     private GameObject player;
+    private PlayerBehavior pb;
     //private HUD hud;
     private TraderBehavior traderBehavior;
     
@@ -23,17 +24,9 @@ public class TraderSelection : MonoBehaviour {
     
     void Awake() {
         player = GameObject.FindWithTag("MainPlayer");
+        pb = player.GetComponent<PlayerBehavior>();
         //hud = player.GetComponent<HUD>();
     }
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
     
     public void Setup(string itemName, int coinValue, bool playerIsBuying, TraderBehavior traderBehavior) {
         this.itemName = itemName;
@@ -59,13 +52,14 @@ public class TraderSelection : MonoBehaviour {
             Debug.LogError("Player was able to click on trade button but doesn't have the stuff necessary");
         }
         if(playerIsBuying) {
-            player.GetComponent<PlayerBehavior>().Money -= coinValue;
-            player.GetComponent<PlayerBehavior>().inventory.AddItem(itemName);
+            pb.Money -= coinValue;
+            pb.inventory.AddItem(itemName);
         }
         else {
-            player.GetComponent<PlayerBehavior>().inventory.RemoveItem(itemName);
-            player.GetComponent<PlayerBehavior>().Money += coinValue;
+            pb.inventory.RemoveItem(itemName);
+            pb.Money += coinValue;
         }
+        pb.PlayFXAudio(pb.TradingSound);
         traderBehavior.UpdateStock();
     }
 }

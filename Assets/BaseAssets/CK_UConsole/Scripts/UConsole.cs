@@ -71,8 +71,12 @@ namespace CardboardKeep
 
                     string[] splitInput = inputField.text.Split();
                     inputMethod = splitInput[0];
-                    if (splitInput.Length > 1) inputArgument = splitInput[1];
-
+                    if (splitInput.Length > 1) {
+                        inputArgument = splitInput[1];
+                        for(int i=2;i<splitInput.Length;i++) {
+                            inputArgument += " "+splitInput[i];
+                        }
+                    }
                     foreach (MethodInfo m in methods)
                     {
                         if (m.Name.Contains(inputMethod))

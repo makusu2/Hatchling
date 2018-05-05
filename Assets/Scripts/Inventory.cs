@@ -29,6 +29,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
     public Dictionary<string,GameObject> VisibleBoxes {get {return visibleBoxes;}}
     
     private GameObject player;
+    private PlayerBehavior pb;
     
     private HUD hud;
     
@@ -205,6 +206,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
 	// Use this for initialization
 	void Start () {
         player = GameObject.FindWithTag("MainPlayer");
+        pb = player.GetComponent<PlayerBehavior>();
         craftingRecipes = MakuUtil.LoadRecipeFile("Assets/SettingsFiles/CraftingRecipes.txt");
         buildingRecipes = MakuUtil.LoadRecipeFile("Assets/SettingsFiles/BuildingRecipes.txt");
         hud = player.GetComponent<HUD>();
@@ -218,6 +220,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
     
     public void AddItem(string name) {
         //TODO make sure that if the item exists in extra, it goes to extra, not normal
+        name = char.ToUpper(name[0]) + name.Substring(1);
         if (!itemOrder.Contains(name)) {
             itemOrder.AddLast(name);
         }
@@ -297,6 +300,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
                     RemoveItem(ingredient);
                 }
         }
+        pb.PlayFXAudio(pb.CraftingSound);
         AddItem(name);
         UpdateCraftingRecipes();
     }
