@@ -59,6 +59,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
     }
     
     
+    
     public void CreateIcons() { /*C# is fucking stupid*/}
     public void DestroyIcons() { /*C# is fucking stupid*/}
     
@@ -156,12 +157,6 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
             DiscardItem(name);
             return;
         }
-        try {
-            visibleBoxes[name].transform.SetParent(hud.ExtraInventoryPanel.transform);
-        }
-        catch(KeyNotFoundException) {
-            Debug.LogError("Tried moving "+name+" from normal to extra inventory, but visibleBoxes didn't contain "+name+".");
-        }
         itemOrder.Remove(name);
         SettleSelectedItem();
     }
@@ -208,6 +203,7 @@ public class Inventory : MonoBehaviour, ItemHolderInt {
         player = GameObject.FindWithTag("MainPlayer");
         pb = player.GetComponent<PlayerBehavior>();
         craftingRecipes = MakuUtil.LoadRecipeFile("Assets/SettingsFiles/CraftingRecipes.txt");
+        
         buildingRecipes = MakuUtil.LoadRecipeFile("Assets/SettingsFiles/BuildingRecipes.txt");
         hud = player.GetComponent<HUD>();
         hud.InventoryMenuOpen = false;

@@ -43,6 +43,50 @@ public class MakuUtil : MonoBehaviour {
         return(recipes);
     }
     
+    /*public static Dictionary<string,Item> LoadItems() {
+        string path = "Assets/Scripts/Items.yml";
+        StreamReader reader = new StreamReader(path);
+        Dictionary<string,Item> items = new Dictionary<string,Item>();
+        string nextLine = reader.ReadLine();
+        while(nextLine != null) {
+            //int level = nextLine.TakeWhile(Char.IsWhiteSpace).Count();
+            nextLine = nextLine.Trim();
+            int separationIndex = nextLine.IndexOf(':');
+            string simpleName = nextLine.Substring(separationIndex);
+            items[simpleName] = Item;
+            items[simpleName].simpleName = simpleName;
+            
+            nextLine = reader.ReadLine();
+            while(nextLine != null && nextLine.TakeWhile(Char.IsWhiteSpace).Count() == 1) {
+                nextLine = nextLine.Trim();
+                int separationIndex = nextLine.IndexOf(": ");
+                string propName = nextLine.Split(": ")[0].Trim();
+                string propVal = nextLine.Substring(separationIndex+2,nextLine.Length).Replace("\"","").Trim();
+                
+                if(propName == "itemType") {
+                    items[simpleName].itemType = propVal;
+                }
+                else if (propName == "nameUppercased") {
+                    items[simpleName].nameUppercased = propVal;
+                }
+                else if (propName == "ingredients") {
+                    propVal = propVal.Replace("{","").Replace("}","").Trim();
+                    string[] ingredientPairs = propVal.Split(", ");
+                    Dictionary<string, int> ingredients = new Dictionary<string,int>();
+                    foreach(string ingredientPair in ingredientPairs) {
+                        string component = ingredientPair.Split(": ")[0];
+                        int count = Int32.ParseInt(ingredientPair.Split(": ")[1]);
+                        ingredients[component] = count;
+                    }
+                    items[simpleName].ingredients = ingredients;
+                }
+                
+                
+                nextLine = reader.ReadLine();
+            }
+        }
+    }*/
+    
     public static void PlayBloodAtPoint(Vector3 position) {
        PlayParticlesAtPoint("Blood",position);
     }

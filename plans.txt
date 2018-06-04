@@ -9,6 +9,10 @@ Scripts should be in your own language, bash-style; C# should allow the file to 
 So it looks like, we should have class variables before methods, rather than static method variables. This is a lot faster cuz of garbage collection.
 Building snap system
 Have hands always show in front of objects
+Add some sort of test armor
+	Actually, it'll be easier if we figure out a better system for items first
+	!!!! You have the item reading method in MakuUtil; transfer other stuff into that
+Make the map be based off the US maybe; the forts in the civil war would be the forts from the civil war? That could be cool
 
 Difficult to do now:
 Dragon growth stages

@@ -5,25 +5,18 @@ using System;
 
 public class MiningRock : MonoBehaviour {
 
-    public int MaxStone = 10;
-    public int MaxSteel = 2;
-    public int RespawnTime = 20;
+    public static int MaxStone = 10;
+    public static int MaxSteel = 2;
+    public static int RespawnTime = 20;
     
-    private int currentStone;
-    private int currentSteel;
+    private int currentStone = MaxStone;
+    private int currentSteel = MaxSteel;
     
-    private GameObject player;
+    private static GameObject player;
     
 	// Use this for initialization
 	void Start () {
-		currentStone = MaxStone;
-        currentSteel = MaxSteel;
-        player = GameObject.FindWithTag("MainPlayer");
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+        player = player??GameObject.FindWithTag("MainPlayer");
 	}
     
     void Disappear() {
