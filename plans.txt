@@ -1,7 +1,20 @@
+Rewrite:
+Extremely low quality models. Make it look like a child drew it (draw it yourself).
+
+
+
+
+
+
+
+
+
+
+
 Electrical system for town
 Bow and arrow combat
 Could we maybe only have one "special" panel; like, since you'll never have townpanel, craftingpanel, chestpanel, or traderpanel open at the same time, we could combine them all...? Would it be worth it?
-Think about what will make things easier when adding towns and shit; modularize stuff for fewest lines of code in high-level (specific NPC or whatever) scripts. 
+Think about what will make things easier when adding towns and shit; modularize stuff for fewest lines of code in high-level (specific NPC or whatever) scripts.
 	Especially for dialogue
 Map and map markers (use navmeshagent to show player path to destination)
 Scripts should be in your own language, bash-style; C# should allow the file to be attached and maybe run each file in fixedupdate
@@ -62,10 +75,10 @@ Growth:
         Heavy breathing
         Clearly struggling
 
-        
-        
-        
-        
+
+
+
+
 Old Dragon growth:
     Stage 0:
         Egg
@@ -148,7 +161,7 @@ Add scroll bar to menus that can run out of room
 Alright, what if we have this guy who's like "Gimme stuff I wanna build a town" and then you can just "deposit" stuff and eventually houses will appear and stuff?
     Eventually he builds a trading post where people trade like 80 apples for 100 wood or whatever
     So, what's the best way of doing it? Should he say "I need 70 bricks" or whatever, or should you just deposit stuff? Or, should it be like the crafting system, where possible builds appear when you talk to them?
-    
+
 Use navmeshpath and calculatepath for pathfinding (stops from getting stuck)
 Pause menu
 
@@ -165,7 +178,7 @@ Hunger and thirst system
 
 Okay, so let's have a "Toolkit" item, and if you use it, it opens the building menu
     But this is not for houses or anything, just small walls that the user can make with what they choose; the other guy is for villages
-    
+
 Maybe each item should be a class; contains the inventory icon and 3d object and stuff like that
     So, GameItem should extend MonoBehavior, and have different methods; also probably add a few interfaces
     GameItems:
@@ -210,7 +223,7 @@ Alright, graphic talk; fuckin, equipped items...
     Do I want to have the same hand position no matter the item?
         Left hand stays same, right hand changes for objects
     Should there be an actual item that's a subclass of the player, or should there just be a mesh that's a component of the hands or something?
-    
+
 
 Have items combine if near others of the same type
     Or don't
@@ -220,12 +233,10 @@ Have items combine if near others of the same type
 I really want to make the inventory standalone...
 
 Better hand model
-    
+
 Maybe make dying enemies ragdoll like in TES, and have player "activate" them to loot
 Look up how to use unity in a more script-y manner rather than GUI-y
 	Just do addcomponent rather than adding in editor
-    
+
 
 Maybe switch animations to ani.Play rather than using transitions
-
-        
