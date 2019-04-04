@@ -1,6 +1,11 @@
 Rewrite:
 Extremely low quality models. Make it look like a child drew it (draw it yourself).
-
+What is your goal?
+    *Advanced programming
+    *2D? Seems too easy...
+    *Combat: Should we be caring about collisions, or should the hit be decided immediately on swing? We can make the swing crazy fast and that'd be cool. We can also keep collisions for limited-life projectiles.
+    *Linear maybe. No open world.
+    *What if it's a Renpy script? 
 
 
 
